@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass - AI Governance. Risk Clarity.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #030b1e;
+      --navy-card:   #07163a;
+      --navy-lift:   #0c2050;
+      --blue:        #4082E8;
+      --blue-dark:   #2d64c4;
+      --teal:        #33CDB6;
+      --teal-dark:   #22a89a;
+      --med-blue:    #423E74;
+      --orange:      #FF8020;
+      --gray-light:  #D0D4E2;
+      --white:       #F6F7F7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--navy);
+      font-family: 'Inter', sans-serif;
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── Starfield canvas ── */
+    #star-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Noise grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── Typography ── */
+    .font-heading { font-family: 'Montserrat', sans-serif; }
+    .font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Layout ── */
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 2rem; }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(64,130,232,0.25) 30%, rgba(51,205,182,0.2) 70%, transparent 100%);
+      margin: 0 2rem;
+    }
+
+    /* ────────────────────────────────────────
+       NAV
+    ──────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      height: 64px;
+      background: rgba(3, 11, 30, 0.88);
+      border-bottom: 1px solid rgba(64,130,232,0.12);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      text-decoration: none;
+    }
+    .nav-brand img {
+      height: 2.5rem;
+      width: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 14px rgba(64,130,232,0.3);
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .nav-brand img:hover {
+      box-shadow: 0 0 24px rgba(64,130,232,0.6);
+      transform: scale(1.04);
+    }
+    .nav-brand-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.0625rem;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+    .nav-brand-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.5625rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-top: -2px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 0.8125rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      text-decoration: none;
+      padding-bottom: 2px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .nav-links a:hover { color: var(--blue); border-bottom-color: var(--blue); }
+    .nav-right { display: flex; align-items: center; gap: 2.5rem; }
+
+    /* ────────────────────────────────────────
+       BUTTONS
+    ──────────────────────────────────────── */
+    .btn {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 0.8125rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.625rem;
+      transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      text-decoration: none;
+    }
+    .btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .btn:active { transform: translateY(1px) !important; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+      color: var(--white);
+      box-shadow: 0 4px 18px rgba(64,130,232,0.4), 0 1px 4px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.13) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 36px rgba(64,130,232,0.6), 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--gray-light);
+      border: 1px solid rgba(208,212,226,0.28);
+    }
+    .btn-outline:hover {
+      border-color: rgba(64,130,232,0.6);
+      color: var(--blue);
+      background: rgba(64,130,232,0.07);
+      transform: translateY(-2px);
+    }
+
+    .btn-lg { padding: 1rem 2.25rem; font-size: 0.875rem; }
+
+    /* ────────────────────────────────────────
+       PILLS / BADGES
+    ──────────────────────────────────────── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.6375rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .pill-teal   { background: rgba(51,205,182,0.1); border: 1px solid rgba(51,205,182,0.28); color: var(--teal); }
+    .pill-blue   { background: rgba(64,130,232,0.1); border: 1px solid rgba(64,130,232,0.28); color: var(--blue); }
+    .pill-orange { background: rgba(255,128,32,0.1); border: 1px solid rgba(255,128,32,0.28); color: var(--orange); }
+
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .dot-teal   { background: var(--teal); }
+    .dot-blue   { background: var(--blue); }
+    .dot-orange { background: var(--orange); }
+
+    /* ────────────────────────────────────────
+       CARDS
+    ──────────────────────────────────────── */
+    .card {
+      background: rgba(7,22,58,0.7);
+      border: 1px solid rgba(64,130,232,0.14);
+      border-radius: 10px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
+    }
+    .card:hover {
+      border-color: rgba(64,130,232,0.35);
+      background: rgba(7,22,58,0.9);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 30px rgba(64,130,232,0.08);
+    }
+    .card-teal { border-color: rgba(51,205,182,0.14); }
+    .card-teal:hover { border-color: rgba(51,205,182,0.35); box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 30px rgba(51,205,182,0.07); }
+
+    .card-accent { position: relative; overflow: hidden; }
+    .card-accent::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .card-accent:hover::before { transform: scaleX(1); }
+
+    /* shimmer on hover */
+    .card-shimmer { position: relative; overflow: hidden; }
+    .card-shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      transition: left 0.5s ease;
+      pointer-events: none;
+    }
+    .card-shimmer:hover::after { left: 150%; }
+
+    /* ────────────────────────────────────────
+       SECTION LABEL
+    ──────────────────────────────────────── */
+    .section-label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ────────────────────────────────────────
+       ICON BOX
+    ──────────────────────────────────────── */
+    .icon-box {
+      width: 2.875rem;
+      height: 2.875rem;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .icon-box-blue   { background: rgba(64,130,232,0.1); border: 1px solid rgba(64,130,232,0.22); }
+    .icon-box-teal   { background: rgba(51,205,182,0.1); border: 1px solid rgba(51,205,182,0.22); }
+    .icon-box-orange { background: rgba(255,128,32,0.1); border: 1px solid rgba(255,128,32,0.22); }
+
+    /* ────────────────────────────────────────
+       STEP BADGE
+    ──────────────────────────────────────── */
+    .step-badge {
+      width: 2.375rem;
+      height: 2.375rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 0.8125rem;
+      flex-shrink: 0;
+    }
+    .step-badge-blue {
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      color: white;
+      box-shadow: 0 0 18px rgba(64,130,232,0.45);
+    }
+    .step-badge-teal {
+      background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+      color: white;
+      box-shadow: 0 0 18px rgba(51,205,182,0.4);
+    }
+
+    /* ────────────────────────────────────────
+       CHECK ITEM
+    ──────────────────────────────────────── */
+    .check-icon {
+      width: 1.375rem;
+      height: 1.375rem;
+      border-radius: 50%;
+      background: rgba(51,205,182,0.12);
+      border: 1px solid rgba(51,205,182,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ────────────────────────────────────────
+       ORB
+    ──────────────────────────────────────── */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* ────────────────────────────────────────
+       DASHBOARD PREVIEW
+    ──────────────────────────────────────── */
+    .preview-wrap {
+      background: rgba(7,20,50,0.94);
+      border: 1px solid rgba(64,130,232,0.22);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 32px 90px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(64,130,232,0.06),
+        0 0 70px rgba(64,130,232,0.1);
+    }
+    .preview-titlebar {
+      background: rgba(3,11,30,0.97);
+      border-bottom: 1px solid rgba(64,130,232,0.1);
+      padding: 0.625rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .preview-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+    /* ────────────────────────────────────────
+       RISK TAGS
+    ──────────────────────────────────────── */
+    .risk-high {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--orange);
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      background: rgba(255,128,32,0.12);
+      border: 1px solid rgba(255,128,32,0.28);
+    }
+    .risk-med {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      background: rgba(64,130,232,0.12);
+      border: 1px solid rgba(64,130,232,0.28);
+    }
+
+    /* ────────────────────────────────────────
+       MOUNTAIN SILHOUETTE
+    ──────────────────────────────────────── */
+    .mountain-wrap {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      z-index: 0;
+      line-height: 0;
+    }
+    .mountain-wrap svg { display: block; width: 100%; }
+
+    /* ────────────────────────────────────────
+       ANIMATIONS
+    ──────────────────────────────────────── */
+    @keyframes float-y {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+    @keyframes pulse-opacity {
+      0%, 100% { opacity: 0.5; }
+      50%       { opacity: 1; }
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes glow-pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50%       { opacity: 0.85; transform: scale(1.06); }
+    }
+    @keyframes scan-line {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(300%); }
+    }
+    @keyframes border-glow {
+      0%, 100% { box-shadow: 0 0 16px rgba(64,130,232,0.3); }
+      50%       { box-shadow: 0 0 32px rgba(64,130,232,0.65); }
+    }
+
+    .anim-float   { animation: float-y 7s ease-in-out infinite; }
+    .anim-pulse   { animation: pulse-opacity 2.8s ease-in-out infinite; }
+    .anim-fadeup  { animation: fade-up 0.7s ease both; }
+    .anim-glow    { animation: glow-pulse 4s ease-in-out infinite; }
+    .anim-border  { animation: border-glow 3s ease-in-out infinite; }
+
+    .d1 { animation-delay: 0.1s; }
+    .d2 { animation-delay: 0.22s; }
+    .d3 { animation-delay: 0.36s; }
+    .d4 { animation-delay: 0.5s; }
+
+    /* ── Scroll-reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .reveal-delay-6 { transition-delay: 0.6s; }
+
+    /* ── Floating particle dots ── */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float-y linear infinite;
+      opacity: 0;
+    }
+
+    /* ────────────────────────────────────────
+       SCROLLBAR
+    ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: rgba(64,130,232,0.35); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(64,130,232,0.65); }
+
+    /* ── Section z-index ── */
+    section, footer, nav { position: relative; z-index: 2; }
+  </style>
+</head>
+<body>
+
+<!-- ══ Starfield Canvas ══ -->
+<canvas id="star-canvas"></canvas>
+
+
+<!-- ══════════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════════ -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-brand">
+      <img src="brand_assets/New Main Logo Project Compass Image 1.png" alt="Compass logo">
+      <div>
+        <div class="nav-brand-name">Compass</div>
+        <div class="nav-brand-sub">AI Governance</div>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#for-teams">For Teams</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.75rem;">
+        Run Assessment
+      </button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section style="position:relative;min-height:calc(100vh - 64px);display:flex;align-items:center;overflow:hidden;padding:5rem 2rem 10rem;">
+
+  <!-- Atmospheric glow orbs - like the logo bg -->
+  <div class="orb" style="width:1000px;height:1000px;top:-350px;right:-300px;background:radial-gradient(circle,rgba(30,80,200,0.18) 0%,rgba(20,60,150,0.08) 40%,transparent 70%);"></div>
+  <div class="orb" style="width:700px;height:700px;top:20%;left:-200px;background:radial-gradient(circle,rgba(51,205,182,0.08) 0%,transparent 68%);"></div>
+  <div class="orb anim-glow" style="width:500px;height:500px;top:30%;left:30%;background:radial-gradient(circle,rgba(64,130,232,0.12) 0%,transparent 68%);"></div>
+  <div class="orb" style="width:400px;height:400px;bottom:10%;right:10%;background:radial-gradient(circle,rgba(30,60,180,0.12) 0%,transparent 68%);"></div>
+
+  <!-- Horizon atmospheric glow (like logo) -->
+  <div style="position:absolute;bottom:0;left:0;right:0;height:280px;background:linear-gradient(to top,rgba(20,60,160,0.22) 0%,rgba(10,30,90,0.1) 50%,transparent 100%);pointer-events:none;z-index:0;"></div>
+
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:3;width:100%;">
+
+    <!-- Left: copy -->
+    <div>
+      <div style="margin-bottom:1.5rem;" class="anim-fadeup">
+        <span class="pill pill-teal">
+          <span class="dot dot-teal"></span>
+          NIST AI RMF Aligned
+        </span>
+      </div>
+
+      <h1 class="font-heading anim-fadeup d1" style="font-weight:900;font-size:clamp(2.625rem,4.8vw,3.875rem);line-height:1.04;letter-spacing:-0.03em;color:var(--white);margin-bottom:1.375rem;">
+        AI Governance.<br>
+        <span style="background:linear-gradient(125deg,var(--blue) 0%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Risk Clarity.</span>
+      </h1>
+
+      <p class="anim-fadeup d2" style="font-size:1.0625rem;line-height:1.78;color:var(--gray-light);margin-bottom:2.5rem;max-width:470px;">
+        Compass discovers AI tools running in your environment, maps governance gaps to the NIST AI Risk Management Framework, and produces clear dashboards for security, compliance, and leadership teams.
+      </p>
+
+      <div style="display:flex;gap:0.875rem;flex-wrap:wrap;margin-bottom:3rem;" class="anim-fadeup d3">
+        <button class="btn btn-primary btn-lg">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5L9.5 5.5H13.5L10.5 8L11.5 12.5L7.5 10.5L3.5 12.5L4.5 8L1.5 5.5H5.5L7.5 1.5Z" fill="currentColor"/></svg>
+          Run Assessment
+        </button>
+        <button class="btn btn-outline btn-lg">See How It Works</button>
+      </div>
+
+      <!-- Stats strip -->
+      <div style="display:flex;gap:2.25rem;align-items:center;" class="anim-fadeup d4">
+        <div>
+          <div class="font-heading" style="font-weight:900;font-size:2.25rem;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;">6</div>
+          <div style="font-size:0.6875rem;color:var(--gray-light);letter-spacing:0.04em;margin-top:2px;">Step Workflow</div>
+        </div>
+        <div style="width:1px;height:2.5rem;background:rgba(208,212,226,0.15);"></div>
+        <div>
+          <div class="font-heading" style="font-weight:900;font-size:2.25rem;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;">4</div>
+          <div style="font-size:0.6875rem;color:var(--gray-light);letter-spacing:0.04em;margin-top:2px;">NIST Functions</div>
+        </div>
+        <div style="width:1px;height:2.5rem;background:rgba(208,212,226,0.15);"></div>
+        <div>
+          <div class="font-heading" style="font-weight:900;font-size:2.25rem;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;">3</div>
+          <div style="font-size:0.6875rem;color:var(--gray-light);letter-spacing:0.04em;margin-top:2px;">Report Audiences</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: mock dashboard -->
+    <div class="anim-float anim-fadeup d2" style="position:relative;">
+      <div style="position:absolute;inset:-60px;border-radius:50%;background:radial-gradient(circle,rgba(64,130,232,0.14) 0%,transparent 68%);pointer-events:none;"></div>
+
+      <div class="preview-wrap anim-border">
+        <div class="preview-titlebar">
+          <div class="preview-dot" style="background:#FF6B6B;"></div>
+          <div class="preview-dot" style="background:#FFD93D;"></div>
+          <div class="preview-dot" style="background:#6BCB77;"></div>
+          <span class="font-heading" style="margin-left:0.875rem;font-size:0.625rem;font-weight:600;letter-spacing:0.1em;color:var(--gray-light);opacity:0.55;">COMPASS - RISK DASHBOARD</span>
+        </div>
+
+        <div style="padding:1.25rem;">
+          <!-- alert bar -->
+          <div style="background:rgba(255,128,32,0.07);border:1px solid rgba(255,128,32,0.22);border-radius:6px;padding:0.55rem 0.875rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+            <div class="dot dot-orange anim-pulse"></div>
+            <span class="font-heading" style="font-size:0.6375rem;font-weight:700;letter-spacing:0.08em;color:var(--orange);">3 HIGH-RISK AI TOOLS DETECTED</span>
+          </div>
+
+          <!-- stats row -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.625rem;margin-bottom:1rem;">
+            <div style="background:rgba(64,130,232,0.07);border:1px solid rgba(64,130,232,0.14);border-radius:6px;padding:0.75rem;text-align:center;">
+              <div class="font-heading" style="font-weight:800;font-size:1.5rem;color:var(--blue);">14</div>
+              <div style="font-size:0.6rem;color:var(--gray-light);opacity:0.7;margin-top:1px;">AI Tools Found</div>
+            </div>
+            <div style="background:rgba(255,128,32,0.07);border:1px solid rgba(255,128,32,0.14);border-radius:6px;padding:0.75rem;text-align:center;">
+              <div class="font-heading" style="font-weight:800;font-size:1.5rem;color:var(--orange);">8</div>
+              <div style="font-size:0.6rem;color:var(--gray-light);opacity:0.7;margin-top:1px;">Gaps Found</div>
+            </div>
+            <div style="background:rgba(51,205,182,0.07);border:1px solid rgba(51,205,182,0.14);border-radius:6px;padding:0.75rem;text-align:center;">
+              <div class="font-heading" style="font-weight:800;font-size:1.5rem;color:var(--teal);">2</div>
+              <div style="font-size:0.6rem;color:var(--gray-light);opacity:0.7;margin-top:1px;">Actions Needed</div>
+            </div>
+          </div>
+
+          <div class="font-heading" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:0.5rem;">Detected AI Tools</div>
+
+          <div style="display:flex;flex-direction:column;gap:0.375rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.625rem;background:rgba(255,128,32,0.05);border:1px solid rgba(255,128,32,0.11);border-radius:4px;">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="dot dot-orange"></div>
+                <span style="font-size:0.6875rem;color:var(--white);">ChatGPT (openai.com)</span>
+              </div>
+              <span class="risk-high">High Risk</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.625rem;background:rgba(255,128,32,0.05);border:1px solid rgba(255,128,32,0.11);border-radius:4px;">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="dot dot-orange"></div>
+                <span style="font-size:0.6875rem;color:var(--white);">GitHub Copilot</span>
+              </div>
+              <span class="risk-high">High Risk</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.625rem;background:rgba(64,130,232,0.05);border:1px solid rgba(64,130,232,0.11);border-radius:4px;">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="dot dot-blue"></div>
+                <span style="font-size:0.6875rem;color:var(--white);">Grammarly AI</span>
+              </div>
+              <span class="risk-med">Medium</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.625rem;background:rgba(51,205,182,0.04);border:1px solid rgba(51,205,182,0.1);border-radius:4px;">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="dot dot-teal"></div>
+                <span style="font-size:0.6875rem;color:var(--white);">Notion AI</span>
+              </div>
+              <span style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal);padding:0.2rem 0.55rem;border-radius:3px;background:rgba(51,205,182,0.1);border:1px solid rgba(51,205,182,0.22);">Low</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mountain silhouette -->
+  <div class="mountain-wrap">
+    <svg viewBox="0 0 1440 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <!-- Distant range -->
+      <path d="M0 220 L0 160 L60 130 L130 150 L200 110 L280 140 L360 95 L440 125 L520 80 L600 115 L680 70 L760 100 L840 60 L920 88 L1000 50 L1080 78 L1160 42 L1240 68 L1320 38 L1380 55 L1440 40 L1440 220 Z" fill="rgba(10,25,65,0.55)"/>
+      <!-- Mid range -->
+      <path d="M0 220 L0 175 L80 155 L170 170 L260 140 L350 160 L450 125 L540 148 L640 115 L730 138 L830 105 L920 128 L1020 95 L1110 118 L1200 88 L1290 108 L1380 82 L1440 95 L1440 220 Z" fill="rgba(5,15,45,0.75)"/>
+      <!-- Foreground ridge -->
+      <path d="M0 220 L0 195 L100 180 L200 192 L310 175 L420 188 L530 172 L640 184 L750 168 L860 180 L970 165 L1080 177 L1190 162 L1300 174 L1380 162 L1440 168 L1440 220 Z" fill="rgba(3,9,25,0.9)"/>
+    </svg>
+  </div>
+
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════════
+     PROBLEM
+══════════════════════════════════════════ -->
+<section style="padding:6.5rem 2rem;">
+  <div class="container">
+
+    <div style="text-align:center;margin-bottom:3.5rem;" class="reveal">
+      <div class="section-label">The Problem</div>
+      <h2 class="font-heading" style="font-weight:800;font-size:clamp(1.875rem,3vw,2.625rem);letter-spacing:-0.025em;color:var(--white);line-height:1.18;margin-bottom:1rem;">
+        AI is already in your organization.<br>You just don't know where.
+      </h2>
+      <p style="font-size:0.9375rem;color:var(--gray-light);line-height:1.78;max-width:520px;margin:0 auto;">
+        Most organizations adopt AI tools before policies, monitoring, or ownership are in place - creating hidden risk that grows quietly in the background.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.375rem;">
+
+      <div class="card card-shimmer reveal reveal-delay-1" style="padding:2rem;">
+        <div class="icon-box icon-box-blue" style="margin-bottom:1.25rem;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 3L19.5 8V14C19.5 17.6 15.8 20.8 11 21C6.2 20.8 2.5 17.6 2.5 14V8L11 3Z" stroke="#4082E8" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M11 8V11M11 13.5V14" stroke="#4082E8" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="font-heading" style="font-weight:700;font-size:1rem;color:var(--white);margin-bottom:0.625rem;">Shadow AI Usage</h3>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Employees use AI tools on company networks without IT or security team awareness - exposing sensitive data with no controls or oversight in place.</p>
+      </div>
+
+      <div class="card card-teal card-shimmer reveal reveal-delay-2" style="padding:2rem;">
+        <div class="icon-box icon-box-teal" style="margin-bottom:1.25rem;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="3" y="3" width="16" height="16" rx="2" stroke="#33CDB6" stroke-width="1.5"/>
+            <path d="M7 8H15M7 11H15M7 14H11" stroke="#33CDB6" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="font-heading" style="font-weight:700;font-size:1rem;color:var(--white);margin-bottom:0.625rem;">No Governance Framework</h3>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Without structure, organizations face unclear accountability, missing policies, and no mechanism to assess or manage AI-related risk before it escalates.</p>
+      </div>
+
+      <div class="card card-shimmer reveal reveal-delay-3" style="padding:2rem;border-color:rgba(255,128,32,0.14);">
+        <div class="icon-box icon-box-orange" style="margin-bottom:1.25rem;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 4V12M11 15V16" stroke="#FF8020" stroke-width="1.75" stroke-linecap="round"/>
+            <path d="M3 19H19L11 4L3 19Z" stroke="#FF8020" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="font-heading" style="font-weight:700;font-size:1rem;color:var(--white);margin-bottom:0.625rem;">Legal &amp; Compliance Risk</h3>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Customer data, IP, and confidential information fed into unvetted AI tools creates real legal exposure and audit liabilities that compound over time.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════ -->
+<section id="how-it-works" style="padding:6.5rem 2rem;position:relative;">
+  <div class="orb" style="width:500px;height:500px;top:10%;right:-150px;background:radial-gradient(circle,rgba(51,205,182,0.07) 0%,transparent 70%);z-index:1;"></div>
+
+  <div class="container" style="position:relative;z-index:2;">
+    <div style="text-align:center;margin-bottom:4rem;" class="reveal">
+      <div class="section-label">The Workflow</div>
+      <h2 class="font-heading" style="font-weight:800;font-size:clamp(1.875rem,3vw,2.625rem);letter-spacing:-0.025em;color:var(--white);line-height:1.18;margin-bottom:1rem;">
+        From logs to actionable reports<br>in six clear steps
+      </h2>
+      <p style="font-size:0.9375rem;color:var(--gray-light);line-height:1.78;max-width:460px;margin:0 auto;">
+        Evidence-first - every finding traces back to your log data, not employee memory.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.375rem;">
+
+      <div class="card card-shimmer reveal reveal-delay-1" style="padding:1.75rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;margin-bottom:1rem;">
+          <div class="step-badge step-badge-blue">01</div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);line-height:1.3;">Upload Logs</div>
+            <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-top:2px;">Evidence First</div>
+          </div>
+        </div>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Accept DNS, firewall, web proxy, and cloud log samples. Clear upload screen with file preview and real-time status confirmation.</p>
+      </div>
+
+      <div class="card card-shimmer reveal reveal-delay-2" style="padding:1.75rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;margin-bottom:1rem;">
+          <div class="step-badge step-badge-blue">02</div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);line-height:1.3;">Detect AI Tools</div>
+            <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-top:2px;">Log Analysis</div>
+          </div>
+        </div>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Match log activity to known AI tool domains and services. View detected tools, source logs, associated users, and confidence scores.</p>
+      </div>
+
+      <div class="card card-teal card-shimmer reveal reveal-delay-3" style="padding:1.75rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;margin-bottom:1rem;">
+          <div class="step-badge step-badge-teal">03</div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);line-height:1.3;">AI Inventory</div>
+            <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-top:2px;">Traceable Records</div>
+          </div>
+        </div>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Build a working AI tool inventory from technical evidence. Filter by tool, user, risk level, and review status with full evidence trail.</p>
+      </div>
+
+      <div class="card card-teal card-shimmer reveal reveal-delay-4" style="padding:1.75rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;margin-bottom:1rem;">
+          <div class="step-badge step-badge-teal">04</div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);line-height:1.3;">Gap Assessment</div>
+            <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-top:2px;">NIST Mapping</div>
+          </div>
+        </div>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Answer governance questions once tools are detected. Guided assessment maps findings to Govern, Map, Measure, and Manage functions.</p>
+      </div>
+
+      <div class="card card-shimmer reveal reveal-delay-5" style="padding:1.75rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;margin-bottom:1rem;">
+          <div class="step-badge step-badge-blue">05</div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);line-height:1.3;">Dashboard + Actions</div>
+            <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-top:2px;">Risk Priority</div>
+          </div>
+        </div>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Rank gaps and recommend next steps. Risk cards, priority lists, and top actions help security teams focus on what needs fixing first.</p>
+      </div>
+
+      <div class="card card-shimmer reveal reveal-delay-6" style="padding:1.75rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;margin-bottom:1rem;">
+          <div class="step-badge step-badge-blue">06</div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);line-height:1.3;">Export Reports</div>
+            <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-top:2px;">Multi-Audience</div>
+          </div>
+        </div>
+        <p style="font-size:0.8125rem;line-height:1.72;color:var(--gray-light);opacity:0.85;">Generate executive, security, and auditor PDF reports from the same findings - each tailored for what that audience needs to act on.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════════
+     FEATURES
+══════════════════════════════════════════ -->
+<section id="features" style="padding:6.5rem 2rem;position:relative;">
+  <div class="orb" style="width:500px;height:500px;bottom:-100px;left:-150px;background:radial-gradient(circle,rgba(64,130,232,0.08) 0%,transparent 70%);z-index:1;"></div>
+
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;position:relative;z-index:2;">
+
+    <!-- Left: principles -->
+    <div class="reveal">
+      <div class="section-label">Core Principles</div>
+      <h2 class="font-heading" style="font-weight:800;font-size:clamp(1.875rem,3vw,2.625rem);letter-spacing:-0.025em;color:var(--white);line-height:1.18;margin-bottom:1.375rem;">
+        Built for how<br>real teams work
+      </h2>
+      <p style="font-size:0.9375rem;color:var(--gray-light);line-height:1.78;margin-bottom:2.5rem;">
+        Compass is designed around the way security, compliance, and audit teams actually operate - with evidence, clarity, and actionable output at every step.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:1.625rem;">
+
+        <div style="display:flex;align-items:flex-start;gap:1rem;">
+          <div class="check-icon">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#33CDB6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.3rem;">Evidence First</div>
+            <div style="font-size:0.8125rem;color:var(--gray-light);line-height:1.7;opacity:0.85;">Start with DNS, firewall, and proxy logs - not employee surveys. Every inventory item links back to its source log entry.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:1rem;">
+          <div class="check-icon">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#33CDB6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.3rem;">Plain Language Throughout</div>
+            <div style="font-size:0.8125rem;color:var(--gray-light);line-height:1.7;opacity:0.85;">Risk explained in business terms first. Technical detail is available when needed - never forced on every reader.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:1rem;">
+          <div class="check-icon">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#33CDB6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.3rem;">NIST AI RMF Aligned</div>
+            <div style="font-size:0.8125rem;color:var(--gray-light);line-height:1.7;opacity:0.85;">Assessment maps to Govern, Map, Measure, and Manage. Each gap shows the NIST area, risk reason, and action item.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:1rem;">
+          <div class="check-icon">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="#33CDB6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.3rem;">Action Oriented</div>
+            <div style="font-size:0.8125rem;color:var(--gray-light);line-height:1.7;opacity:0.85;">Every high-risk finding leads to a clear next step. Block risky tools, add monitoring - and know exactly where to start.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right: report audience cards -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+      <div class="card card-accent card-shimmer reveal reveal-delay-1" style="padding:1.625rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+          <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);">Executive Report</div>
+          <span class="pill pill-orange" style="font-size:0.5875rem;">Leadership</span>
+        </div>
+        <p style="font-size:0.8125rem;color:var(--gray-light);opacity:0.85;line-height:1.68;">Business impact, legal exposure, financial risk, and top decisions. Written for leadership - no heavy technical language.</p>
+      </div>
+
+      <div class="card card-accent card-shimmer reveal reveal-delay-2" style="padding:1.625rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+          <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);">Security Report</div>
+          <span class="pill pill-blue" style="font-size:0.5875rem;">Security Team</span>
+        </div>
+        <p style="font-size:0.8125rem;color:var(--gray-light);opacity:0.85;line-height:1.68;">Missing controls, risk severity, source evidence, NIST mapping, and action priority for immediate operational response.</p>
+      </div>
+
+      <div class="card card-accent card-teal card-shimmer reveal reveal-delay-3" style="padding:1.625rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+          <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);">Auditor Report</div>
+          <span class="pill pill-teal" style="font-size:0.5875rem;">Compliance</span>
+        </div>
+        <p style="font-size:0.8125rem;color:var(--gray-light);opacity:0.85;line-height:1.68;">Assessment evidence, framework mapping, dates, scope, and structured findings - ready for formal audit documentation.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════════
+     FOR TEAMS
+══════════════════════════════════════════ -->
+<section id="for-teams" style="padding:6.5rem 2rem;">
+  <div class="container">
+
+    <div style="text-align:center;margin-bottom:3.5rem;" class="reveal">
+      <div class="section-label">Who It's For</div>
+      <h2 class="font-heading" style="font-weight:800;font-size:clamp(1.875rem,3vw,2.625rem);letter-spacing:-0.025em;color:var(--white);line-height:1.18;">
+        One platform. Every stakeholder.
+      </h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;">
+
+      <div class="card card-shimmer reveal reveal-delay-1" style="padding:1.875rem;text-align:center;">
+        <div style="width:3.5rem;height:3.5rem;border-radius:50%;background:linear-gradient(135deg,rgba(64,130,232,0.2),rgba(64,130,232,0.04));border:1px solid rgba(64,130,232,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 3L19.5 8V14C19.5 17.6 15.8 20.8 11 21C6.2 20.8 2.5 17.6 2.5 14V8L11 3Z" stroke="#4082E8" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="11" cy="12" r="2.5" stroke="#4082E8" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.375rem;">Security Lead</div>
+        <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-bottom:0.875rem;">Primary MVP User</div>
+        <p style="font-size:0.8125rem;color:var(--gray-light);opacity:0.85;line-height:1.68;">Find AI activity, review risk, and decide what to fix first - backed by full log evidence.</p>
+      </div>
+
+      <div class="card card-teal card-shimmer reveal reveal-delay-2" style="padding:1.875rem;text-align:center;">
+        <div style="width:3.5rem;height:3.5rem;border-radius:50%;background:linear-gradient(135deg,rgba(51,205,182,0.2),rgba(51,205,182,0.04));border:1px solid rgba(51,205,182,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="4" y="3" width="14" height="16" rx="2" stroke="#33CDB6" stroke-width="1.5"/>
+            <path d="M8 8H14M8 11H14M8 14H11" stroke="#33CDB6" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.375rem;">Compliance Officer</div>
+        <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);margin-bottom:0.875rem;">Policy &amp; Oversight</div>
+        <p style="font-size:0.8125rem;color:var(--gray-light);opacity:0.85;line-height:1.68;">Map AI usage against policy requirements and identify gaps before they become audit findings.</p>
+      </div>
+
+      <div class="card card-shimmer reveal reveal-delay-3" style="padding:1.875rem;text-align:center;border-color:rgba(66,62,116,0.35);">
+        <div style="width:3.5rem;height:3.5rem;border-radius:50%;background:linear-gradient(135deg,rgba(66,62,116,0.3),rgba(66,62,116,0.08));border:1px solid rgba(66,62,116,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 3L19 7V11C19 15.4 15.4 19.4 11 21C6.6 19.4 3 15.4 3 11V7L11 3Z" stroke="#9B97D4" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M8 11L10 13L14 9" stroke="#9B97D4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.375rem;">Auditor</div>
+        <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9B97D4;margin-bottom:0.875rem;">Structured Evidence</div>
+        <p style="font-size:0.8125rem;color:var(--gray-light);opacity:0.85;line-height:1.68;">Structured findings with evidence, dates, scope, and framework mapping for formal audit documentation.</p>
+      </div>
+
+      <div class="card card-shimmer reveal reveal-delay-4" style="padding:1.875rem;text-align:center;border-color:rgba(255,128,32,0.14);">
+        <div style="width:3.5rem;height:3.5rem;border-radius:50%;background:linear-gradient(135deg,rgba(255,128,32,0.2),rgba(255,128,32,0.04));border:1px solid rgba(255,128,32,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 18L7 12L11 14L15 8L19 10" stroke="#FF8020" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="19" cy="10" r="1.5" fill="#FF8020"/>
+          </svg>
+        </div>
+        <div class="font-heading" style="font-weight:700;font-size:0.9375rem;color:var(--white);margin-bottom:0.375rem;">Business Leader</div>
+        <div class="font-heading" style="font-size:0.5875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:0.875rem;">Executive View</div>
+        <p style="font-size:0.8125rem;color:var(--gray-light);opacity:0.85;line-height:1.68;">Understand business impact and legal exposure without wading through technical security reports.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════════
+     CTA
+══════════════════════════════════════════ -->
+<section style="padding:8rem 2rem;position:relative;overflow:hidden;">
+  <div class="orb anim-glow" style="width:800px;height:800px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(20,60,180,0.18) 0%,rgba(10,30,90,0.08) 45%,transparent 70%);z-index:1;"></div>
+  <div class="orb" style="width:400px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(51,205,182,0.08) 0%,transparent 68%);z-index:1;"></div>
+
+  <div class="container reveal" style="text-align:center;position:relative;z-index:3;max-width:680px;">
+
+    <img src="brand_assets/New Main Logo Project Compass Image 1.png" alt="Compass" class="anim-float" style="height:7rem;width:auto;margin:0 auto 2.25rem;display:block;border-radius:12px;box-shadow:0 0 50px rgba(64,130,232,0.55),0 20px 60px rgba(0,0,0,0.5);">
+
+    <h2 class="font-heading" style="font-weight:900;font-size:clamp(2rem,4.5vw,3.125rem);letter-spacing:-0.03em;color:var(--white);line-height:1.1;margin-bottom:1.25rem;">
+      Ready to see what AI is<br>running in your org?
+    </h2>
+    <p style="font-size:1rem;color:var(--gray-light);line-height:1.78;margin-bottom:2.75rem;max-width:480px;margin-left:auto;margin-right:auto;">
+      Upload your logs. Compass detects AI tools, maps governance gaps, and generates reports your security team and leadership can act on - all in minutes.
+    </p>
+
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;">
+      <button class="btn btn-primary btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;">Run Assessment</button>
+      <button class="btn btn-outline btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;">Export Sample Report</button>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;">
+      <span class="pill pill-teal">NIST AI RMF</span>
+      <span class="pill pill-blue">Evidence First</span>
+      <span class="pill pill-orange">Action Oriented</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer style="background:rgba(2,6,16,0.97);border-top:1px solid rgba(64,130,232,0.09);padding:2.5rem 2rem;">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
+
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <img src="brand_assets/New Main Logo Project Compass Image 1.png" alt="Compass" style="height:2rem;width:auto;opacity:0.8;border-radius:5px;">
+      <div>
+        <div class="font-heading" style="font-weight:700;font-size:0.875rem;color:var(--white);">Compass</div>
+        <div style="font-size:0.6875rem;color:var(--gray-light);opacity:0.5;">AI Governance. Risk Clarity.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
+      <span class="font-heading" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);">NIST AI RMF</span>
+      <span class="font-heading" style="font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-light);opacity:0.4;">Log Discovery - Risk Dashboards - Reporting</span>
+    </div>
+
+    <div style="font-size:0.75rem;color:var(--gray-light);opacity:0.35;">Capstone Project - MICS 2026</div>
+  </div>
+</footer>
+
+
+<script>
+// ══════════════════════════════════════════
+//  STARFIELD CANVAS
+// ══════════════════════════════════════════
+(function () {
+  const canvas = document.getElementById('star-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = document.body.scrollHeight;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); initStars(); });
+
+  const STAR_COUNT = 280;
+  let stars = [];
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x:       rand(0, canvas.width),
+        y:       rand(0, canvas.height * 0.75),
+        r:       rand(0.3, 1.8),
+        baseAlpha: rand(0.25, 0.9),
+        alpha:   rand(0.25, 0.9),
+        speed:   rand(0.003, 0.012),
+        phase:   rand(0, Math.PI * 2),
+        color:   Math.random() < 0.15 ? '#99ccff' : '#ffffff',
+      });
+    }
+  }
+  initStars();
+
+  let lastTime = 0;
+  function draw(ts) {
+    const dt = ts - lastTime;
+    lastTime = ts;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    stars.forEach(s => {
+      s.phase += s.speed;
+      s.alpha = s.baseAlpha * (0.5 + 0.5 * Math.sin(s.phase));
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = s.alpha;
+      ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+
+// ══════════════════════════════════════════
+//  SCROLL REVEAL (IntersectionObserver)
+// ══════════════════════════════════════════
+(function () {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
+
+</body>
+</html>
