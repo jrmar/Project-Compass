@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - Open Questions & Decision Brief</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #051123;
+      --blue:      #4082E8;
+      --teal:      #33CDB6;
+      --orange:    #FF8020;
+      --gray-dark: #2C3550;
+      --gray-mid:  #5A6480;
+      --gray-light:#8A92A8;
+      --gray-bg:   #F4F6FA;
+      --white:     #FFFFFF;
+      --border:    #DDE1EC;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 10pt;
+      line-height: 1.65;
+      color: var(--gray-dark);
+      background: var(--white);
+      padding: 0;
+      margin: 0;
+    }
+
+    /* ── Cover Page ── */
+    .cover {
+      background: var(--navy);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(64,130,232,0.18) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      pointer-events: none;
+    }
+
+    .cover::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(51,205,182,0.1) 0%, transparent 70%);
+      bottom: 80px; left: -100px;
+      pointer-events: none;
+    }
+
+    .cover-top {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative; z-index: 1;
+    }
+
+    .cover-logo-badge {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: rgba(64,130,232,0.2);
+      border: 1px solid rgba(64,130,232,0.4);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .cover-brand { color: #fff; }
+    .cover-brand-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 13pt;
+      letter-spacing: -0.02em;
+    }
+    .cover-brand-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 7pt;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #33CDB6;
+    }
+
+    .cover-center {
+      position: relative; z-index: 1;
+      text-align: center;
+    }
+
+    .cover-eyebrow {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 7.5pt;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #33CDB6;
+      border: 1px solid rgba(51,205,182,0.35);
+      background: rgba(51,205,182,0.08);
+      border-radius: 100px;
+      padding: 0.3rem 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .cover-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 32pt;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 1rem;
+    }
+
+    .cover-title span {
+      background: linear-gradient(125deg, #4082E8 0%, #33CDB6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cover-subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 11pt;
+      color: rgba(208,212,226,0.85);
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .cover-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative; z-index: 1;
+    }
+
+    .cover-meta {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8pt;
+      color: rgba(208,212,226,0.5);
+      letter-spacing: 0.04em;
+    }
+
+    .cover-pills {
+      display: flex; gap: 0.5rem;
+    }
+
+    .cover-pill {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 100px;
+      border: 1px solid rgba(64,130,232,0.3);
+      color: #4082E8;
+      background: rgba(64,130,232,0.08);
+    }
+
+    /* ── Document Pages ── */
+    .page {
+      padding: 2.5rem 3rem;
+      max-width: 100%;
+    }
+
+    /* ── Page Header (repeated) ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0.875rem;
+      border-bottom: 2px solid var(--navy);
+      margin-bottom: 2rem;
+    }
+
+    .page-header-left {
+      display: flex; align-items: center; gap: 0.625rem;
+    }
+
+    .page-header-mark {
+      width: 8px; height: 28px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, var(--blue), var(--teal));
+    }
+
+    .page-header-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 10pt;
+      letter-spacing: -0.01em;
+      color: var(--navy);
+    }
+
+    .page-header-doc {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 7pt;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+    }
+
+    /* ── Section Heading ── */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .section-heading:first-of-type { margin-top: 0; }
+
+    .section-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), #2d64c4);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 8.5pt;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(64,130,232,0.4);
+    }
+
+    .section-num-teal {
+      background: linear-gradient(135deg, var(--teal), #22a89a);
+      box-shadow: 0 2px 8px rgba(51,205,182,0.4);
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 13pt;
+      letter-spacing: -0.02em;
+      color: var(--navy);
+    }
+
+    .section-label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 7pt;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.2rem;
+    }
+
+    /* ── OQ Card ── */
+    .oq-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+      break-inside: avoid;
+    }
+
+    .oq-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      background: var(--gray-bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .oq-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.5pt;
+      font-weight: 500;
+      color: var(--white);
+      background: var(--navy);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .oq-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 10pt;
+      color: var(--navy);
+    }
+
+    .oq-status {
+      margin-left: auto;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .status-resolved  { background: rgba(51,205,182,0.12); border: 1px solid rgba(51,205,182,0.35); color: #1a8a7a; }
+    .status-decision  { background: rgba(64,130,232,0.1);  border: 1px solid rgba(64,130,232,0.35);  color: #2d64c4; }
+    .status-open      { background: rgba(255,128,32,0.1);  border: 1px solid rgba(255,128,32,0.35);  color: #c4640f; }
+
+    .oq-body {
+      padding: 0.875rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.875rem;
+    }
+
+    .oq-section-label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 6.5pt;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      margin-bottom: 0.3rem;
+    }
+
+    .oq-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 8.5pt;
+      line-height: 1.65;
+      color: var(--gray-dark);
+    }
+
+    .oq-rec {
+      background: rgba(64,130,232,0.05);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 5px 5px 0;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .oq-rec-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 8.5pt;
+      line-height: 1.65;
+      color: var(--gray-dark);
+    }
+
+    .oq-rec-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 6.5pt;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 0.25rem;
+    }
+
+    .oq-full {
+      grid-column: 1 / -1;
+    }
+
+    /* ── Question Table ── */
+    .q-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 8.5pt;
+      break-inside: avoid;
+    }
+
+    .q-table thead tr {
+      background: var(--navy);
+      color: white;
+    }
+
+    .q-table thead th {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 7pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+    }
+
+    .q-table tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .q-table tbody tr:nth-child(even) {
+      background: var(--gray-bg);
+    }
+
+    .q-table tbody td {
+      padding: 0.55rem 0.75rem;
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    .q-table .qid {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7pt;
+      font-weight: 500;
+      color: var(--blue);
+      white-space: nowrap;
+    }
+
+    .nist-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 6.5pt;
+      color: var(--gray-mid);
+      background: var(--gray-bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.1rem 0.35rem;
+      white-space: nowrap;
+    }
+
+    .gap-tag {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 6pt;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .gap-high   { background: rgba(255,128,32,0.12); color: #b85a00; border: 1px solid rgba(255,128,32,0.3); }
+    .gap-medium { background: rgba(64,130,232,0.1);  color: #2d64c4; border: 1px solid rgba(64,130,232,0.3); }
+    .gap-low    { background: rgba(51,205,182,0.1);  color: #1a8a7a; border: 1px solid rgba(51,205,182,0.3); }
+
+    /* ── Function Section ── */
+    .function-block {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      break-inside: avoid;
+    }
+
+    .function-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .function-header-blue { background: linear-gradient(90deg, rgba(64,130,232,0.12), rgba(64,130,232,0.04)); }
+    .function-header-teal { background: linear-gradient(90deg, rgba(51,205,182,0.12), rgba(51,205,182,0.04)); }
+
+    .function-badge {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 7.5pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+    .function-badge-blue { background: var(--blue); color: white; }
+    .function-badge-teal { background: var(--teal); color: white; }
+
+    .function-name {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 10.5pt;
+      color: var(--navy);
+    }
+
+    .function-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 8pt;
+      color: var(--gray-mid);
+      margin-left: auto;
+      font-style: italic;
+    }
+
+    /* ── Summary Decision Table ── */
+    .decision-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+
+    .decision-table thead tr {
+      background: var(--navy);
+      color: white;
+    }
+
+    .decision-table thead th {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 7pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.6rem 0.875rem;
+      text-align: left;
+    }
+
+    .decision-table tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .decision-table tbody tr:nth-child(even) {
+      background: var(--gray-bg);
+    }
+
+    .decision-table tbody td {
+      padding: 0.6rem 0.875rem;
+      vertical-align: middle;
+    }
+
+    .decision-table .check {
+      text-align: center;
+      font-size: 11pt;
+    }
+
+    /* ── Info box ── */
+    .info-box {
+      background: rgba(64,130,232,0.05);
+      border: 1px solid rgba(64,130,232,0.2);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      gap: 0.625rem;
+    }
+
+    .info-box-icon {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      font-weight: 800;
+      font-size: 8pt;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .info-box-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 8.5pt;
+      line-height: 1.65;
+      color: var(--gray-dark);
+    }
+
+    /* ── Divider ── */
+    .rule {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+      margin: 1.5rem 0;
+    }
+
+    /* ── Footer ── */
+    .page-footer {
+      margin-top: 2rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-brand {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 7.5pt;
+      color: var(--navy);
+    }
+
+    .footer-meta {
+      font-family: 'Inter', sans-serif;
+      font-size: 7pt;
+      color: var(--gray-light);
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .cover { min-height: 100vh; }
+      .page { padding: 1.5rem 2rem; }
+      .oq-card, .function-block { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ COVER PAGE ══════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo-badge">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 2L19.5 7V15C19.5 18.6 15.8 21.2 11 22C6.2 21.2 2.5 18.6 2.5 15V7L11 2Z" stroke="#4082E8" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="11" cy="12" r="3" stroke="#33CDB6" stroke-width="1.5"/>
+        <path d="M11 9V7M11 15V17M8 12H6M16 12H14" stroke="#4082E8" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="cover-brand">
+      <div class="cover-brand-name">Compass</div>
+      <div class="cover-brand-sub">AI Governance - NIST AI RMF</div>
+    </div>
+  </div>
+
+  <div class="cover-center">
+    <div class="cover-eyebrow">Planning Document - Internal</div>
+    <div class="cover-title">
+      Open Questions<br><span>Decision Brief</span>
+    </div>
+    <div class="cover-subtitle">
+      Architecture, UX, and product decisions required before the application build begins. Includes the full Gap Assessment question bank mapped to the NIST AI Risk Management Framework.
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-meta">
+      Project Compass - MICS Capstone &nbsp;|&nbsp; Version 1.0 &nbsp;|&nbsp; June 2026
+    </div>
+    <div class="cover-pills">
+      <span class="cover-pill">NIST AI RMF</span>
+      <span class="cover-pill" style="color:#33CDB6;border-color:rgba(51,205,182,0.3);background:rgba(51,205,182,0.08);">9 Open Questions</span>
+      <span class="cover-pill" style="color:#FF8020;border-color:rgba(255,128,32,0.3);background:rgba(255,128,32,0.08);">16 Assessment Questions</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════ PAGE 1 - OPEN QUESTIONS ══════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-header-mark"></div>
+      <div>
+        <div class="page-header-title">Open Questions - Decision Brief</div>
+        <div class="page-header-doc">Project Compass - MICS Capstone 2026</div>
+      </div>
+    </div>
+    <div class="page-header-doc">Section 1 of 2</div>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-icon">i</div>
+    <div class="info-box-text">
+      The following questions must be resolved before the corresponding application screens can be built. OQ-1 and OQ-9 are already resolved - the team has provided sample log files, the domain registry (70 entries, Microsoft Purview sourced), and seeded detection results. Questions OQ-2 through OQ-8 require team decisions.
+    </div>
+  </div>
+
+  <!-- OQ-1 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-1</span>
+      <span class="oq-title">Sample Log File Format</span>
+      <span class="oq-status status-resolved">Resolved</span>
+    </div>
+    <div class="oq-body">
+      <div class="oq-full">
+        <div class="oq-section-label">Resolution</div>
+        <div class="oq-text">Sample log files have been created and provided by the team. The domain registry contains 70 entries sourced from the Microsoft Purview supported AI sites list. Seeded detection results are available in both raw and frontend-ready JSON formats. No further action needed on this item.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-2 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-2</span>
+      <span class="oq-title">Risk Scoring Formula</span>
+      <span class="oq-status status-decision">Needs Decision</span>
+    </div>
+    <div class="oq-body">
+      <div>
+        <div class="oq-section-label">Question</div>
+        <div class="oq-text">How are detection results and assessment answers combined into a single overall risk score for the dashboard? What are the weights for each component?</div>
+      </div>
+      <div class="oq-rec">
+        <div class="oq-rec-label">Recommended Formula</div>
+        <div class="oq-rec-text">
+          <strong>Overall Score</strong> = (Detection Score × 0.5) + (Assessment Score × 0.5)<br><br>
+          <strong>Detection Score:</strong> High/Unknown tools × 15 pts, Medium × 7 pts, Low × 2 pts (capped 100)<br>
+          <strong>Assessment Score:</strong> 100 minus percentage of Yes/Partial answers<br><br>
+          With current data: Detection ~74, Assessment ~75 → <strong>Overall: HIGH (74.5)</strong>
+        </div>
+      </div>
+      <div class="oq-full">
+        <div class="oq-section-label">Team Decision Needed</div>
+        <div class="oq-text">Agree with the 50/50 weighting? Should detections carry more weight than governance answers? Should the Unknown AI tool carry a higher penalty since it cannot be identified?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-3 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-3</span>
+      <span class="oq-title">Gap Assessment Questions - Static or Dynamic?</span>
+      <span class="oq-status status-decision">Needs Decision</span>
+    </div>
+    <div class="oq-body">
+      <div>
+        <div class="oq-section-label">Question</div>
+        <div class="oq-text">Should the 16 governance questions be the same every time (static), or should a small number of additional questions appear based on what categories were detected in the scan?</div>
+      </div>
+      <div class="oq-rec">
+        <div class="oq-rec-label">Recommendation</div>
+        <div class="oq-rec-text">
+          Dynamic - add 3 to 4 conditional questions based on detected categories. If image generation tools were found (Midjourney), ask about deepfake policy. If voice/audio tools (ElevenLabs), ask about voice synthesis controls. Adds realism without significant build complexity.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-4 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-4</span>
+      <span class="oq-title">PDF Export Method</span>
+      <span class="oq-status status-decision">Needs Decision</span>
+    </div>
+    <div class="oq-body">
+      <div>
+        <div class="oq-section-label">Options</div>
+        <div class="oq-text">
+          <strong>Browser Print (window.print()):</strong> Zero extra libraries, uses browser PDF engine, works well with print-optimized CSS. Output quality depends on browser settings.<br><br>
+          <strong>jsPDF:</strong> Full programmatic control, consistent output, but significantly more build time and more things that can fail during a live demo.
+        </div>
+      </div>
+      <div class="oq-rec">
+        <div class="oq-rec-label">Recommendation</div>
+        <div class="oq-rec-text">Use browser print for MVP. A dedicated print CSS stylesheet (media print) that hides navigation, applies white backgrounds, and formats report content takes roughly half a day of work. jsPDF can be added post-capstone if a production version is pursued.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-5 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-5</span>
+      <span class="oq-title">Application Structure - Multi-Page vs Single Page App</span>
+      <span class="oq-status status-decision">Needs Decision</span>
+    </div>
+    <div class="oq-body">
+      <div>
+        <div class="oq-section-label">Options</div>
+        <div class="oq-text">
+          <strong>Multi-Page HTML:</strong> Separate .html file per step. State passes via localStorage. Each step is independent - if one breaks, others still work. Simplest to build and debug.<br><br>
+          <strong>Single Page App:</strong> One HTML file, JavaScript shows and hides views. Smoother step transitions, all data lives in memory, but one bug can break the entire flow.
+        </div>
+      </div>
+      <div class="oq-rec">
+        <div class="oq-rec-label">Recommendation</div>
+        <div class="oq-rec-text">Multi-page HTML with localStorage for state. For a capstone demo timeline, simpler and more demo-reliable is the right tradeoff. A shared step progress bar component makes it feel like one continuous app even across separate pages.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-6 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-6</span>
+      <span class="oq-title">Login Screen vs. Direct to Upload</span>
+      <span class="oq-status status-decision">Needs Decision</span>
+    </div>
+    <div class="oq-body">
+      <div>
+        <div class="oq-section-label">Options</div>
+        <div class="oq-text">
+          <strong>No login:</strong> App starts directly at the upload screen. Fastest path to demo content, minimal friction.<br><br>
+          <strong>Demo login screen:</strong> Pre-filled credentials (demo@compass.ai / Compass2026) and a single Sign In button that navigates to upload. Adds realism. Roughly 2 hours of build time.
+        </div>
+      </div>
+      <div class="oq-rec">
+        <div class="oq-rec-label">Recommendation</div>
+        <div class="oq-rec-text">Add a minimal login screen. It establishes the product as a real enterprise tool from the first moment, creates a natural demo start point, and takes only 2 hours to build. The login does not need real authentication - just navigate on button click.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-7 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-7</span>
+      <span class="oq-title">Firewall Rule Format for Block Action</span>
+      <span class="oq-status status-decision">Needs Decision</span>
+    </div>
+    <div class="oq-body">
+      <div>
+        <div class="oq-section-label">Options</div>
+        <div class="oq-text">
+          <strong>Generic:</strong> Readable by everyone, vendor-neutral.<br>
+          <strong>Palo Alto PAN-OS:</strong> Most widely deployed enterprise firewall, recognized by security professionals.<br>
+          <strong>Cisco ASA:</strong> Common in mid-market enterprise environments.<br>
+          <strong>Multi-format toggle:</strong> Show all three with a format selector in the modal.
+        </div>
+      </div>
+      <div class="oq-rec">
+        <div class="oq-rec-label">Recommendation</div>
+        <div class="oq-rec-text">Multi-format toggle: Generic, Palo Alto, and Cisco ASA. The toggle is a small UI component (3 to 4 hours). It shows technical depth to the security-focused audience while keeping a readable generic format for non-technical viewers. This is the same data rendered three ways.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-8 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-8</span>
+      <span class="oq-title">SIEM Query Format for Monitor Action</span>
+      <span class="oq-status status-decision">Needs Decision</span>
+    </div>
+    <div class="oq-body">
+      <div>
+        <div class="oq-section-label">Options</div>
+        <div class="oq-text">
+          <strong>Splunk SPL:</strong> Largest installed SIEM base in enterprise. SPL queries are recognizable to most security professionals.<br>
+          <strong>Microsoft Sentinel KQL:</strong> Fastest growing enterprise SIEM. KQL is familiar to Microsoft shop audiences.<br>
+          <strong>Generic alert description:</strong> Non-technical explanation of what the alert does.
+        </div>
+      </div>
+      <div class="oq-rec">
+        <div class="oq-rec-label">Recommendation</div>
+        <div class="oq-rec-text">Show Splunk SPL and Microsoft Sentinel KQL with a platform toggle, plus a generic description tab. Query text is already drafted in the PRD. This covers the two most common enterprise SIEMs and ensures the demo resonates with any security audience.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OQ-9 -->
+  <div class="oq-card">
+    <div class="oq-header">
+      <span class="oq-id">OQ-9</span>
+      <span class="oq-title">Sample Log Files for Demo</span>
+      <span class="oq-status status-resolved">Resolved</span>
+    </div>
+    <div class="oq-body">
+      <div class="oq-full">
+        <div class="oq-section-label">Resolution</div>
+        <div class="oq-text">Sample log files have been provided. Detection results cover 13 tools across DNS, proxy, and firewall log sources with 210 total events across 5 observed users (asmith, guest, jdoe, mchen, rpatel) and 5 source IPs. No further action needed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Table -->
+  <div class="rule"></div>
+  <div class="section-label" style="margin-bottom:0.75rem;">Decision Summary</div>
+
+  <table class="decision-table">
+    <thead>
+      <tr>
+        <th style="width:55px;">#</th>
+        <th>Question</th>
+        <th>Recommendation</th>
+        <th style="width:70px;text-align:center;">Status</th>
+        <th style="width:70px;text-align:center;">Team OK?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-1</span></td>
+        <td>Sample log file format</td>
+        <td>Resolved - files provided</td>
+        <td class="check">✅</td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-2</span></td>
+        <td>Risk scoring formula</td>
+        <td>Detection 50% + Assessment 50%</td>
+        <td class="check"><span style="color:#FF8020;">⬤</span></td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-3</span></td>
+        <td>Static vs dynamic questions</td>
+        <td>Dynamic - 3 to 4 conditional questions</td>
+        <td class="check"><span style="color:#FF8020;">⬤</span></td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-4</span></td>
+        <td>PDF export method</td>
+        <td>Browser print with print CSS</td>
+        <td class="check"><span style="color:#FF8020;">⬤</span></td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-5</span></td>
+        <td>App structure</td>
+        <td>Multi-page HTML + localStorage</td>
+        <td class="check"><span style="color:#FF8020;">⬤</span></td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-6</span></td>
+        <td>Login screen</td>
+        <td>Yes - simple demo login (2 hrs)</td>
+        <td class="check"><span style="color:#FF8020;">⬤</span></td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-7</span></td>
+        <td>Firewall block format</td>
+        <td>Multi-format toggle (Generic, Palo Alto, Cisco)</td>
+        <td class="check"><span style="color:#FF8020;">⬤</span></td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-8</span></td>
+        <td>SIEM monitor format</td>
+        <td>Splunk + Sentinel toggle + generic</td>
+        <td class="check"><span style="color:#FF8020;">⬤</span></td>
+        <td class="check"></td>
+      </tr>
+      <tr>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:7.5pt;color:#4082E8;">OQ-9</span></td>
+        <td>Demo log files ownership</td>
+        <td>Resolved - files provided</td>
+        <td class="check">✅</td>
+        <td class="check"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <div class="footer-brand">Compass - Project Compass MICS Capstone</div>
+    <div class="footer-meta">Open Questions Brief - v1.0 - June 2026 - Page 1 of 2</div>
+  </div>
+</div>
+
+
+<!-- ══════════════ PAGE 2 - ASSESSMENT QUESTIONS ══════════════ -->
+<div class="page" style="page-break-before: always;">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-header-mark" style="background:linear-gradient(180deg,var(--teal),var(--blue));"></div>
+      <div>
+        <div class="page-header-title">Gap Assessment Question Bank</div>
+        <div class="page-header-doc">Project Compass - MICS Capstone 2026</div>
+      </div>
+    </div>
+    <div class="page-header-doc">Section 2 of 2</div>
+  </div>
+
+  <div class="info-box" style="background:rgba(51,205,182,0.05);border-color:rgba(51,205,182,0.2);">
+    <div class="info-box-icon" style="background:var(--teal);">i</div>
+    <div class="info-box-text">
+      16 governance questions mapped to the four NIST AI RMF functions: Govern, Map, Measure, and Manage. Each "No" or "Unsure" answer generates a finding with a risk level and recommended action. Answer options: <strong>Yes</strong> (100 pts) / <strong>Partial</strong> (50 pts) / <strong>No</strong> (0 pts) / <strong>Unsure</strong> (0 pts, flagged for follow-up).
+    </div>
+  </div>
+
+  <!-- GOVERN -->
+  <div class="function-block">
+    <div class="function-header function-header-blue">
+      <span class="function-badge function-badge-blue">Govern</span>
+      <span class="function-name">Organizational Policies and Accountability</span>
+      <span class="function-desc">Does the org have policies and ownership structures for AI?</span>
+    </div>
+    <table class="q-table">
+      <thead>
+        <tr>
+          <th style="width:45px;">ID</th>
+          <th>Question</th>
+          <th style="width:100px;">NIST Ref</th>
+          <th style="width:120px;">Gap If "No"</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="qid">G-01</td>
+          <td>Does your organization have a written AI usage policy that defines approved and prohibited uses?</td>
+          <td><span class="nist-tag">Govern 1.1</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">G-02</td>
+          <td>Is there a designated owner or team responsible for AI governance decisions?</td>
+          <td><span class="nist-tag">Govern 1.2</span></td>
+          <td><span class="gap-tag gap-medium">Medium</span></td>
+        </tr>
+        <tr>
+          <td class="qid">G-03</td>
+          <td>Are employees required to review and acknowledge AI usage policies?</td>
+          <td><span class="nist-tag">Govern 1.3</span></td>
+          <td><span class="gap-tag gap-medium">Medium</span></td>
+        </tr>
+        <tr>
+          <td class="qid">G-04</td>
+          <td>Does your organization review and update AI policies at least once per year?</td>
+          <td><span class="nist-tag">Govern 1.7</span></td>
+          <td><span class="gap-tag gap-low">Low</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MAP -->
+  <div class="function-block">
+    <div class="function-header function-header-teal">
+      <span class="function-badge function-badge-teal">Map</span>
+      <span class="function-name">AI Tool Inventory and Risk Awareness</span>
+      <span class="function-desc">Does the org understand what AI is in use and what risks those tools carry?</span>
+    </div>
+    <table class="q-table">
+      <thead>
+        <tr>
+          <th style="width:45px;">ID</th>
+          <th>Question</th>
+          <th style="width:100px;">NIST Ref</th>
+          <th style="width:120px;">Gap If "No"</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="qid">M-01</td>
+          <td>Has your organization formally inventoried all AI tools in use across departments?</td>
+          <td><span class="nist-tag">Map 1.1</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">M-02</td>
+          <td>Have the data handling practices of each AI tool in use been reviewed?</td>
+          <td><span class="nist-tag">Map 1.5</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">M-03</td>
+          <td>Do you understand which AI tools have access to sensitive or confidential company data?</td>
+          <td><span class="nist-tag">Map 2.2</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">M-04</td>
+          <td>Has a formal risk assessment been conducted for any AI tool currently in use?</td>
+          <td><span class="nist-tag">Map 5.1</span></td>
+          <td><span class="gap-tag gap-medium">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MEASURE -->
+  <div class="function-block">
+    <div class="function-header function-header-blue">
+      <span class="function-badge function-badge-blue">Measure</span>
+      <span class="function-name">Monitoring and Ongoing Risk Measurement</span>
+      <span class="function-desc">Does the org actively monitor and measure AI risk over time?</span>
+    </div>
+    <table class="q-table">
+      <thead>
+        <tr>
+          <th style="width:45px;">ID</th>
+          <th>Question</th>
+          <th style="width:100px;">NIST Ref</th>
+          <th style="width:120px;">Gap If "No"</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="qid">ME-01</td>
+          <td>Is AI tool usage monitored in your SIEM, proxy, or equivalent logging system?</td>
+          <td><span class="nist-tag">Measure 2.5</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">ME-02</td>
+          <td>Do you receive alerts when new or unknown AI tools are accessed on the network?</td>
+          <td><span class="nist-tag">Measure 2.6</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">ME-03</td>
+          <td>Are AI-related security incidents tracked and reviewed on a regular schedule?</td>
+          <td><span class="nist-tag">Measure 4.1</span></td>
+          <td><span class="gap-tag gap-medium">Medium</span></td>
+        </tr>
+        <tr>
+          <td class="qid">ME-04</td>
+          <td>Do you conduct periodic reviews of the AI tool inventory to check for newly adopted tools?</td>
+          <td><span class="nist-tag">Measure 2.2</span></td>
+          <td><span class="gap-tag gap-medium">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MANAGE -->
+  <div class="function-block">
+    <div class="function-header function-header-teal">
+      <span class="function-badge function-badge-teal">Manage</span>
+      <span class="function-name">Response and Remediation Capability</span>
+      <span class="function-desc">Does the org have the processes to act on AI risk?</span>
+    </div>
+    <table class="q-table">
+      <thead>
+        <tr>
+          <th style="width:45px;">ID</th>
+          <th>Question</th>
+          <th style="width:100px;">NIST Ref</th>
+          <th style="width:120px;">Gap If "No"</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="qid">MG-01</td>
+          <td>Does your organization have a defined process to block or restrict unauthorized AI tools?</td>
+          <td><span class="nist-tag">Manage 1.3</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">MG-02</td>
+          <td>Is there a vendor review process for AI tools before organizational adoption?</td>
+          <td><span class="nist-tag">Manage 2.2</span></td>
+          <td><span class="gap-tag gap-high">High</span></td>
+        </tr>
+        <tr>
+          <td class="qid">MG-03</td>
+          <td>Do you have an incident response plan that covers AI-related data exposure events?</td>
+          <td><span class="nist-tag">Manage 3.1</span></td>
+          <td><span class="gap-tag gap-medium">Medium</span></td>
+        </tr>
+        <tr>
+          <td class="qid">MG-04</td>
+          <td>Are AI tool owners formally assigned to maintain accountability for each approved tool?</td>
+          <td><span class="nist-tag">Manage 4.1</span></td>
+          <td><span class="gap-tag gap-medium">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Conditional Questions -->
+  <div class="rule"></div>
+  <div class="section-label" style="margin-bottom:0.75rem;">Conditional Questions - Triggered by Detected Tool Categories</div>
+
+  <div class="info-box">
+    <div class="info-box-icon">→</div>
+    <div class="info-box-text">These questions appear only if specific tool categories were detected during the scan. They are added at the end of the relevant NIST section.</div>
+  </div>
+
+  <table class="q-table">
+    <thead>
+      <tr>
+        <th style="width:45px;">ID</th>
+        <th>Question</th>
+        <th style="width:130px;">Trigger Condition</th>
+        <th style="width:100px;">NIST Ref</th>
+        <th style="width:90px;">Gap If "No"</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="qid">C-01</td>
+        <td>Do you have a policy that addresses AI-generated media, including deepfakes and synthetic images?</td>
+        <td style="font-size:7.5pt;color:var(--gray-mid);">Image Generation tool detected (e.g., Midjourney)</td>
+        <td><span class="nist-tag">Govern 1.1</span></td>
+        <td><span class="gap-tag gap-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="qid">C-02</td>
+        <td>Do you have controls in place around AI voice synthesis or audio cloning tools?</td>
+        <td style="font-size:7.5pt;color:var(--gray-mid);">Audio Generation tool detected (e.g., ElevenLabs)</td>
+        <td><span class="nist-tag">Govern 1.1</span></td>
+        <td><span class="gap-tag gap-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="qid">C-03</td>
+        <td>Are guest and contractor accounts restricted from accessing AI tools on the corporate network?</td>
+        <td style="font-size:7.5pt;color:var(--gray-mid);">"guest" user observed in detection results</td>
+        <td><span class="nist-tag">Manage 1.3</span></td>
+        <td><span class="gap-tag gap-high">High</span></td>
+      </tr>
+      <tr>
+        <td class="qid">C-04</td>
+        <td>Do you have a process to investigate and identify unrecognized or unclassified AI tool traffic?</td>
+        <td style="font-size:7.5pt;color:var(--gray-mid);">Unknown/unclassified domain detected in logs</td>
+        <td><span class="nist-tag">Map 1.1</span></td>
+        <td><span class="gap-tag gap-high">High</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <div class="footer-brand">Compass - Project Compass MICS Capstone</div>
+    <div class="footer-meta">Gap Assessment Question Bank - v1.0 - June 2026 - Page 2 of 2</div>
+  </div>
+</div>
+
+</body>
+</html>

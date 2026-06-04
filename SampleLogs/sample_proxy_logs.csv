@@ -1,0 +1,77 @@
+# Project Compass Demo Proxy Log
+# Format: timestamp,src_ip,user,http_method,url,status,bytes_sent,bytes_received,user_agent,category,risk_level,policy_action
+2026-06-03T09:00:23Z,10.24.10.44,rpatel,CONNECT,https://drive.google.com/generate,403,3541,267734,"Python-Requests/2.32",Cloud Storage,medium,allowed
+2026-06-03T09:01:01Z,10.24.9.31,mchen,POST,https://perplexity.ai/v1/completions,200,9157,34568,"Python-Requests/2.32",AI Search,medium,allowed
+2026-06-03T09:01:54Z,10.24.20.99,guest,GET,https://elevenlabs.io/,403,8270,158971,"Edge/125.0",Audio Generation,high,blocked
+2026-06-03T09:03:07Z,10.24.10.44,rpatel,CONNECT,https://midjourney.com/upload,403,6169,298621,"Python-Requests/2.32",Image Generation,high,blocked
+2026-06-03T09:03:41Z,10.24.8.15,jdoe,POST,https://elevenlabs.io/login,200,2363,258539,"Firefox/126.0",Audio Generation,high,review_required
+2026-06-03T09:04:47Z,10.24.8.15,jdoe,GET,https://claude.ai/generate,403,4172,98891,"Python-Requests/2.32",AI Assistant,medium,allowed
+2026-06-03T09:05:53Z,10.24.9.31,mchen,GET,https://gemini.google.com/generate,429,1640,285649,"Edge/125.0",AI Assistant,medium,review_required
+2026-06-03T09:06:32Z,10.24.8.22,asmith,POST,https://notion.so/v1/completions,200,5796,91456,"Firefox/126.0",Productivity,low,allowed
+2026-06-03T09:07:34Z,10.24.9.31,mchen,GET,https://api.openai.com/v1/completions,200,4598,193844,"Python-Requests/2.32",AI API,medium,allowed
+2026-06-03T09:08:23Z,10.24.8.22,asmith,CONNECT,https://copilot.microsoft.com/v1/completions,403,6182,193144,"Python-Requests/2.32",AI Assistant,low,allowed
+2026-06-03T09:09:14Z,10.24.8.15,jdoe,POST,https://github.com/v1/completions,200,2310,308084,"Edge/125.0",Developer Tools,low,allowed
+2026-06-03T09:10:12Z,10.24.10.44,rpatel,CONNECT,https://notion.so/api/chat,200,5091,96263,"Firefox/126.0",Productivity,low,allowed
+2026-06-03T09:11:00Z,10.24.20.99,guest,POST,https://drive.google.com/upload,429,1198,293597,"Firefox/126.0",Cloud Storage,medium,allowed
+2026-06-03T09:12:01Z,10.24.8.15,jdoe,CONNECT,https://chat.openai.com/upload,429,4309,68772,"Python-Requests/2.32",AI Assistant,medium,allowed
+2026-06-03T09:13:01Z,10.24.10.44,rpatel,POST,https://notion.so/api/chat,429,6712,347662,"Python-Requests/2.32",Productivity,low,review_required
+2026-06-03T09:14:07Z,10.24.10.44,rpatel,POST,https://elevenlabs.io/generate,200,5508,344358,"Chrome/125.0",Audio Generation,high,review_required
+2026-06-03T09:14:55Z,10.24.9.31,mchen,POST,https://copilot.microsoft.com/generate,200,814,80547,"Python-Requests/2.32",AI Assistant,low,review_required
+2026-06-03T09:15:42Z,10.24.20.99,guest,CONNECT,https://notion.so/upload,302,1819,185598,"Python-Requests/2.32",Productivity,low,review_required
+2026-06-03T09:16:34Z,10.24.20.99,guest,CONNECT,https://api.openai.com/settings,403,8072,195293,"Firefox/126.0",AI API,medium,allowed
+2026-06-03T09:17:27Z,10.24.9.31,mchen,POST,https://copilot.microsoft.com/login,200,5027,49140,"Python-Requests/2.32",AI Assistant,low,review_required
+2026-06-03T09:18:39Z,10.24.9.31,mchen,GET,https://copilot.microsoft.com/upload,200,8462,118461,"Edge/125.0",AI Assistant,low,review_required
+2026-06-03T09:19:40Z,10.24.8.15,jdoe,CONNECT,https://copilot.microsoft.com/login,200,5932,280201,"Edge/125.0",AI Assistant,low,allowed
+2026-06-03T09:20:19Z,10.24.20.99,guest,GET,https://github.com/generate,302,3712,83444,"Edge/125.0",Developer Tools,low,allowed
+2026-06-03T09:21:30Z,10.24.8.22,asmith,GET,https://elevenlabs.io/v1/completions,302,2482,175325,"Chrome/125.0",Audio Generation,high,allowed
+2026-06-03T09:22:24Z,10.24.9.31,mchen,GET,https://notion.so/login,403,4874,319245,"Firefox/126.0",Productivity,low,review_required
+2026-06-03T09:23:11Z,10.24.8.22,asmith,CONNECT,https://github.com/generate,302,4873,39320,"Firefox/126.0",Developer Tools,low,allowed
+2026-06-03T09:24:09Z,10.24.10.44,rpatel,GET,https://elevenlabs.io/login,200,8178,61124,"Edge/125.0",Audio Generation,high,review_required
+2026-06-03T09:24:54Z,10.24.8.15,jdoe,GET,https://claude.ai/,200,4199,150713,"Chrome/125.0",AI Assistant,medium,allowed
+2026-06-03T09:25:41Z,10.24.10.44,rpatel,POST,https://notion.so/generate,403,5847,87148,"Firefox/126.0",Productivity,low,review_required
+2026-06-03T09:26:39Z,10.24.9.31,mchen,GET,https://drive.google.com/generate,200,9012,342308,"Edge/125.0",Cloud Storage,medium,allowed
+2026-06-03T09:27:34Z,10.24.8.15,jdoe,POST,https://notion.so/upload,429,5865,342729,"Python-Requests/2.32",Productivity,low,allowed
+2026-06-03T09:28:36Z,10.24.8.22,asmith,CONNECT,https://claude.ai/generate,200,6646,58262,"Firefox/126.0",AI Assistant,medium,review_required
+2026-06-03T09:29:25Z,10.24.9.31,mchen,CONNECT,https://elevenlabs.io/login,200,5390,247046,"Edge/125.0",Audio Generation,high,allowed
+2026-06-03T09:30:16Z,10.24.8.22,asmith,GET,https://chat.openai.com/api/chat,429,7864,83839,"Chrome/125.0",AI Assistant,medium,allowed
+2026-06-03T09:31:28Z,10.24.20.99,guest,CONNECT,https://midjourney.com/login,403,9355,244536,"Edge/125.0",Image Generation,high,allowed
+2026-06-03T09:32:22Z,10.24.10.44,rpatel,POST,https://api.openai.com/upload,200,4006,80223,"Edge/125.0",AI API,medium,review_required
+2026-06-03T09:33:03Z,10.24.9.31,mchen,POST,https://midjourney.com/generate,403,3083,348290,"Edge/125.0",Image Generation,high,blocked
+2026-06-03T09:34:06Z,10.24.8.15,jdoe,CONNECT,https://notion.so/,302,2091,141186,"Edge/125.0",Productivity,low,review_required
+2026-06-03T09:34:56Z,10.24.9.31,mchen,POST,https://gemini.google.com/generate,200,2613,293093,"Chrome/125.0",AI Assistant,medium,allowed
+2026-06-03T09:36:01Z,10.24.8.22,asmith,GET,https://midjourney.com/generate,302,1413,349153,"Firefox/126.0",Image Generation,high,review_required
+2026-06-03T09:36:48Z,10.24.10.44,rpatel,CONNECT,https://elevenlabs.io/v1/completions,200,7227,195377,"Python-Requests/2.32",Audio Generation,high,review_required
+2026-06-03T09:37:44Z,10.24.20.99,guest,POST,https://chat.openai.com/login,200,6161,163907,"Chrome/125.0",AI Assistant,medium,allowed
+2026-06-03T09:38:37Z,10.24.10.44,rpatel,GET,https://unknown-ai-tool.example/,200,5357,44351,"Chrome/125.0",Unknown AI,unknown,review_required
+2026-06-03T09:39:33Z,10.24.9.31,mchen,POST,https://github.com/login,200,3750,17572,"Edge/125.0",Developer Tools,low,allowed
+2026-06-03T09:40:27Z,10.24.8.15,jdoe,POST,https://unknown-ai-tool.example/upload,403,3622,314297,"Edge/125.0",Unknown AI,unknown,review_required
+2026-06-03T09:41:39Z,10.24.10.44,rpatel,POST,https://perplexity.ai/settings,429,5945,163206,"Edge/125.0",AI Search,medium,review_required
+2026-06-03T09:42:29Z,10.24.8.22,asmith,POST,https://notion.so/,403,7145,348858,"Python-Requests/2.32",Productivity,low,allowed
+2026-06-03T09:43:07Z,10.24.8.22,asmith,POST,https://unknown-ai-tool.example/api/chat,403,5953,47129,"Python-Requests/2.32",Unknown AI,unknown,blocked
+2026-06-03T09:44:21Z,10.24.8.22,asmith,CONNECT,https://gemini.google.com/login,200,2019,22859,"Python-Requests/2.32",AI Assistant,medium,allowed
+2026-06-03T09:45:11Z,10.24.20.99,guest,CONNECT,https://gemini.google.com/api/chat,302,1778,6507,"Firefox/126.0",AI Assistant,medium,allowed
+2026-06-03T09:45:51Z,10.24.8.15,jdoe,POST,https://claude.ai/generate,429,7423,333037,"Firefox/126.0",AI Assistant,medium,allowed
+2026-06-03T09:47:04Z,10.24.8.15,jdoe,CONNECT,https://chat.openai.com/settings,302,8279,304799,"Edge/125.0",AI Assistant,medium,review_required
+2026-06-03T09:47:52Z,10.24.10.44,rpatel,POST,https://copilot.microsoft.com/upload,302,2297,9921,"Chrome/125.0",AI Assistant,low,allowed
+2026-06-03T09:48:56Z,10.24.8.22,asmith,POST,https://drive.google.com/,302,1635,250637,"Firefox/126.0",Cloud Storage,medium,allowed
+2026-06-03T09:49:42Z,10.24.8.15,jdoe,POST,https://notion.so/api/chat,200,6556,243994,"Firefox/126.0",Productivity,low,review_required
+2026-06-03T09:50:32Z,10.24.9.31,mchen,CONNECT,https://drive.google.com/settings,200,5204,249507,"Chrome/125.0",Cloud Storage,medium,allowed
+2026-06-03T09:51:37Z,10.24.8.22,asmith,CONNECT,https://api.openai.com/,200,3921,343263,"Python-Requests/2.32",AI API,medium,allowed
+2026-06-03T09:52:34Z,10.24.8.22,asmith,CONNECT,https://chat.openai.com/login,200,4022,309880,"Edge/125.0",AI Assistant,medium,review_required
+2026-06-03T09:53:21Z,10.24.9.31,mchen,POST,https://chat.openai.com/login,200,3346,46650,"Edge/125.0",AI Assistant,medium,review_required
+2026-06-03T09:54:29Z,10.24.8.15,jdoe,POST,https://gemini.google.com/login,200,6246,47784,"Edge/125.0",AI Assistant,medium,allowed
+2026-06-03T09:55:17Z,10.24.8.15,jdoe,GET,https://unknown-ai-tool.example/,200,6900,227048,"Edge/125.0",Unknown AI,unknown,review_required
+2026-06-03T09:56:14Z,10.24.8.22,asmith,POST,https://chat.openai.com/api/chat,429,6035,47451,"Edge/125.0",AI Assistant,medium,review_required
+2026-06-03T09:57:00Z,10.24.8.22,asmith,GET,https://notion.so/api/chat,302,4814,47694,"Chrome/125.0",Productivity,low,review_required
+2026-06-03T09:57:52Z,10.24.8.15,jdoe,CONNECT,https://copilot.microsoft.com/,200,2172,25998,"Chrome/125.0",AI Assistant,low,review_required
+2026-06-03T09:59:01Z,10.24.9.31,mchen,POST,https://claude.ai/login,200,8917,14131,"Chrome/125.0",AI Assistant,medium,allowed
+2026-06-03T09:59:51Z,10.24.20.99,guest,GET,https://github.com/upload,302,5382,186841,"Chrome/125.0",Developer Tools,low,allowed
+2026-06-03T10:00:38Z,10.24.20.99,guest,GET,https://gemini.google.com/generate,429,5169,123133,"Python-Requests/2.32",AI Assistant,medium,allowed
+2026-06-03T10:01:45Z,10.24.20.99,guest,GET,https://elevenlabs.io/api/chat,403,7364,113300,"Firefox/126.0",Audio Generation,high,blocked
+2026-06-03T10:02:44Z,10.24.8.22,asmith,POST,https://api.openai.com/settings,302,2384,315376,"Chrome/125.0",AI API,medium,allowed
+2026-06-03T10:03:39Z,10.24.9.31,mchen,POST,https://api.openai.com/api/chat,302,9038,308317,"Edge/125.0",AI API,medium,allowed
+2026-06-03T10:04:34Z,10.24.9.31,mchen,GET,https://unknown-ai-tool.example/v1/completions,200,2030,201287,"Python-Requests/2.32",Unknown AI,unknown,review_required
+2026-06-03T10:05:27Z,10.24.10.44,rpatel,GET,https://unknown-ai-tool.example/v1/completions,403,7606,312945,"Firefox/126.0",Unknown AI,unknown,blocked
+2026-06-03T10:06:09Z,10.24.8.22,asmith,CONNECT,https://copilot.microsoft.com/settings,200,1888,175485,"Firefox/126.0",AI Assistant,low,allowed
+2026-06-03T10:07:06Z,10.24.8.22,asmith,GET,https://api.openai.com/generate,200,5176,333863,"Firefox/126.0",AI API,medium,allowed
+2026-06-03T10:07:57Z,10.24.9.31,mchen,CONNECT,https://unknown-ai-tool.example/v1/completions,429,2036,254713,"Python-Requests/2.32",Unknown AI,unknown,review_required

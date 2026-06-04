@@ -1,0 +1,67 @@
+# Project Compass Demo DNS Log
+# Format: timestamp,src_ip,user,query,type,response_ip,rcode,category,risk_level
+2026-06-03T09:00:00Z,10.24.20.99,guest,api.openai.com,AAAA,138.206.201.112,NOERROR,AI API,medium
+2026-06-03T09:00:55Z,10.24.8.15,jdoe,drive.google.com,CNAME,51.18.82.178,NOERROR,Cloud Storage,medium
+2026-06-03T09:01:49Z,10.24.8.22,asmith,elevenlabs.io,A,105.34.52.59,NOERROR,Audio Generation,high
+2026-06-03T09:02:27Z,10.24.8.15,jdoe,gemini.google.com,A,219.155.164.129,NOERROR,AI Assistant,medium
+2026-06-03T09:03:26Z,10.24.9.31,mchen,api.openai.com,CNAME,162.115.119.81,NOERROR,AI API,medium
+2026-06-03T09:04:14Z,10.24.8.15,jdoe,notion.so,A,116.208.183.220,NOERROR,Productivity,low
+2026-06-03T09:04:46Z,10.24.20.99,guest,gemini.google.com,A,124.193.125.94,NOERROR,AI Assistant,medium
+2026-06-03T09:05:46Z,10.24.9.31,mchen,midjourney.com,A,143.140.197.46,NOERROR,Image Generation,high
+2026-06-03T09:06:36Z,10.24.20.99,guest,gemini.google.com,A,228.176.62.115,NOERROR,AI Assistant,medium
+2026-06-03T09:07:19Z,10.24.8.22,asmith,chat.openai.com,AAAA,173.188.137.158,NOERROR,AI Assistant,medium
+2026-06-03T09:08:07Z,10.24.9.31,mchen,drive.google.com,CNAME,24.174.211.214,NOERROR,Cloud Storage,medium
+2026-06-03T09:08:49Z,10.24.10.44,rpatel,chat.openai.com,A,85.157.147.118,NOERROR,AI Assistant,medium
+2026-06-03T09:09:31Z,10.24.8.22,asmith,copilot.microsoft.com,A,132.112.177.217,NOERROR,AI Assistant,low
+2026-06-03T09:10:30Z,10.24.20.99,guest,perplexity.ai,A,83.152.96.168,NOERROR,AI Search,medium
+2026-06-03T09:11:07Z,10.24.20.99,guest,copilot.microsoft.com,A,88.14.219.168,NOERROR,AI Assistant,low
+2026-06-03T09:12:04Z,10.24.20.99,guest,midjourney.com,AAAA,84.70.224.75,NOERROR,Image Generation,high
+2026-06-03T09:12:49Z,10.24.10.44,rpatel,chat.openai.com,AAAA,77.185.67.158,NOERROR,AI Assistant,medium
+2026-06-03T09:13:34Z,10.24.9.31,mchen,copilot.microsoft.com,CNAME,125.161.202.156,NOERROR,AI Assistant,low
+2026-06-03T09:14:26Z,10.24.8.22,asmith,claude.ai,AAAA,183.35.18.186,NOERROR,AI Assistant,medium
+2026-06-03T09:14:59Z,10.24.9.31,mchen,github.com,CNAME,18.122.108.134,NOERROR,Developer Tools,low
+2026-06-03T09:15:42Z,10.24.9.31,mchen,gemini.google.com,A,35.178.143.167,NOERROR,AI Assistant,medium
+2026-06-03T09:16:30Z,10.24.8.22,asmith,perplexity.ai,A,180.184.223.34,NOERROR,AI Search,medium
+2026-06-03T09:17:31Z,10.24.9.31,mchen,unknown-ai-tool.example,CNAME,68.30.151.151,NOERROR,Unknown AI,unknown
+2026-06-03T09:18:16Z,10.24.9.31,mchen,midjourney.com,A,225.17.218.95,NOERROR,Image Generation,high
+2026-06-03T09:19:03Z,10.24.8.22,asmith,chat.openai.com,A,75.156.166.78,NOERROR,AI Assistant,medium
+2026-06-03T09:19:42Z,10.24.8.22,asmith,notion.so,CNAME,116.219.58.132,NOERROR,Productivity,low
+2026-06-03T09:20:41Z,10.24.9.31,mchen,claude.ai,AAAA,157.97.94.198,NOERROR,AI Assistant,medium
+2026-06-03T09:21:28Z,10.24.8.15,jdoe,gemini.google.com,AAAA,165.26.120.23,NOERROR,AI Assistant,medium
+2026-06-03T09:22:07Z,10.24.9.31,mchen,github.com,AAAA,138.187.47.139,NOERROR,Developer Tools,low
+2026-06-03T09:22:43Z,10.24.20.99,guest,github.com,CNAME,161.93.28.156,NOERROR,Developer Tools,low
+2026-06-03T09:23:42Z,10.24.8.15,jdoe,drive.google.com,CNAME,49.105.79.113,NOERROR,Cloud Storage,medium
+2026-06-03T09:24:23Z,10.24.8.15,jdoe,midjourney.com,CNAME,19.180.208.199,NOERROR,Image Generation,high
+2026-06-03T09:25:10Z,10.24.20.99,guest,api.openai.com,CNAME,123.65.103.35,NOERROR,AI API,medium
+2026-06-03T09:25:51Z,10.24.8.15,jdoe,elevenlabs.io,A,76.48.173.53,NOERROR,Audio Generation,high
+2026-06-03T09:26:54Z,10.24.10.44,rpatel,unknown-ai-tool.example,AAAA,207.143.226.145,NOERROR,Unknown AI,unknown
+2026-06-03T09:27:27Z,10.24.8.15,jdoe,api.openai.com,AAAA,223.215.39.175,NOERROR,AI API,medium
+2026-06-03T09:28:25Z,10.24.8.22,asmith,notion.so,A,143.142.180.205,NOERROR,Productivity,low
+2026-06-03T09:29:03Z,10.24.8.15,jdoe,elevenlabs.io,CNAME,179.223.42.65,NOERROR,Audio Generation,high
+2026-06-03T09:29:50Z,10.24.10.44,rpatel,midjourney.com,A,180.227.169.89,NOERROR,Image Generation,high
+2026-06-03T09:30:45Z,10.24.8.22,asmith,api.openai.com,CNAME,47.160.14.101,NOERROR,AI API,medium
+2026-06-03T09:31:32Z,10.24.8.22,asmith,chat.openai.com,AAAA,210.190.65.176,NOERROR,AI Assistant,medium
+2026-06-03T09:32:15Z,10.24.20.99,guest,github.com,AAAA,102.226.35.56,NOERROR,Developer Tools,low
+2026-06-03T09:33:02Z,10.24.9.31,mchen,copilot.microsoft.com,AAAA,159.126.68.130,NOERROR,AI Assistant,low
+2026-06-03T09:33:47Z,10.24.8.22,asmith,gemini.google.com,A,142.150.177.162,NOERROR,AI Assistant,medium
+2026-06-03T09:34:48Z,10.24.20.99,guest,chat.openai.com,AAAA,161.86.124.207,NOERROR,AI Assistant,medium
+2026-06-03T09:35:27Z,10.24.8.22,asmith,gemini.google.com,AAAA,47.179.89.57,NOERROR,AI Assistant,medium
+2026-06-03T09:36:19Z,10.24.10.44,rpatel,midjourney.com,CNAME,176.119.94.100,NOERROR,Image Generation,high
+2026-06-03T09:36:59Z,10.24.20.99,guest,drive.google.com,AAAA,228.72.121.212,NOERROR,Cloud Storage,medium
+2026-06-03T09:37:37Z,10.24.9.31,mchen,chat.openai.com,A,110.36.45.114,NOERROR,AI Assistant,medium
+2026-06-03T09:38:26Z,10.24.8.22,asmith,chat.openai.com,A,125.151.221.81,NOERROR,AI Assistant,medium
+2026-06-03T09:39:12Z,10.24.9.31,mchen,api.openai.com,CNAME,103.20.35.111,NOERROR,AI API,medium
+2026-06-03T09:40:00Z,10.24.8.15,jdoe,github.com,CNAME,124.72.217.13,NOERROR,Developer Tools,low
+2026-06-03T09:41:02Z,10.24.8.22,asmith,midjourney.com,AAAA,103.13.120.59,NOERROR,Image Generation,high
+2026-06-03T09:41:39Z,10.24.8.15,jdoe,chat.openai.com,AAAA,23.203.56.78,NOERROR,AI Assistant,medium
+2026-06-03T09:42:20Z,10.24.9.31,mchen,unknown-ai-tool.example,CNAME,25.15.29.26,NOERROR,Unknown AI,unknown
+2026-06-03T09:43:09Z,10.24.20.99,guest,github.com,AAAA,205.50.37.115,NOERROR,Developer Tools,low
+2026-06-03T09:43:59Z,10.24.8.15,jdoe,perplexity.ai,A,197.71.213.175,NOERROR,AI Search,medium
+2026-06-03T09:44:46Z,10.24.8.22,asmith,drive.google.com,CNAME,23.91.145.105,NOERROR,Cloud Storage,medium
+2026-06-03T09:45:28Z,10.24.9.31,mchen,notion.so,A,209.215.161.198,NOERROR,Productivity,low
+2026-06-03T09:46:15Z,10.24.8.22,asmith,claude.ai,CNAME,138.87.75.114,NOERROR,AI Assistant,medium
+2026-06-03T09:47:11Z,10.24.8.15,jdoe,api.openai.com,AAAA,49.43.197.162,NOERROR,AI API,medium
+2026-06-03T09:48:02Z,10.24.10.44,rpatel,chat.openai.com,CNAME,121.165.203.226,NOERROR,AI Assistant,medium
+2026-06-03T09:48:42Z,10.24.10.44,rpatel,elevenlabs.io,AAAA,72.28.65.137,NOERROR,Audio Generation,high
+2026-06-03T09:49:29Z,10.24.8.15,jdoe,chat.openai.com,AAAA,227.132.167.176,NOERROR,AI Assistant,medium
+2026-06-03T09:50:25Z,10.24.10.44,rpatel,gemini.google.com,CNAME,209.86.163.40,NOERROR,AI Assistant,medium

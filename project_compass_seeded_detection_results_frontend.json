@@ -1,0 +1,1004 @@
+{
+  "assessment_id": "assessment-2026-06-03-001",
+  "assessment_name": "Project Compass Log Upload",
+  "summary": {
+    "total_events": 210,
+    "unique_tools_or_domains": 13,
+    "events_by_source": {
+      "dns": 65,
+      "proxy": 75,
+      "firewall": 70
+    },
+    "events_by_risk_level": {
+      "medium": 102,
+      "high": 31,
+      "low": 62,
+      "unknown": 15
+    },
+    "events_by_observed_action": {
+      "resolved": 65,
+      "allowed": 40,
+      "blocked": 6,
+      "review_required": 29,
+      "reset-both": 3,
+      "allow": 61,
+      "deny": 6
+    },
+    "high_or_unknown_events": 46,
+    "users_observed": [
+      "asmith",
+      "guest",
+      "jdoe",
+      "mchen",
+      "rpatel"
+    ],
+    "source_ips_observed": [
+      "10.24.10.44",
+      "10.24.20.99",
+      "10.24.8.15",
+      "10.24.8.22",
+      "10.24.9.31"
+    ]
+  },
+  "detected_tools": [
+    {
+      "domain": "unknown-ai-tool.example",
+      "tool_name": "Unknown AI Tool",
+      "category": "Unknown AI",
+      "risk_level": "unknown",
+      "approved_status": "review_required",
+      "event_count": 15,
+      "users": [
+        "asmith",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "actions": [
+        "blocked",
+        "deny",
+        "reset-both",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "midjourney.com",
+      "tool_name": "Midjourney",
+      "category": "Image Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "event_count": 11,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "proxy"
+      ],
+      "actions": [
+        "allowed",
+        "blocked",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "elevenlabs.io",
+      "tool_name": "ElevenLabs",
+      "category": "Audio Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "event_count": 12,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "proxy"
+      ],
+      "actions": [
+        "allowed",
+        "blocked",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "perplexity.ai",
+      "tool_name": "Perplexity",
+      "category": "AI Search",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "event_count": 5,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "proxy"
+      ],
+      "actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "claude.ai",
+      "tool_name": "Claude",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "event_count": 8,
+      "users": [
+        "asmith",
+        "jdoe",
+        "mchen"
+      ],
+      "source_ips": [
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "proxy"
+      ],
+      "actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "drive.google.com",
+      "tool_name": "Google Drive",
+      "category": "Cloud Storage",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "event_count": 13,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "actions": [
+        "allow",
+        "allowed",
+        "resolved"
+      ]
+    },
+    {
+      "domain": "gemini.google.com",
+      "tool_name": "Google Gemini",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "event_count": 14,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "proxy"
+      ],
+      "actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "api.openai.com",
+      "tool_name": "OpenAI API",
+      "category": "AI API",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "event_count": 17,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "actions": [
+        "allow",
+        "allowed",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "chat.openai.com",
+      "tool_name": "ChatGPT Legacy",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "event_count": 18,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "proxy"
+      ],
+      "actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "unknown-ssl-ai-or-web",
+      "tool_name": "Unattributed SSL AI/Web Traffic",
+      "category": "AI Search",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "event_count": 38,
+      "users": [],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "firewall"
+      ],
+      "actions": [
+        "allow",
+        "deny",
+        "reset-both"
+      ]
+    },
+    {
+      "domain": "notion.so",
+      "tool_name": "Notion",
+      "category": "Productivity",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "event_count": 15,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "proxy"
+      ],
+      "actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ]
+    },
+    {
+      "domain": "github.com",
+      "tool_name": "GitHub",
+      "category": "Developer Tools",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "event_count": 21,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "actions": [
+        "allow",
+        "allowed",
+        "resolved"
+      ]
+    },
+    {
+      "domain": "copilot.microsoft.com",
+      "tool_name": "Microsoft Copilot",
+      "category": "Enterprise AI Assistant",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "event_count": 23,
+      "users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "actions": [
+        "allow",
+        "allowed",
+        "resolved",
+        "review_required"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "COMPASS-001",
+      "title": "Unknown risk AI tool activity detected: Unknown AI Tool",
+      "severity": "high",
+      "domain": "unknown-ai-tool.example",
+      "tool_name": "Unknown AI Tool",
+      "category": "Unknown AI",
+      "event_count": 15,
+      "affected_users": [
+        "asmith",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "observed_actions": [
+        "blocked",
+        "deny",
+        "reset-both",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 25,
+        "overall_risk": "unknown",
+        "control_breakdown": {
+          "govern": 23,
+          "map": 20,
+          "measure": 25,
+          "manage": 17
+        }
+      },
+      "recommendation": "Block or restrict access until reviewed by security."
+    },
+    {
+      "finding_id": "COMPASS-002",
+      "title": "High risk AI tool activity detected: Midjourney",
+      "severity": "high",
+      "domain": "midjourney.com",
+      "tool_name": "Midjourney",
+      "category": "Image Generation",
+      "event_count": 11,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allowed",
+        "blocked",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 38,
+        "overall_risk": "high",
+        "control_breakdown": {
+          "govern": 36,
+          "map": 33,
+          "measure": 38,
+          "manage": 30
+        }
+      },
+      "recommendation": "Block or restrict access until reviewed by security."
+    },
+    {
+      "finding_id": "COMPASS-003",
+      "title": "High risk AI tool activity detected: ElevenLabs",
+      "severity": "high",
+      "domain": "elevenlabs.io",
+      "tool_name": "ElevenLabs",
+      "category": "Audio Generation",
+      "event_count": 12,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allowed",
+        "blocked",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 38,
+        "overall_risk": "high",
+        "control_breakdown": {
+          "govern": 36,
+          "map": 33,
+          "measure": 38,
+          "manage": 30
+        }
+      },
+      "recommendation": "Block or restrict access until reviewed by security."
+    },
+    {
+      "finding_id": "COMPASS-004",
+      "title": "Medium risk AI tool activity detected: Perplexity",
+      "severity": "medium",
+      "domain": "perplexity.ai",
+      "tool_name": "Perplexity",
+      "category": "AI Search",
+      "event_count": 5,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 64,
+        "overall_risk": "medium",
+        "control_breakdown": {
+          "govern": 62,
+          "map": 59,
+          "measure": 64,
+          "manage": 56
+        }
+      },
+      "recommendation": "Allow only with non-sensitive data and require policy review."
+    },
+    {
+      "finding_id": "COMPASS-005",
+      "title": "Medium risk AI tool activity detected: Claude",
+      "severity": "medium",
+      "domain": "claude.ai",
+      "tool_name": "Claude",
+      "category": "General AI Assistant",
+      "event_count": 8,
+      "affected_users": [
+        "asmith",
+        "jdoe",
+        "mchen"
+      ],
+      "source_ips": [
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 64,
+        "overall_risk": "medium",
+        "control_breakdown": {
+          "govern": 62,
+          "map": 59,
+          "measure": 64,
+          "manage": 56
+        }
+      },
+      "recommendation": "Allow only with non-sensitive data and require policy review."
+    },
+    {
+      "finding_id": "COMPASS-006",
+      "title": "Medium risk AI tool activity detected: Google Drive",
+      "severity": "medium",
+      "domain": "drive.google.com",
+      "tool_name": "Google Drive",
+      "category": "Cloud Storage",
+      "event_count": 13,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allow",
+        "allowed",
+        "resolved"
+      ],
+      "nist_scoring": {
+        "overall_score": 64,
+        "overall_risk": "medium",
+        "control_breakdown": {
+          "govern": 62,
+          "map": 59,
+          "measure": 64,
+          "manage": 56
+        }
+      },
+      "recommendation": "Allow only with non-sensitive data and require policy review."
+    },
+    {
+      "finding_id": "COMPASS-007",
+      "title": "Medium risk AI tool activity detected: Google Gemini",
+      "severity": "medium",
+      "domain": "gemini.google.com",
+      "tool_name": "Google Gemini",
+      "category": "General AI Assistant",
+      "event_count": 14,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 64,
+        "overall_risk": "medium",
+        "control_breakdown": {
+          "govern": 62,
+          "map": 59,
+          "measure": 64,
+          "manage": 56
+        }
+      },
+      "recommendation": "Allow only with non-sensitive data and require policy review."
+    },
+    {
+      "finding_id": "COMPASS-008",
+      "title": "Medium risk AI tool activity detected: OpenAI API",
+      "severity": "medium",
+      "domain": "api.openai.com",
+      "tool_name": "OpenAI API",
+      "category": "AI API",
+      "event_count": 17,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allow",
+        "allowed",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 64,
+        "overall_risk": "medium",
+        "control_breakdown": {
+          "govern": 62,
+          "map": 59,
+          "measure": 64,
+          "manage": 56
+        }
+      },
+      "recommendation": "Allow only with non-sensitive data and require policy review."
+    },
+    {
+      "finding_id": "COMPASS-009",
+      "title": "Medium risk AI tool activity detected: ChatGPT Legacy",
+      "severity": "medium",
+      "domain": "chat.openai.com",
+      "tool_name": "ChatGPT Legacy",
+      "category": "General AI Assistant",
+      "event_count": 18,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 64,
+        "overall_risk": "medium",
+        "control_breakdown": {
+          "govern": 62,
+          "map": 59,
+          "measure": 64,
+          "manage": 56
+        }
+      },
+      "recommendation": "Allow only with non-sensitive data and require policy review."
+    },
+    {
+      "finding_id": "COMPASS-010",
+      "title": "Medium risk AI tool activity detected: Unattributed SSL AI/Web Traffic",
+      "severity": "medium",
+      "domain": "unknown-ssl-ai-or-web",
+      "tool_name": "Unattributed SSL AI/Web Traffic",
+      "category": "AI Search",
+      "event_count": 38,
+      "affected_users": [],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "firewall"
+      ],
+      "observed_actions": [
+        "allow",
+        "deny",
+        "reset-both"
+      ],
+      "nist_scoring": {
+        "overall_score": 64,
+        "overall_risk": "medium",
+        "control_breakdown": {
+          "govern": 62,
+          "map": 59,
+          "measure": 64,
+          "manage": 56
+        }
+      },
+      "recommendation": "Allow only with non-sensitive data and require policy review."
+    },
+    {
+      "finding_id": "COMPASS-011",
+      "title": "Low risk AI tool activity detected: Notion",
+      "severity": "low",
+      "domain": "notion.so",
+      "tool_name": "Notion",
+      "category": "Productivity",
+      "event_count": 15,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen",
+        "rpatel"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allowed",
+        "resolved",
+        "review_required"
+      ],
+      "nist_scoring": {
+        "overall_score": 82,
+        "overall_risk": "low",
+        "control_breakdown": {
+          "govern": 80,
+          "map": 77,
+          "measure": 82,
+          "manage": 74
+        }
+      },
+      "recommendation": "Monitor usage and confirm approved data handling."
+    },
+    {
+      "finding_id": "COMPASS-012",
+      "title": "Low risk AI tool activity detected: GitHub",
+      "severity": "low",
+      "domain": "github.com",
+      "tool_name": "GitHub",
+      "category": "Developer Tools",
+      "event_count": 21,
+      "affected_users": [
+        "asmith",
+        "guest",
+        "jdoe",
+        "mchen"
+      ],
+      "source_ips": [
+        "10.24.10.44",
+        "10.24.20.99",
+        "10.24.8.15",
+        "10.24.8.22",
+        "10.24.9.31"
+      ],
+      "evidence_sources": [
+        "dns",
+        "firewall",
+        "proxy"
+      ],
+      "observed_actions": [
+        "allow",
+        "allowed",
+        "resolved"
+      ],
+      "nist_scoring": {
+        "overall_score": 82,
+        "overall_risk": "low",
+        "control_breakdown": {
+          "govern": 80,
+          "map": 77,
+          "measure": 82,
+          "manage": 74
+        }
+      },
+      "recommendation": "Monitor usage and confirm approved data handling."
+    }
+  ],
+  "after_actions": [
+    {
+      "action_id": "AA-001",
+      "action": "Review unknown or unattributed AI traffic",
+      "priority": "high",
+      "owner": "Security Lead",
+      "status": "recommended",
+      "related_findings": [
+        "COMPASS-001",
+        "COMPASS-002",
+        "COMPASS-003"
+      ]
+    },
+    {
+      "action_id": "AA-002",
+      "action": "Add approved and restricted AI tools to policy",
+      "priority": "medium",
+      "owner": "Security Lead",
+      "status": "recommended",
+      "related_findings": [
+        "COMPASS-001",
+        "COMPASS-002",
+        "COMPASS-003",
+        "COMPASS-004",
+        "COMPASS-005",
+        "COMPASS-006",
+        "COMPASS-007",
+        "COMPASS-008"
+      ]
+    },
+    {
+      "action_id": "AA-003",
+      "action": "Prepare executive summary of AI usage and top risks",
+      "priority": "medium",
+      "owner": "Project Compass",
+      "status": "recommended",
+      "related_findings": [
+        "COMPASS-001",
+        "COMPASS-002",
+        "COMPASS-003",
+        "COMPASS-004",
+        "COMPASS-005",
+        "COMPASS-006"
+      ]
+    }
+  ]
+}

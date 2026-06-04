@@ -1,0 +1,717 @@
+{
+  "registry_name": "Project Compass AI Tool Domain Registry",
+  "version": "1.0-demo",
+  "entry_count": 70,
+  "source": {
+    "name": "Microsoft Purview supported AI sites",
+    "url": "https://learn.microsoft.com/en-us/purview/ai-microsoft-purview-supported-sites",
+    "note": "Domains are seeded from the Microsoft Purview supported AI sites list. Risk levels are sample Project Compass classifications, not Microsoft official ratings."
+  },
+  "risk_level_meaning": {
+    "low": "Known enterprise or mainstream AI service. Allow with standard monitoring and approved data use.",
+    "medium": "Known AI service with user input, file upload, or unclear enterprise controls. Allow with restrictions or review.",
+    "high": "Consumer generative AI, media generation, code execution, deepfake, face swap, unknown data retention, or impersonation risk. Review or block until approved."
+  },
+  "tools": [
+    {
+      "domain": "10web.io",
+      "name": "10Web",
+      "category": "Website Builder",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "abridge.com",
+      "name": "Abridge",
+      "category": "Healthcare AI",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "adcreative.ai",
+      "name": "AdCreative.ai",
+      "category": "Marketing Content",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "addy.ai",
+      "name": "Addy AI",
+      "category": "Email Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "agentgpt.reworkd.ai",
+      "name": "AgentGPT",
+      "category": "Agentic Automation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "ai21.com",
+      "name": "AI21 Labs",
+      "category": "Foundation Model Provider",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "ai2sql.io",
+      "name": "AI2SQL",
+      "category": "Code and SQL Assistant",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aibuddy.chat",
+      "name": "AI Buddy",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aichatting.net",
+      "name": "AI Chatting",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aicontentfy.com",
+      "name": "AIContentfy",
+      "category": "Writing Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aicopywriter.ai",
+      "name": "AI Copywriter",
+      "category": "Writing Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aidungeon.io",
+      "name": "AI Dungeon",
+      "category": "Entertainment AI",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aiexcelbot.com",
+      "name": "AI Excel Bot",
+      "category": "Productivity Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aifaceswap.io",
+      "name": "AI Face Swap",
+      "category": "Face Swap and Deepfake",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aiimagegenerator.io",
+      "name": "AI Image Generator",
+      "category": "Image Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aipdf.ai",
+      "name": "AI PDF",
+      "category": "Document Analysis",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aiseo.ai",
+      "name": "AISEO",
+      "category": "Writing Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aistudios.com",
+      "name": "AI Studios",
+      "category": "Video Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "ai-writer.com",
+      "name": "AI Writer",
+      "category": "Writing Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "akool.com",
+      "name": "Akool",
+      "category": "Media Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "allenai.org",
+      "name": "Allen Institute for AI",
+      "category": "Research AI",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "anthropic.com",
+      "name": "Anthropic",
+      "category": "Foundation Model Provider",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "app.synthesia.io",
+      "name": "Synthesia",
+      "category": "Video Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "artbreeder.com",
+      "name": "Artbreeder",
+      "category": "Image Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "askyourpdf.com",
+      "name": "AskYourPDF",
+      "category": "Document Analysis",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "audiostack.ai",
+      "name": "AudioStack",
+      "category": "Audio Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "autogenai.com",
+      "name": "AutogenAI",
+      "category": "Writing Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aws.amazon.com/bedrock/titan",
+      "name": "Amazon Titan",
+      "category": "Enterprise AI Platform",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "aws.amazon.com/q",
+      "name": "Amazon Q",
+      "category": "Enterprise AI Assistant",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "azure.microsoft.com/en-us/products/ai-services/openai-service",
+      "name": "Azure OpenAI Service",
+      "category": "Enterprise AI Platform",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "bard.google.com",
+      "name": "Google Bard",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "bearly.ai",
+      "name": "Bearly AI",
+      "category": "Productivity Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "beautiful.ai",
+      "name": "Beautiful.ai",
+      "category": "Presentation Generation",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "bing.com/chat",
+      "name": "Bing Chat",
+      "category": "General AI Assistant",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "bolt.new",
+      "name": "Bolt",
+      "category": "Code Assistant",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "boomy.com",
+      "name": "Boomy",
+      "category": "Music Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "brandmark.io",
+      "name": "Brandmark",
+      "category": "Design Generation",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "browsegpt.ai",
+      "name": "BrowseGPT",
+      "category": "Browser Automation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "c.ai",
+      "name": "Character AI",
+      "category": "Consumer Chatbot",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "capcut.com",
+      "name": "CapCut",
+      "category": "Video Editing and AI Media",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "captions.ai",
+      "name": "Captions",
+      "category": "Video Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "character.ai",
+      "name": "Character.AI",
+      "category": "Consumer Chatbot",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "chat.bing.com",
+      "name": "Microsoft Copilot Chat",
+      "category": "General AI Assistant",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "chat.com",
+      "name": "Chat.com",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "chatbase.co",
+      "name": "Chatbase",
+      "category": "Custom Chatbot Builder",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "chatbotgen.com",
+      "name": "ChatbotGen",
+      "category": "Custom Chatbot Builder",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "chatdoc.com",
+      "name": "ChatDOC",
+      "category": "Document Analysis",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "chatgpt.com",
+      "name": "ChatGPT",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "chatpdf.com",
+      "name": "ChatPDF",
+      "category": "Document Analysis",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "claude.ai",
+      "name": "Claude",
+      "category": "General AI Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "cleanup.pictures",
+      "name": "Cleanup.pictures",
+      "category": "Image Editing",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "clipdrop.co",
+      "name": "Clipdrop",
+      "category": "Image Generation and Editing",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "cognition.ai",
+      "name": "Cognition",
+      "category": "Agentic Code Assistant",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "cohere.com",
+      "name": "Cohere",
+      "category": "Foundation Model Provider",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "consensus.app",
+      "name": "Consensus",
+      "category": "Research Assistant",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "copilot.microsoft.com",
+      "name": "Microsoft Copilot",
+      "category": "Enterprise AI Assistant",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "copy.ai",
+      "name": "Copy.ai",
+      "category": "Writing Assistant",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "coursebox.ai",
+      "name": "Coursebox",
+      "category": "Education AI",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "craiyon.com",
+      "name": "Craiyon",
+      "category": "Image Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "cursor.com",
+      "name": "Cursor",
+      "category": "Code Assistant",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "cutout.pro",
+      "name": "Cutout Pro",
+      "category": "Image Editing",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "deepai.org",
+      "name": "DeepAI",
+      "category": "General AI Tools",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "deepbrain.io",
+      "name": "DeepBrain",
+      "category": "Video Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "deepfakesweb.com",
+      "name": "Deepfakes Web",
+      "category": "Face Swap and Deepfake",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "deepseek.com",
+      "name": "DeepSeek",
+      "category": "General AI Assistant",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "descript.com",
+      "name": "Descript",
+      "category": "Audio and Video Editing",
+      "risk_level": "medium",
+      "approved_status": "review_required",
+      "data_handling_review": "needed",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "designer.microsoft.com",
+      "name": "Microsoft Designer",
+      "category": "Image Generation and Design",
+      "risk_level": "low",
+      "approved_status": "monitor",
+      "data_handling_review": "standard",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "devin.ai",
+      "name": "Devin",
+      "category": "Agentic Code Assistant",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "dreamstudio.ai",
+      "name": "DreamStudio",
+      "category": "Image Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    },
+    {
+      "domain": "elevenlabs.io",
+      "name": "ElevenLabs",
+      "category": "Audio Generation",
+      "risk_level": "high",
+      "approved_status": "restricted",
+      "data_handling_review": "required",
+      "source_reference": "Microsoft Purview supported AI sites",
+      "notes": "Demo classification for Project Compass. Validate vendor privacy, retention, access control, and acceptable use before production approval."
+    }
+  ]
+}
