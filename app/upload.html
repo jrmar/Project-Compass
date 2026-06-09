@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - Upload Logs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    .upload-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 720px) {
+      .upload-layout { grid-template-columns: 1fr; }
+      .upload-sidebar { order: -1; }
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar-section {
+      margin-bottom: 16px;
+    }
+
+    .sidebar-section:last-child { margin-bottom: 0; }
+
+    /* ---- Actions footer ---- */
+    .upload-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .upload-count {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .upload-count strong {
+      color: var(--teal);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Column header ---- */
+    .col-columns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .col-tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      color: var(--light);
+    }
+
+    /* ---- Sample download link ---- */
+    .sample-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: none;
+      margin-top: 10px;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+
+    .sample-link:hover { color: var(--teal); }
+
+    /* ---- Empty state ---- */
+    .no-files {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 16px 0;
+      font-style: italic;
+    }
+
+    /* ---- Validation msg ---- */
+    .upload-error {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 8px;
+      font-weight: 600;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======== App Header ======== -->
+  <header class="app-header">
+    <a class="app-header-logo" href="login.html">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <div class="app-header-right">
+      <div class="org-badge">
+        <span class="org-badge-dot"></span>
+        <span id="header-org-name">Organization</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======== Step Progress Bar ======== -->
+  <div class="step-bar-wrapper">
+    <div class="step-bar">
+      <div class="step-item active">
+        <div class="step-dot">1</div>
+        <div class="step-label">Upload</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">2</div>
+        <div class="step-label">Detect</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">3</div>
+        <div class="step-label">Inventory</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">4</div>
+        <div class="step-label">Assess</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">5</div>
+        <div class="step-label">Dashboard</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">6</div>
+        <div class="step-label">Report</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== Page Content ======== -->
+  <main class="page-content">
+
+    <h1 class="page-title">Upload Network Logs</h1>
+    <p class="page-subtitle">
+      Start with your DNS query logs - these reveal which AI-related domains your
+      organization's devices are reaching out to.
+    </p>
+
+    <div class="upload-layout">
+
+      <!-- ---- Left: Upload area ---- -->
+      <div>
+        <!-- Drop zone -->
+        <div class="upload-zone" id="drop-zone">
+          <input type="file" id="file-input" accept=".csv" multiple>
+          <span class="upload-icon">&#128196;</span>
+          <div class="upload-title">Drop your DNS log CSV here</div>
+          <div class="upload-sub">or <strong>click to browse</strong></div>
+          <div class="upload-sub" style="margin-top: 8px; font-size: 11px;">
+            Accepts .csv files &nbsp;&middot;&nbsp; Max 50 MB each
+          </div>
+        </div>
+
+        <div class="upload-error" id="upload-error"></div>
+
+        <!-- File list -->
+        <div class="file-list" id="file-list">
+          <div class="no-files" id="no-files-msg">No files added yet.</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="upload-actions">
+          <div class="upload-count">
+            <strong id="file-count">0</strong> file(s) ready
+          </div>
+          <button
+            class="btn btn-teal btn-lg"
+            id="analyze-btn"
+            onclick="startAnalysis()"
+            disabled
+          >
+            Analyze Logs &#8594;
+          </button>
+        </div>
+      </div><!-- /.left -->
+
+      <!-- ---- Right: Sidebar ---- -->
+      <div class="upload-sidebar">
+
+        <!-- What to upload -->
+        <div class="glass-card" style="padding: 20px;">
+          <div class="sidebar-section">
+            <div class="info-panel">
+              <div class="info-panel-title">&#128270; What We Detect</div>
+              <ul>
+                <li>DNS queries to known AI tool domains</li>
+                <li>Traffic to generative AI APIs</li>
+                <li>Connections to sanctioned and unsanctioned tools</li>
+                <li>Volume per user and per tool</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="sidebar-section" style="margin-top: 16px;">
+            <div class="info-panel info-panel-teal">
+              <div class="info-panel-title">&#128202; Expected CSV Columns</div>
+              <div class="col-columns">
+                <span class="col-tag">date</span>
+                <span class="col-tag">time</span>
+                <span class="col-tag">client_ip</span>
+                <span class="col-tag">query_domain</span>
+                <span class="col-tag">record_type</span>
+                <span class="col-tag">response_code</span>
+              </div>
+              <div style="margin-top: 10px; font-size: 11px; color: var(--muted);">
+                Column names and order may vary - Compass will attempt to auto-map common DNS log formats.
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-section" style="margin-top: 16px;">
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+              Don't have DNS logs handy? Use the sample file to run a demonstration.
+            </div>
+            <a class="sample-link" href="../SampleLogs/sample_dns_logs.csv" download>
+              &#8595; Download sample_dns_logs.csv
+            </a>
+          </div>
+        </div>
+
+        <!-- Privacy note -->
+        <div style="margin-top: 16px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
+          <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
+            <strong style="color: var(--light); display: block; margin-bottom: 4px;">&#128274; Data stays in your browser</strong>
+            Uploaded files are processed locally. Nothing is sent to external servers.
+            All data is cleared when you close this tab.
+          </div>
+        </div>
+
+        <!-- Coming soon note -->
+        <div style="margin-top: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,128,32,0.05); border: 1px solid rgba(255,128,32,0.15);">
+          <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
+            <strong style="color: var(--orange); display: block; margin-bottom: 4px;">&#9888;&#65039; Coming Soon</strong>
+            Firewall and proxy log support are in development. DNS logs are analyzed first.
+          </div>
+        </div>
+
+      </div><!-- /.sidebar -->
+
+    </div><!-- /.upload-layout -->
+
+  </main>
+
+  <script>
+    // ---- Load session ----
+    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
+    if (!session || !session.org_name) {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('header-org-name').textContent = session.org_name;
+    }
+
+    // ---- File state ----
+    let uploadedFiles = [];
+
+    // ---- Drop zone interactions ----
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      handleFiles(Array.from(e.dataTransfer.files));
+    });
+
+    fileInput.addEventListener('change', () => {
+      handleFiles(Array.from(fileInput.files));
+      fileInput.value = '';
+    });
+
+    // ---- Process selected files ----
+    function handleFiles(files) {
+      const errEl = document.getElementById('upload-error');
+      errEl.style.display = 'none';
+
+      files.forEach(file => {
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+          errEl.textContent = `"${file.name}" is not a CSV file. Only .csv files are accepted.`;
+          errEl.style.display = 'block';
+          return;
+        }
+
+        if (file.size > 50 * 1024 * 1024) {
+          errEl.textContent = `"${file.name}" exceeds the 50 MB limit.`;
+          errEl.style.display = 'block';
+          return;
+        }
+
+        // Prevent duplicate names
+        if (uploadedFiles.find(f => f.name === file.name)) return;
+
+        // Read file to get row count
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const lines = e.target.result.split('\n').filter(l => l.trim()).length;
+          const rows = Math.max(0, lines - 1); // subtract header
+          uploadedFiles.push({ name: file.name, size: file.size, rows });
+          renderFileList();
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // ---- Render file chips ----
+    function renderFileList() {
+      const list = document.getElementById('file-list');
+      const noMsg = document.getElementById('no-files-msg');
+      const countEl = document.getElementById('file-count');
+      const analyzeBtn = document.getElementById('analyze-btn');
+
+      if (uploadedFiles.length === 0) {
+        list.innerHTML = '<div class="no-files" id="no-files-msg">No files added yet.</div>';
+        analyzeBtn.disabled = true;
+        countEl.textContent = '0';
+        return;
+      }
+
+      countEl.textContent = uploadedFiles.length;
+      analyzeBtn.disabled = false;
+
+      list.innerHTML = uploadedFiles.map((f, i) => `
+        <div class="file-chip" id="chip-${i}">
+          <span class="file-chip-icon">&#128196;</span>
+          <div class="file-chip-info">
+            <div class="file-chip-name">${escHtml(f.name)}</div>
+            <div class="file-chip-meta">${formatBytes(f.size)} &nbsp;&middot;&nbsp; ${f.rows.toLocaleString()} rows detected</div>
+          </div>
+          <button class="file-chip-remove" onclick="removeFile(${i})" title="Remove">&times;</button>
+        </div>
+      `).join('');
+    }
+
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      renderFileList();
+    }
+
+    // ---- Kick off analysis ----
+    function startAnalysis() {
+      if (uploadedFiles.length === 0) return;
+
+      const analyzeBtn = document.getElementById('analyze-btn');
+      analyzeBtn.textContent = 'Starting...';
+      analyzeBtn.disabled = true;
+
+      // Save upload metadata to session
+      session.upload = {
+        files: uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
+        uploaded_at: new Date().toISOString(),
+        log_types: ['dns']
+      };
+      localStorage.setItem('compass_session', JSON.stringify(session));
+
+      window.location.href = 'scanning.html';
+    }
+
+    // ---- Helpers ----
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>

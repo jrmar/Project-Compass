@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      background-image:
+        radial-gradient(ellipse 90% 70% at 50% 0%, rgba(64,130,232,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(51,205,182,0.06) 0%, transparent 60%);
+    }
+
+    .login-wrapper {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    /* ---- Logo + Wordmark ---- */
+    .login-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .login-brand img {
+      height: 64px;
+      width: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    .login-brand-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ---- Card ---- */
+    .login-card {
+      width: 100%;
+      padding: 36px 32px 28px;
+    }
+
+    .login-card-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .login-card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .login-divider {
+      border: none;
+      border-top: 1px solid var(--glass-border);
+      margin: 20px 0;
+    }
+
+    .login-disclaimer {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 4px;
+    }
+
+    /* Resume banner */
+    .resume-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(51, 205, 182, 0.07);
+      border: 1px solid rgba(51, 205, 182, 0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+    }
+
+    .resume-banner-text {
+      font-size: 12px;
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    .resume-banner-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .resume-btn {
+      background: rgba(51, 205, 182, 0.15);
+      border: 1px solid rgba(51, 205, 182, 0.25);
+      border-radius: 6px;
+      color: var(--teal);
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 6px 12px;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .resume-btn:hover { background: rgba(51, 205, 182, 0.22); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+
+    <!-- Brand -->
+    <div class="login-brand">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass Logo">
+      <span class="login-brand-name">Project Compass</span>
+    </div>
+
+    <!-- Card -->
+    <div class="login-card glass-card">
+      <h1 class="login-card-title">Assessment Setup</h1>
+      <p class="login-card-sub">Tell us about your organization before we begin.</p>
+
+      <!-- Resume session banner (shown if session exists) -->
+      <div class="resume-banner hidden" id="resume-banner">
+        <div>
+          <div class="resume-banner-text" id="resume-org-name">Previous session found</div>
+          <div class="resume-banner-sub">Continue where you left off?</div>
+        </div>
+        <button class="resume-btn" onclick="resumeSession()">Resume →</button>
+      </div>
+
+      <!-- Setup Form -->
+      <form id="setup-form" onsubmit="handleSetup(event)" novalidate>
+
+        <div class="form-group">
+          <label class="form-label" for="org-name">
+            Organization Name <span class="required">*</span>
+          </label>
+          <input
+            class="form-input"
+            type="text"
+            id="org-name"
+            placeholder="e.g. Acme Corporation"
+            autocomplete="organization"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="user-name">
+            Your Name <span class="optional">(optional)</span>
+          </label>
+          <input
+            class="form-input"
+            type="text"
+            id="user-name"
+            placeholder="e.g. Jane Smith"
+            autocomplete="name"
+          >
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label class="form-label" for="user-role">Your Role</label>
+          <div class="select-wrapper">
+            <select class="form-select" id="user-role">
+              <option value="IT Security">IT Security</option>
+              <option value="Compliance">Compliance / Risk</option>
+              <option value="Executive">Executive Leadership</option>
+              <option value="IT Admin">IT Administrator</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <span class="form-hint">Used to tailor report language for your audience.</span>
+        </div>
+
+        <div id="error-msg" class="hidden" style="color: var(--danger); font-size: 12px; margin-bottom: 12px; font-weight: 600;"></div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+          Begin Assessment →
+        </button>
+      </form>
+
+      <hr class="login-divider">
+
+      <p class="login-disclaimer">
+        By proceeding, you confirm that you have authorization to analyze your
+        organization's network logs for AI governance purposes. No data leaves
+        your browser.
+      </p>
+    </div>
+
+  </div><!-- /.login-wrapper -->
+
+  <script>
+    // ---- Restore existing session to form fields ----
+    const stored = localStorage.getItem('compass_session');
+    if (stored) {
+      try {
+        const session = JSON.parse(stored);
+        if (session.org_name) {
+          // Pre-fill form
+          document.getElementById('org-name').value = session.org_name;
+          if (session.user_name) document.getElementById('user-name').value = session.user_name;
+          if (session.user_role) document.getElementById('user-role').value = session.user_role;
+
+          // Show resume banner
+          const banner = document.getElementById('resume-banner');
+          banner.classList.remove('hidden');
+          document.getElementById('resume-org-name').textContent = session.org_name;
+        }
+      } catch (_) {}
+    }
+
+    // ---- Resume session: go to the furthest completed step ----
+    function resumeSession() {
+      const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
+      if (session.detection) {
+        window.location.href = 'detect.html';
+      } else {
+        window.location.href = 'upload.html';
+      }
+    }
+
+    // ---- Handle form submit ----
+    function handleSetup(e) {
+      e.preventDefault();
+      const orgName = document.getElementById('org-name').value.trim();
+      const userName = document.getElementById('user-name').value.trim();
+      const userRole = document.getElementById('user-role').value;
+      const errEl = document.getElementById('error-msg');
+
+      if (!orgName) {
+        errEl.textContent = 'Organization name is required.';
+        errEl.classList.remove('hidden');
+        document.getElementById('org-name').focus();
+        return;
+      }
+
+      errEl.classList.add('hidden');
+
+      const session = {
+        org_name:   orgName,
+        user_name:  userName,
+        user_role:  userRole,
+        started_at: new Date().toISOString(),
+        upload:     null,
+        detection:  null,
+        inventory:  null,
+        assessment: null
+      };
+
+      localStorage.setItem('compass_session', JSON.stringify(session));
+      window.location.href = 'upload.html';
+    }
+  </script>
+</body>
+</html>
