@@ -147,7 +147,7 @@ def parse_log(filepath, ruleset, min_risk="low"):
                 continue
 
             # Skip header row
-            if line.startswith("timestamp,"):
+            if line.lower().startswith("timestamp,"):
                 continue
 
             # Parse CSV row
@@ -161,16 +161,29 @@ def parse_log(filepath, ruleset, min_risk="low"):
                 errors.append((lineno, raw.rstrip(), "Too few fields"))
                 continue
 
-            # Map fields to match: timestamp, client_ip, query_domain, query_type, response_code, bytes_out
-            timestamp   = row[0].strip() if len(row) > 0 else ""
-            src_ip      = row[1].strip() if len(row) > 1 else ""
-            user        = src_ip  # no user field in this log; fall back to IP
-            query       = row[2].strip() if len(row) > 2 else ""
-            qtype       = row[3].strip() if len(row) > 3 else ""
-            response_ip = ""
-            rcode       = row[4].strip() if len(row) > 4 else ""
-            log_cat     = ""
-            log_risk    = ""
+            # Auto-detect format based on column count:
+            #   9 columns -> timestamp, src_ip, user, query, type, response_ip, rcode, category, risk_level
+            #   6 columns -> timestamp, client_ip, query_domain, query_type, response_code, bytes_out
+            if len(row) >= 9:
+                timestamp   = row[0].strip()
+                src_ip      = row[1].strip()
+                user        = row[2].strip()
+                query       = row[3].strip()
+                qtype       = row[4].strip()
+                response_ip = row[5].strip()
+                rcode       = row[6].strip()
+                log_cat     = row[7].strip()
+                log_risk    = row[8].strip()
+            else:
+                timestamp   = row[0].strip() if len(row) > 0 else ""
+                src_ip      = row[1].strip() if len(row) > 1 else ""
+                user        = src_ip  # no user field in this format; fall back to IP
+                query       = row[2].strip() if len(row) > 2 else ""
+                qtype       = row[3].strip() if len(row) > 3 else ""
+                response_ip = ""
+                rcode       = row[4].strip() if len(row) > 4 else ""
+                log_cat     = ""
+                log_risk    = ""
 
             match = match_domain(query, ruleset)
             if not match:
@@ -312,11 +325,14 @@ def print_terminal_summary(flagged, summary, errors, skipped, log_file):
     }
     reset = "\033[0m"
     risk_square = "■"
+    SCALE = 10  # 1 square per 10 queries
     for level in ["high", "medium", "low", "unknown"]:
         count = summary["by_risk"].get(level, 0)
         color = risk_colors[level]
-        squares = f"{color}{risk_square * count}{reset}"
+        num_squares = (count + SCALE - 1) // SCALE if count > 0 else 0  # round up, but 0 stays 0
+        squares = f"{color}{risk_square * num_squares}{reset}"
         print(f"  {color}{level:<8}{reset} {count:>4}  {squares}")
+    print(f"  (each {risk_square} = {SCALE} queries)")
 
     print(f"\n--- Top AI Domains ---")
     top_domains = sorted(summary["by_domain"].items(), key=lambda x: -x[1]["count"])[:10]
