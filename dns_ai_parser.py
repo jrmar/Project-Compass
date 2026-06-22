@@ -146,6 +146,10 @@ def parse_log(filepath, ruleset, min_risk="low"):
             if not line or line.startswith("#"):
                 continue
 
+            # Skip header row
+            if line.startswith("timestamp,"):
+                continue
+
             # Parse CSV row
             try:
                 row = next(csv.reader([line]))
@@ -153,20 +157,20 @@ def parse_log(filepath, ruleset, min_risk="low"):
                 errors.append((lineno, raw.rstrip(), str(e)))
                 continue
 
-            if len(row) < 4:
+            if len(row) < 3:
                 errors.append((lineno, raw.rstrip(), "Too few fields"))
                 continue
 
-            # Map fields — be tolerant of missing optional fields
+            # Map fields to match: timestamp, client_ip, query_domain, query_type, response_code, bytes_out
             timestamp   = row[0].strip() if len(row) > 0 else ""
             src_ip      = row[1].strip() if len(row) > 1 else ""
-            user        = row[2].strip() if len(row) > 2 else ""
-            query       = row[3].strip() if len(row) > 3 else ""
-            qtype       = row[4].strip() if len(row) > 4 else ""
-            response_ip = row[5].strip() if len(row) > 5 else ""
-            rcode       = row[6].strip() if len(row) > 6 else ""
-            log_cat     = row[7].strip() if len(row) > 7 else ""
-            log_risk    = row[8].strip() if len(row) > 8 else ""
+            user        = src_ip  # no user field in this log; fall back to IP
+            query       = row[2].strip() if len(row) > 2 else ""
+            qtype       = row[3].strip() if len(row) > 3 else ""
+            response_ip = ""
+            rcode       = row[4].strip() if len(row) > 4 else ""
+            log_cat     = ""
+            log_risk    = ""
 
             match = match_domain(query, ruleset)
             if not match:
@@ -300,10 +304,19 @@ def print_terminal_summary(flagged, summary, errors, skipped, log_file):
     print(f"  Parse errors         : {len(errors)}")
 
     print(f"\n--- Risk Breakdown ---")
+    risk_colors = {
+        "high":    "\033[91m",  # red
+        "medium":  "\033[93m",  # yellow
+        "low":     "\033[92m",  # green
+        "unknown": "\033[90m",  # gray
+    }
+    reset = "\033[0m"
+    risk_square = "■"
     for level in ["high", "medium", "low", "unknown"]:
         count = summary["by_risk"].get(level, 0)
-        bar = "█" * count
-        print(f"  {level:<8} {count:>4}  {bar}")
+        color = risk_colors[level]
+        squares = f"{color}{risk_square * count}{reset}"
+        print(f"  {color}{level:<8}{reset} {count:>4}  {squares}")
 
     print(f"\n--- Top AI Domains ---")
     top_domains = sorted(summary["by_domain"].items(), key=lambda x: -x[1]["count"])[:10]
@@ -324,6 +337,13 @@ def print_terminal_summary(flagged, summary, errors, skipped, log_file):
         for lineno, raw, msg in errors[:10]:
             print(f"  Line {lineno}: {msg}")
             print(f"    {raw[:80]}")
+
+    print(f"\n--- Report Summary ---")
+    print(f"  This report identifies AI-related DNS activity across your network.")
+    print(f"  {len(flagged)} of {total + len(errors)} total queries matched known AI services,")
+    print(f"  spanning {len(summary['by_domain'])} unique domains and {len(summary['by_user'])} unique users/IPs.")
+    print(f"  Risk levels reflect domain sensitivity (e.g. direct API access scores higher")
+    print(f"  than browser-based assistants). Full detail is available in the output files below.")
 
     print(f"\n{sep}\n")
 
