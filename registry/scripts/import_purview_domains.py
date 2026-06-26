@@ -32,7 +32,7 @@ load_dotenv()
 
 # ---- Configuration ----
 PURVIEW_URL = (
-    "https://learn.microsoft.com/en-us/purview/sit-defn-all-ai-sensitive-info-types"
+    "https://learn.microsoft.com/en-us/purview/ai-microsoft-purview-supported-sites"
 )
 
 # Fallback known AI domains if scraping fails or for offline testing
@@ -238,44 +238,49 @@ def run_import(dry_run=False):
     print(f"[INFO] Approved registry: {len(approved_domains)} active domains")
     print(f"[INFO] Pending queue:     {len(pending_domains)} pending domains")
 
-    # Step 4: Record this import run
-    cursor.execute(
-        """
-        INSERT INTO compass.registry_import_run
-            (source_name, source_url, source_hash, domains_found, imported_by, notes)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """,
-        "Microsoft Purview",
-        PURVIEW_URL,
-        source_hash,
-        len(raw_domains),
-        "import_script",
-        f"Automated import run at {datetime.now(timezone.utc).isoformat()}"
-    )
-    conn.commit()
-
-    # Get the import run ID
-    cursor.execute("SELECT @@IDENTITY")
-    import_run_id = int(cursor.fetchone()[0])
-    print(f"[INFO] Import run recorded. ID: {import_run_id}")
-
-    # Step 5: Stage new domains in pending table
-    staged = 0
+    # Step 4: Determine which domains to stage (count first, then INSERT import run)
+    # Cannot UPDATE an append-only ledger table, so all counts must be known upfront.
+    to_stage = []
     skipped_approved = 0
     skipped_pending = 0
 
     for raw in raw_domains:
         nd = normalize_domain(raw)
-
         if nd in approved_domains:
             skipped_approved += 1
-            continue
-
-        if nd in pending_domains:
+        elif nd in pending_domains:
             skipped_pending += 1
-            continue
+        else:
+            to_stage.append((raw, nd))
 
-        # Stage as pending
+    staged = len(to_stage)
+
+    # Step 5: Insert import run record with final counts (append-only - no UPDATE allowed)
+    cursor.execute(
+        """
+        INSERT INTO compass.registry_import_run
+            (source_name, source_url, source_hash, domains_found,
+             domains_staged, domains_skipped, imported_by, notes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        "Microsoft Purview",
+        PURVIEW_URL,
+        source_hash,
+        len(raw_domains),
+        staged,
+        skipped_approved + skipped_pending,
+        "import_script",
+        f"Automated import run at {datetime.now(timezone.utc).isoformat()}"
+    )
+    conn.commit()
+
+    cursor.execute("SELECT @@IDENTITY")
+    import_run_id = int(cursor.fetchone()[0])
+    print(f"[INFO] Import run recorded. ID: {import_run_id}")
+    print(f"[INFO] {staged} new domains to stage, {skipped_approved + skipped_pending} to skip")
+
+    # Step 6: Stage new domains in pending table
+    for raw, nd in to_stage:
         cursor.execute(
             """
             INSERT INTO compass.pending_ai_registry (
@@ -294,23 +299,8 @@ def run_import(dry_run=False):
             "Pending",
             import_run_id
         )
-        staged += 1
         print(f"  [STAGED]  {raw:40s}  risk: {suggest_risk(nd)}")
 
-    conn.commit()
-
-    # Step 6: Update import run with final counts
-    cursor.execute(
-        """
-        UPDATE compass.registry_import_run
-        SET domains_staged  = ?,
-            domains_skipped = ?
-        WHERE id = ?
-        """,
-        staged,
-        skipped_approved + skipped_pending,
-        import_run_id
-    )
     conn.commit()
 
     cursor.close()

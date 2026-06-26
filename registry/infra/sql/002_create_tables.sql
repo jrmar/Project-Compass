@@ -4,16 +4,17 @@
 -- Run after 001_create_schema.sql.
 --
 -- Tables:
---   compass.registry_import_run   - append-only audit log of each import
---   compass.pending_ai_registry   - staging area for new/changed domains
---   compass.approved_ai_registry  - official registry used by detection engine
+--   compass.registry_import_run   - append-only ledger (no updates allowed)
+--   compass.pending_ai_registry   - updatable ledger with system versioning
+--   compass.approved_ai_registry  - updatable ledger with system versioning
 -- ============================================================
 
 
 -- ------------------------------------------------------------
 -- TABLE 1: registry_import_run
 -- Records each time the import script checks Microsoft Purview.
--- Append-only ledger: rows can never be updated or deleted.
+-- Append-only: rows can never be updated or deleted.
+-- This syntax works without system versioning columns.
 -- ------------------------------------------------------------
 IF NOT EXISTS (
     SELECT 1 FROM sys.tables t
@@ -23,9 +24,9 @@ IF NOT EXISTS (
 BEGIN
     CREATE TABLE [compass].[registry_import_run] (
         id                  INT             IDENTITY(1,1)   NOT NULL,
-        source_name         NVARCHAR(100)                   NOT NULL,   -- e.g. 'Microsoft Purview'
+        source_name         NVARCHAR(100)                   NOT NULL,
         source_url          NVARCHAR(500)                   NOT NULL,
-        source_hash         NVARCHAR(64)                    NOT NULL,   -- SHA-256 of sorted domain list
+        source_hash         NVARCHAR(64)                    NOT NULL,
         domains_found       INT                             NOT NULL DEFAULT 0,
         domains_staged      INT                             NOT NULL DEFAULT 0,
         domains_skipped     INT                             NOT NULL DEFAULT 0,
@@ -46,9 +47,9 @@ GO
 
 -- ------------------------------------------------------------
 -- TABLE 2: pending_ai_registry
--- Staging table for all new or changed domains before approval.
--- The import script can only write here, never to approved table.
--- Updatable ledger: all changes are tracked and tamper-evident.
+-- Staging area for new or changed domains before approval.
+-- Updatable ledger requires SYSTEM_VERSIONING = ON and
+-- explicit temporal (ValidFrom/ValidTo) columns.
 -- ------------------------------------------------------------
 IF NOT EXISTS (
     SELECT 1 FROM sys.tables t
@@ -58,42 +59,46 @@ IF NOT EXISTS (
 BEGIN
     CREATE TABLE [compass].[pending_ai_registry] (
         id                      INT             IDENTITY(1,1)   NOT NULL,
-        domain_pattern          NVARCHAR(255)                   NOT NULL,   -- e.g. *.chatgpt.com
-        normalized_domain       NVARCHAR(255)                   NOT NULL,   -- e.g. chatgpt.com
-        source_name             NVARCHAR(100)                   NOT NULL,   -- 'Microsoft Purview', 'DNS Logs', etc.
-        change_type             NVARCHAR(50)                    NOT NULL,   -- ADD | ADD_UNKNOWN | UPDATE
+        domain_pattern          NVARCHAR(255)                   NOT NULL,
+        normalized_domain       NVARCHAR(255)                   NOT NULL,
+        source_name             NVARCHAR(100)                   NOT NULL,
+        change_type             NVARCHAR(50)                    NOT NULL,
         suggested_tool_name     NVARCHAR(200)                   NULL,
-        suggested_category      NVARCHAR(100)                   NULL,       -- Generative AI | Code Assistant | etc.
-        suggested_risk_level    NVARCHAR(50)                    NULL,       -- Low | Medium | Medium-High | High
+        suggested_category      NVARCHAR(100)                   NULL,
+        suggested_risk_level    NVARCHAR(50)                    NULL,
         review_status           NVARCHAR(50)                    NOT NULL DEFAULT 'Pending',
-                                                                            -- Pending | Approved | Rejected | Watchlist | Blocked
         reviewer_notes          NVARCHAR(2000)                  NULL,
-        import_run_id           INT                             NULL,       -- FK to registry_import_run
+        import_run_id           INT                             NULL,
         requested_at            DATETIME2                       NOT NULL DEFAULT GETUTCDATE(),
         reviewer_name           NVARCHAR(200)                   NULL,
         reviewed_at             DATETIME2                       NULL,
 
-        -- Fields for unknown AI usage discovered from network logs
+        -- Unknown AI usage fields (from network log discovery)
         first_seen              DATETIME2                       NULL,
         last_seen               DATETIME2                       NULL,
         user_count              INT                             NULL DEFAULT 0,
         request_count           INT                             NULL DEFAULT 0,
         data_uploads_observed   BIT                             NULL DEFAULT 0,
-        log_source              NVARCHAR(100)                   NULL,       -- dns | proxy | firewall
+        log_source              NVARCHAR(100)                   NULL,
 
-        CONSTRAINT PK_pending_ai_registry          PRIMARY KEY (id),
-        CONSTRAINT CK_pending_review_status        CHECK (review_status IN (
-                                                       'Pending', 'Approved', 'Rejected',
-                                                       'Watchlist', 'Blocked', 'False Positive'
-                                                   )),
-        CONSTRAINT CK_pending_change_type          CHECK (change_type IN (
-                                                       'ADD', 'ADD_UNKNOWN', 'UPDATE'
-                                                   )),
-        CONSTRAINT CK_pending_risk_level           CHECK (suggested_risk_level IN (
-                                                       'Low', 'Medium', 'Medium-High', 'High', NULL
-                                                   ))
+        -- Required for updatable ledger: system versioning period columns
+        -- These are hidden and managed automatically by Azure SQL
+        ValidFrom   DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL,
+        ValidTo     DATETIME2 GENERATED ALWAYS AS ROW END   HIDDEN NOT NULL,
+        PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo),
+
+        CONSTRAINT PK_pending_ai_registry   PRIMARY KEY (id),
+        CONSTRAINT CK_pending_review_status CHECK (review_status IN (
+            'Pending', 'Approved', 'Rejected', 'Watchlist', 'Blocked', 'False Positive'
+        )),
+        CONSTRAINT CK_pending_change_type   CHECK (change_type IN (
+            'ADD', 'ADD_UNKNOWN', 'UPDATE'
+        ))
     )
-    WITH (LEDGER = ON);
+    WITH (
+        SYSTEM_VERSIONING = ON (HISTORY_TABLE = compass.pending_ai_registry_history),
+        LEDGER = ON
+    );
 
     PRINT 'Table [compass].[pending_ai_registry] created (updatable ledger).';
 END
@@ -104,10 +109,9 @@ GO
 
 -- ------------------------------------------------------------
 -- TABLE 3: approved_ai_registry
--- The official registry Compass uses for detection.
+-- The official registry the detection engine reads from.
 -- Only the approval stored procedure can insert here.
--- The detection engine has SELECT-only access.
--- Updatable ledger: all changes tracked and tamper-evident.
+-- Updatable ledger with system versioning.
 -- ------------------------------------------------------------
 IF NOT EXISTS (
     SELECT 1 FROM sys.tables t
@@ -117,29 +121,36 @@ IF NOT EXISTS (
 BEGIN
     CREATE TABLE [compass].[approved_ai_registry] (
         id                  INT             IDENTITY(1,1)   NOT NULL,
-        domain_pattern      NVARCHAR(255)                   NOT NULL,   -- e.g. *.chatgpt.com
-        normalized_domain   NVARCHAR(255)                   NOT NULL,   -- e.g. chatgpt.com
+        domain_pattern      NVARCHAR(255)                   NOT NULL,
+        normalized_domain   NVARCHAR(255)                   NOT NULL,
         tool_name           NVARCHAR(200)                   NOT NULL,
         category            NVARCHAR(100)                   NOT NULL,
-        risk_level          NVARCHAR(50)                    NOT NULL,   -- Low | Medium | High
+        risk_level          NVARCHAR(50)                    NOT NULL,
         source_name         NVARCHAR(100)                   NOT NULL,
-        approval_status     NVARCHAR(50)                    NOT NULL,   -- Approved | Approved_Restricted | Monitor | Blocked
+        approval_status     NVARCHAR(50)                    NOT NULL,
         approved_by         NVARCHAR(200)                   NOT NULL,
         approved_at         DATETIME2                       NOT NULL DEFAULT GETUTCDATE(),
         active              BIT                             NOT NULL DEFAULT 1,
         notes               NVARCHAR(2000)                  NULL,
-        pending_id          INT                             NULL,       -- reference to pending_ai_registry
+        pending_id          INT                             NULL,
         registry_version    NVARCHAR(50)                    NULL,
 
-        CONSTRAINT PK_approved_ai_registry         PRIMARY KEY (id),
-        CONSTRAINT UQ_approved_normalized_domain   UNIQUE (normalized_domain),
-        CONSTRAINT CK_approved_risk_level          CHECK (risk_level IN ('Low', 'Medium', 'High')),
-        CONSTRAINT CK_approved_status              CHECK (approval_status IN (
-                                                       'Approved', 'Approved_Restricted',
-                                                       'Monitor', 'Blocked'
-                                                   ))
+        -- Required for updatable ledger: system versioning period columns
+        ValidFrom   DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL,
+        ValidTo     DATETIME2 GENERATED ALWAYS AS ROW END   HIDDEN NOT NULL,
+        PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo),
+
+        CONSTRAINT PK_approved_ai_registry      PRIMARY KEY (id),
+        CONSTRAINT UQ_approved_normalized_domain UNIQUE (normalized_domain),
+        CONSTRAINT CK_approved_risk_level        CHECK (risk_level IN ('Low', 'Medium', 'High')),
+        CONSTRAINT CK_approved_status            CHECK (approval_status IN (
+            'Approved', 'Approved_Restricted', 'Monitor', 'Blocked'
+        ))
     )
-    WITH (LEDGER = ON);
+    WITH (
+        SYSTEM_VERSIONING = ON (HISTORY_TABLE = compass.approved_ai_registry_history),
+        LEDGER = ON
+    );
 
     PRINT 'Table [compass].[approved_ai_registry] created (updatable ledger).';
 END

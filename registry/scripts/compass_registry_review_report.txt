@@ -1,0 +1,91 @@
+======================================================================
+  PROJECT COMPASS - Registry Bulk Approval Report
+  Registry Version : v1.0-purview-bulk
+  Source           : Microsoft Purview Supported AI Sites
+  Generated        : 2026-06-26 08:41:21 UTC
+  Mode             : DRY RUN - no DB changes
+======================================================================
+
+SUMMARY
+----------------------------------------
+  Total domains processed : 1209
+  Auto-approved           : 1199
+  Left in pending         : 10
+  Approver                : system-auto
+
+APPROVED REGISTRY - CATEGORY BREAKDOWN
+----------------------------------------
+  Unclassified                             620
+  Unknown AI Tool                          360
+  Unclassified AI Tool                      99
+  Generative AI                             48
+  AI Productivity                           21
+  Enterprise AI Platform                    15
+  AI Image / Video Generation               14
+  AI Audio / Voice Generation                8
+  AI Video Generation                        6
+  AI Search                                  5
+  AI Developer Platform                      4
+  AI Code Assistant                          4
+  AI Meeting Intelligence                    4
+  AI Customer Service                        1
+
+APPROVED REGISTRY - DEFAULT RISK DISTRIBUTION
+----------------------------------------
+  (Risk is a baseline starting point. DNS log analysis
+   and NIST scoring determine operational risk level.)
+
+  Low                38  ███
+  Medium            641  ████████████████████████████████████████
+  Medium-High       459  ████████████████████████████████████████
+  High               71  ███████
+
+PENDING REVIEW QUEUE
+----------------------------------------
+  10 domains require manual security review.
+  These were selected to represent a variety of classification
+  scenarios. Use usp_ApproveRegistryEntry or usp_RejectRegistryEntry
+  to action each item.
+
+  ID      Domain                                      Risk          Confidence
+  ------  ------------------------------------------  ------------  --------------------
+  1       10web.cloud                                 Medium        DEFAULT
+  2       10web.io                                    Medium        DEFAULT
+  3       10web.me                                    Medium        DEFAULT
+  4       10zebra.com                                 Medium        DEFAULT
+  9       a1d.ai                                      Medium-High   PATTERN
+  10      a2e.ai                                      Medium-High   PATTERN
+  12      adcreative.ai                               Medium-High   PATTERN
+  108     app.synthesia                               High          HIGH
+  117     artbreeder.com                              High          HIGH
+  188     business.adobe                              High          HIGH
+
+  To view all pending items in Azure:
+    EXEC compass.usp_GetPendingItems
+
+REVIEW GUIDANCE FOR PENDING ITEMS
+----------------------------------------
+  For each pending domain, the security reviewer should confirm:
+  1. Is the vendor legitimate with a clear privacy policy?
+  2. Can submitted data be used for model training?
+  3. Does the tool support enterprise controls (SSO, DPA)?
+  4. Is there a confirmed business need within the organization?
+  5. What is the appropriate final risk level and approval status?
+
+  Approval status options:
+    Approved             - Permitted for organizational use
+    Approved_Restricted  - Permitted with usage restrictions
+    Monitor              - Permitted but flagged for monitoring
+    Blocked              - Not permitted; send to enforcement
+
+ENTERPRISE AUTOMATION NOTE
+----------------------------------------
+  In a production deployment, the Purview import script
+  (import_purview_domains.py) would run on a scheduled basis
+  (e.g., weekly cron) to detect new AI sites added to the
+  Microsoft Purview list. Only net-new domains would be staged
+  in pending - already approved or already pending domains
+  are skipped automatically. This keeps the registry current
+  without re-reviewing domains already actioned.
+
+======================================================================

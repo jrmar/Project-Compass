@@ -49,6 +49,7 @@ END
 GO
 
 GRANT SELECT ON [compass].[pending_ai_registry]         TO compass_reviewer;
+GRANT UPDATE ON [compass].[pending_ai_registry]         TO compass_reviewer;
 GRANT SELECT ON [compass].[approved_ai_registry]        TO compass_reviewer;
 GRANT SELECT ON [compass].[registry_import_run]         TO compass_reviewer;
 GRANT EXECUTE ON [compass].[usp_ApproveRegistryEntry]   TO compass_reviewer;
