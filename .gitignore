@@ -4,3 +4,8 @@ package-lock.json
 .DS_Store
 Thumbs.db
 CLAUDE.md
+
+# Registry - never commit real credentials
+registry/.env
+registry/**/__pycache__/
+registry/**/*.pyc
