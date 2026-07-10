@@ -20,14 +20,9 @@
       .upload-sidebar { order: -1; }
     }
 
-    /* ---- Sidebar ---- */
-    .sidebar-section {
-      margin-bottom: 16px;
-    }
-
+    .sidebar-section { margin-bottom: 16px; }
     .sidebar-section:last-child { margin-bottom: 0; }
 
-    /* ---- Actions footer ---- */
     .upload-actions {
       display: flex;
       align-items: center;
@@ -37,23 +32,10 @@
       border-top: 1px solid var(--glass-border);
     }
 
-    .upload-count {
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .upload-count { font-size: 12px; color: var(--muted); }
+    .upload-count strong { color: var(--teal); font-variant-numeric: tabular-nums; }
 
-    .upload-count strong {
-      color: var(--teal);
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ---- Column header ---- */
-    .col-columns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
+    .col-columns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 
     .col-tag {
       background: rgba(255,255,255,0.05);
@@ -65,7 +47,6 @@
       color: var(--light);
     }
 
-    /* ---- Sample download link ---- */
     .sample-link {
       display: inline-flex;
       align-items: center;
@@ -77,10 +58,8 @@
       font-weight: 600;
       transition: color 0.15s;
     }
-
     .sample-link:hover { color: var(--teal); }
 
-    /* ---- Empty state ---- */
     .no-files {
       font-size: 12px;
       color: var(--muted);
@@ -89,7 +68,6 @@
       font-style: italic;
     }
 
-    /* ---- Validation msg ---- */
     .upload-error {
       color: var(--danger);
       font-size: 12px;
@@ -163,25 +141,22 @@
 
       <!-- ---- Left: Upload area ---- -->
       <div>
-        <!-- Drop zone -->
         <div class="upload-zone" id="drop-zone">
-          <input type="file" id="file-input" accept=".csv" multiple>
+          <input type="file" id="file-input" accept=".csv,.log" multiple>
           <span class="upload-icon">&#128196;</span>
           <div class="upload-title">Drop your DNS log CSV here</div>
           <div class="upload-sub">or <strong>click to browse</strong></div>
           <div class="upload-sub" style="margin-top: 8px; font-size: 11px;">
-            Accepts .csv files &nbsp;&middot;&nbsp; Max 50 MB each
+            Accepts .csv and .log files &nbsp;&middot;&nbsp; Max 50 MB each
           </div>
         </div>
 
         <div class="upload-error" id="upload-error"></div>
 
-        <!-- File list -->
         <div class="file-list" id="file-list">
           <div class="no-files" id="no-files-msg">No files added yet.</div>
         </div>
 
-        <!-- Actions -->
         <div class="upload-actions">
           <div class="upload-count">
             <strong id="file-count">0</strong> file(s) ready
@@ -195,12 +170,11 @@
             Analyze Logs &#8594;
           </button>
         </div>
-      </div><!-- /.left -->
+      </div>
 
       <!-- ---- Right: Sidebar ---- -->
       <div class="upload-sidebar">
 
-        <!-- What to upload -->
         <div class="glass-card" style="padding: 20px;">
           <div class="sidebar-section">
             <div class="info-panel">
@@ -218,15 +192,14 @@
             <div class="info-panel info-panel-teal">
               <div class="info-panel-title">&#128202; Expected CSV Columns</div>
               <div class="col-columns">
-                <span class="col-tag">date</span>
-                <span class="col-tag">time</span>
+                <span class="col-tag">timestamp</span>
                 <span class="col-tag">client_ip</span>
                 <span class="col-tag">query_domain</span>
-                <span class="col-tag">record_type</span>
+                <span class="col-tag">query_type</span>
                 <span class="col-tag">response_code</span>
               </div>
               <div style="margin-top: 10px; font-size: 11px; color: var(--muted);">
-                Column names and order may vary - Compass will attempt to auto-map common DNS log formats.
+                Column names and order may vary — Compass will attempt to auto-map common DNS log formats.
               </div>
             </div>
           </div>
@@ -241,16 +214,15 @@
           </div>
         </div>
 
-        <!-- Privacy note -->
+        <!-- Privacy note — updated to reflect real processing -->
         <div style="margin-top: 16px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
           <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
-            <strong style="color: var(--light); display: block; margin-bottom: 4px;">&#128274; Data stays in your browser</strong>
-            Uploaded files are processed locally. Nothing is sent to external servers.
-            All data is cleared when you close this tab.
+            <strong style="color: var(--light); display: block; margin-bottom: 4px;">&#128274; Secure Processing</strong>
+            Log files are sent securely to the Compass analysis engine and matched against
+            the live AI domain registry. Files are not stored after analysis completes.
           </div>
         </div>
 
-        <!-- Coming soon note -->
         <div style="margin-top: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,128,32,0.05); border: 1px solid rgba(255,128,32,0.15);">
           <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
             <strong style="color: var(--orange); display: block; margin-bottom: 4px;">&#9888;&#65039; Coming Soon</strong>
@@ -258,14 +230,14 @@
           </div>
         </div>
 
-      </div><!-- /.sidebar -->
+      </div>
 
-    </div><!-- /.upload-layout -->
+    </div>
 
   </main>
 
   <script>
-    // ---- Load session ----
+    // ---- Session guard ----
     const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) {
       window.location.href = 'login.html';
@@ -274,9 +246,10 @@
     }
 
     // ---- File state ----
-    let uploadedFiles = [];
+    // We store both metadata AND the actual File object so scanning.html can upload it
+    let uploadedFiles = []; // { name, size, rows, fileObj }
 
-    // ---- Drop zone interactions ----
+    // ---- Drop zone ----
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
 
@@ -300,14 +273,15 @@
       fileInput.value = '';
     });
 
-    // ---- Process selected files ----
+    // ---- Process files ----
     function handleFiles(files) {
       const errEl = document.getElementById('upload-error');
       errEl.style.display = 'none';
 
       files.forEach(file => {
-        if (!file.name.toLowerCase().endsWith('.csv')) {
-          errEl.textContent = `"${file.name}" is not a CSV file. Only .csv files are accepted.`;
+        const name = file.name.toLowerCase();
+        if (!name.endsWith('.csv') && !name.endsWith('.log')) {
+          errEl.textContent = `"${file.name}" must be a .csv or .log file.`;
           errEl.style.display = 'block';
           return;
         }
@@ -318,15 +292,14 @@
           return;
         }
 
-        // Prevent duplicate names
         if (uploadedFiles.find(f => f.name === file.name)) return;
 
-        // Read file to get row count
         const reader = new FileReader();
         reader.onload = (e) => {
           const lines = e.target.result.split('\n').filter(l => l.trim()).length;
-          const rows = Math.max(0, lines - 1); // subtract header
-          uploadedFiles.push({ name: file.name, size: file.size, rows });
+          const rows = Math.max(0, lines - 1);
+          // Store the actual File object alongside metadata
+          uploadedFiles.push({ name: file.name, size: file.size, rows, fileObj: file });
           renderFileList();
         };
         reader.readAsText(file);
@@ -336,7 +309,6 @@
     // ---- Render file chips ----
     function renderFileList() {
       const list = document.getElementById('file-list');
-      const noMsg = document.getElementById('no-files-msg');
       const countEl = document.getElementById('file-count');
       const analyzeBtn = document.getElementById('analyze-btn');
 
@@ -367,7 +339,7 @@
       renderFileList();
     }
 
-    // ---- Kick off analysis ----
+    // ---- Start analysis ----
     function startAnalysis() {
       if (uploadedFiles.length === 0) return;
 
@@ -375,7 +347,7 @@
       analyzeBtn.textContent = 'Starting...';
       analyzeBtn.disabled = true;
 
-      // Save upload metadata to session
+      // Save metadata to session for scanning.html to display
       session.upload = {
         files: uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
         uploaded_at: new Date().toISOString(),
@@ -383,10 +355,18 @@
       };
       localStorage.setItem('compass_session', JSON.stringify(session));
 
+      // Store the actual File objects in sessionStorage via a global
+      // (File objects can't go in localStorage, so we use a window global
+      // that scanning.html will read immediately after navigation)
+      window._compassFiles = uploadedFiles.map(f => f.fileObj);
+
+      // Use sessionStorage to signal that real files are ready
+      sessionStorage.setItem('compass_has_files', 'true');
+      sessionStorage.setItem('compass_file_count', uploadedFiles.length);
+
       window.location.href = 'scanning.html';
     }
 
-    // ---- Helpers ----
     function formatBytes(bytes) {
       if (bytes < 1024) return bytes + ' B';
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
