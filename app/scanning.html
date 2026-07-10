@@ -356,8 +356,31 @@
     async function runAnalysis() {
       // Try to get file from window global set by upload.html
       // (File objects survive same-tab navigation as window globals in most browsers)
-      const files = window.opener?._compassFiles || window._compassFiles;
       const hasFiles = sessionStorage.getItem('compass_has_files') === 'true';
+      const fileData = sessionStorage.getItem('compass_file_data');
+      const fileName = sessionStorage.getItem('compass_file_name') || 'dns_log.csv';
+      const fileType = sessionStorage.getItem('compass_file_type') || 'text/csv';
+      
+      // Reconstruct File object from base64 stored in sessionStorage
+      let files = null;
+      if (hasFiles && fileData) {
+        try {
+          const arr = fileData.split(',');
+          const bstr = atob(arr[1]);
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          while (n--) u8arr[n] = bstr.charCodeAt(n);
+          const reconstructedFile = new File([u8arr], fileName, { type: fileType });
+          files = [reconstructedFile];
+          // Clear sessionStorage after reading
+          sessionStorage.removeItem('compass_file_data');
+          sessionStorage.removeItem('compass_file_name');
+          sessionStorage.removeItem('compass_file_type');
+        } catch (err) {
+          console.error('Failed to reconstruct file:', err);
+          files = null;
+        }
+      }
 
       // Phase 1: Init (always show, real or demo)
       await delay(200);
