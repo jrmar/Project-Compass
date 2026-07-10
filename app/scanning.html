@@ -25,7 +25,6 @@
       width: 100%;
     }
 
-    /* ---- Logo ---- */
     .scan-logo {
       height: 44px;
       width: auto;
@@ -34,7 +33,6 @@
       opacity: 0.85;
     }
 
-    /* ---- Radar pulse animation ---- */
     .radar-wrap {
       position: relative;
       width: 120px;
@@ -50,7 +48,6 @@
       opacity: 0;
       animation: radar-pulse 2s ease-out infinite;
     }
-
     .radar-ring:nth-child(2) { animation-delay: 0.6s; }
     .radar-ring:nth-child(3) { animation-delay: 1.2s; }
 
@@ -74,7 +71,6 @@
       font-size: 22px;
     }
 
-    /* ---- Title / Status ---- */
     .scan-title {
       font-size: 20px;
       font-weight: 800;
@@ -89,10 +85,7 @@
       margin-bottom: 32px;
     }
 
-    /* ---- Progress bar ---- */
-    .scan-progress-wrap {
-      margin-bottom: 16px;
-    }
+    .scan-progress-wrap { margin-bottom: 16px; }
 
     .scan-progress-pct {
       display: flex;
@@ -102,10 +95,8 @@
       color: var(--muted);
       margin-bottom: 6px;
     }
-
     .scan-progress-pct .pct-val { color: var(--teal); font-weight: 700; }
 
-    /* ---- Stage log ---- */
     .stage-log {
       background: rgba(9, 26, 54, 0.6);
       border: 1px solid var(--glass-border);
@@ -128,54 +119,13 @@
       transform: translateY(4px);
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
-
-    .log-line.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .log-line.visible { opacity: 1; transform: translateY(0); }
 
     .log-time { color: var(--muted); flex-shrink: 0; }
     .log-status { color: var(--teal); flex-shrink: 0; }
     .log-status.warn { color: var(--orange); }
+    .log-status.error { color: var(--danger, #ff4d4d); }
     .log-msg { color: var(--light); }
-
-    /* ---- Completion overlay ---- */
-    .scan-done {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .done-check {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: rgba(51, 205, 182, 0.15);
-      border: 2px solid var(--teal);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    @keyframes pop-in {
-      from { transform: scale(0.5); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
-    }
-
-    .done-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--teal);
-    }
-
-    .done-sub {
-      font-size: 12px;
-      color: var(--muted);
-    }
 
     .scan-disclaimer {
       margin-top: 28px;
@@ -192,7 +142,6 @@
          src="../brand_assets/New Main Logo Project Compass Image 1.png"
          alt="Project Compass">
 
-    <!-- Radar animation -->
     <div class="radar-wrap">
       <div class="radar-ring"></div>
       <div class="radar-ring"></div>
@@ -200,11 +149,9 @@
       <div class="radar-core">&#128270;</div>
     </div>
 
-    <!-- Title -->
     <div class="scan-title" id="scan-title">Running COMPASS Analysis</div>
     <div class="scan-org" id="scan-org">Scanning logs for AI tool activity...</div>
 
-    <!-- Progress bar -->
     <div class="scan-progress-wrap">
       <div class="scan-progress-pct">
         <span>Progress</span>
@@ -215,15 +162,17 @@
       </div>
     </div>
 
-    <!-- Stage log -->
     <div class="stage-log" id="stage-log"></div>
 
     <p class="scan-disclaimer">Do not close this window during analysis.</p>
 
-  </div><!-- /.scan-container -->
+  </div>
 
   <script>
-    // ---- Guard: require a session ----
+    // ---- Azure Function endpoint ----
+    const AZURE_FN_URL = 'https://compass-dns-fn.azurewebsites.net/api/parse';
+
+    // ---- Session guard ----
     const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) {
       window.location.href = 'login.html';
@@ -234,26 +183,37 @@
         `Analyzing logs for ${session.org_name}...`;
     }
 
-    // ---- Animation stages ----
-    const now = () => {
-      const d = new Date();
-      return d.toTimeString().slice(0, 8);
-    };
+    // ---- UI helpers ----
+    const logEl   = document.getElementById('stage-log');
+    const fillEl  = document.getElementById('progress-fill');
+    const pctEl   = document.getElementById('pct-label');
 
-    const stages = [
-      { pct: 5,  delay: 200,  status: 'INFO', msg: 'COMPASS engine initialized' },
-      { pct: 14, delay: 600,  status: 'INFO', msg: 'Reading DNS log entries...' },
-      { pct: 26, delay: 1100, status: 'INFO', msg: `Parsed ${getRowCount()} log rows across ${getFileCount()} file(s)` },
-      { pct: 38, delay: 1700, status: 'INFO', msg: 'Loading AI domain registry (70 entries)...' },
-      { pct: 52, delay: 2300, status: 'INFO', msg: 'Matching queried domains against registry...' },
-      { pct: 64, delay: 2900, status: 'WARN', msg: '3 high-risk domains flagged for review' },
-      { pct: 75, delay: 3500, status: 'INFO', msg: 'Scoring risk levels (NIST AI RMF)...' },
-      { pct: 84, delay: 4100, status: 'INFO', msg: 'Correlating users to detected tools...' },
-      { pct: 91, delay: 4600, status: 'INFO', msg: 'Building findings report...' },
-      { pct: 97, delay: 5100, status: 'INFO', msg: 'Finalizing 13 detected tools across 5 users' },
-      { pct: 100, delay: 5700, status: 'OK',  msg: 'Analysis complete. Redirecting...' },
-    ];
+    const now = () => new Date().toTimeString().slice(0, 8);
 
+    function setProgress(pct) {
+      fillEl.style.width = pct + '%';
+      pctEl.textContent = pct + '%';
+    }
+
+    function addLog(status, msg) {
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      const cls = status === 'WARN' ? 'log-status warn'
+                : status === 'ERROR' ? 'log-status error'
+                : 'log-status';
+      line.innerHTML = `
+        <span class="log-time">${now()}</span>
+        <span class="${cls}">[${status}]</span>
+        <span class="log-msg">${msg}</span>
+      `;
+      logEl.appendChild(line);
+      requestAnimationFrame(() => requestAnimationFrame(() => line.classList.add('visible')));
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // ---- Helper: get row count from session ----
     function getRowCount() {
       if (session && session.upload && session.upload.files) {
         const total = session.upload.files.reduce((s, f) => s + (f.rows || 0), 0);
@@ -269,62 +229,243 @@
       return 1;
     }
 
-    // ---- Run animation ----
-    const logEl = document.getElementById('stage-log');
-    const fillEl = document.getElementById('progress-fill');
-    const pctEl  = document.getElementById('pct-label');
+    // ---- Parse plain-text response from Azure Function ----
+    function parseAzureResponse(text) {
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const result = {
+        registry_size: 0,
+        total_parsed: 0,
+        flagged: 0,
+        skipped: 0,
+        errors: 0,
+        risk: { high: 0, medium: 0, low: 0, unknown: 0 },
+        top_domains: []
+      };
 
-    stages.forEach((stage, i) => {
-      setTimeout(() => {
-        // Update progress bar
-        fillEl.style.width = stage.pct + '%';
-        pctEl.textContent = stage.pct + '%';
+      for (const line of lines) {
+        if (line.startsWith('Domains in registry:'))  result.registry_size = parseInt(line.split(':')[1]) || 0;
+        if (line.startsWith('Total entries parsed:')) result.total_parsed  = parseInt(line.split(':')[1]) || 0;
+        if (line.startsWith('AI-related (flagged):')) result.flagged       = parseInt(line.split(':')[1]) || 0;
+        if (line.startsWith('Non-AI / filtered:'))   result.skipped       = parseInt(line.split(':')[1]) || 0;
+        if (line.startsWith('Parse errors:'))        result.errors        = parseInt(line.split(':')[1]) || 0;
+        if (line.startsWith('high'))    result.risk.high    = parseInt(line.split(/\s+/)[1]) || 0;
+        if (line.startsWith('medium'))  result.risk.medium  = parseInt(line.split(/\s+/)[1]) || 0;
+        if (line.startsWith('low'))     result.risk.low     = parseInt(line.split(/\s+/)[1]) || 0;
+        if (line.startsWith('unknown')) result.risk.unknown = parseInt(line.split(/\s+/)[1]) || 0;
 
-        // Append log line
-        const line = document.createElement('div');
-        line.className = 'log-line';
-        const statusClass = stage.status === 'WARN' ? 'log-status warn' : 'log-status';
-        line.innerHTML = `
-          <span class="log-time">${now()}</span>
-          <span class="${statusClass}">[${stage.status}]</span>
-          <span class="log-msg">${stage.msg}</span>
-        `;
-        logEl.appendChild(line);
-
-        // Animate in
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => line.classList.add('visible'));
-        });
-
-        // Scroll log to bottom
-        logEl.scrollTop = logEl.scrollHeight;
-
-        // Last stage: load seeded data then redirect
-        if (i === stages.length - 1) {
-          loadSeedDataAndRedirect();
+        // Top domains lines: "  domain.com   Category   high   42 queries"
+        const domainMatch = line.match(/^(\S+)\s+(.+?)\s+(high|medium|low|unknown)\s+(\d+)\s+quer/i);
+        if (domainMatch) {
+          result.top_domains.push({
+            domain: domainMatch[1],
+            category: domainMatch[2].trim(),
+            risk_level: domainMatch[3].toLowerCase(),
+            event_count: parseInt(domainMatch[4]) || 0
+          });
         }
-      }, stage.delay);
-    });
+      }
 
-    // ---- Load seeded detection results ----
-    function loadSeedDataAndRedirect() {
+      return result;
+    }
+
+    // ---- Map Azure results → seeded detection format ----
+    function buildDetectionPayload(parsed, fileNames) {
+      const highCount = parsed.risk.high;
+      const medCount  = parsed.risk.medium;
+      const lowCount  = parsed.risk.low;
+
+      // Build detected_tools from top domains
+      const detected_tools = parsed.top_domains.map(d => ({
+        domain: d.domain,
+        tool_name: toToolName(d.domain),
+        category: d.category,
+        risk_level: d.risk_level,
+        approved_status: d.risk_level === 'high' ? 'restricted'
+                       : d.risk_level === 'medium' ? 'review_required'
+                       : 'approved',
+        event_count: d.event_count,
+        users: [],         // DNS logs don't have users in 6-col format; IPs used instead
+        source_ips: [],
+        sources: ['dns'],
+        actions: d.risk_level === 'high' ? ['review_required', 'blocked'] : ['resolved']
+      }));
+
+      return {
+        assessment_id:   `assessment-${new Date().toISOString().slice(0,10)}-live`,
+        assessment_name: `Compass Analysis — ${fileNames.join(', ')}`,
+        _live: true,
+        _registry_size: parsed.registry_size,
+        summary: {
+          total_events:          parsed.flagged,
+          unique_tools_or_domains: parsed.top_domains.length,
+          events_by_source:      { dns: parsed.flagged, proxy: 0, firewall: 0 },
+          events_by_risk_level:  { high: highCount, medium: medCount, low: lowCount, unknown: parsed.risk.unknown },
+          events_by_observed_action: { resolved: lowCount, review_required: medCount, blocked: highCount },
+          high_or_unknown_events: highCount + parsed.risk.unknown,
+          users_observed:        [],
+          source_ips_observed:   []
+        },
+        detected_tools
+      };
+    }
+
+    // ---- Convert domain to a readable tool name ----
+    function toToolName(domain) {
+      const map = {
+        'openai.com': 'OpenAI', 'chat.openai.com': 'ChatGPT',
+        'api.openai.com': 'OpenAI API', 'claude.ai': 'Claude',
+        'anthropic.com': 'Anthropic', 'gemini.google.com': 'Google Gemini',
+        'copilot.github.com': 'GitHub Copilot', 'github.com': 'GitHub',
+        'midjourney.com': 'Midjourney', 'huggingface.co': 'Hugging Face',
+        'character.ai': 'Character.AI', 'perplexity.ai': 'Perplexity AI',
+        'notion.so': 'Notion AI', 'www.google.com': 'Google',
+        'mail.google.com': 'Gmail', 'mini.google.com': 'Google Mini',
+      };
+      if (map[domain]) return map[domain];
+      // Capitalize first segment: "jasper.ai" → "Jasper AI"
+      return domain.split('.').slice(-2, -1)[0]
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase()) + ' AI';
+    }
+
+    // ---- Fallback: load seeded data ----
+    function loadFallbackAndRedirect(reason) {
+      addLog('WARN', `Live analysis unavailable: ${reason}`);
+      addLog('INFO', 'Loading demonstration data...');
+      setProgress(90);
+
       fetch('../project_compass_seeded_detection_results_frontend.json')
-        .then(r => {
-          if (!r.ok) throw new Error('fetch failed');
-          return r.json();
-        })
+        .then(r => r.ok ? r.json() : Promise.reject('fetch failed'))
         .then(data => {
           session.detection = data;
+          session.detection._fallback = true;
           localStorage.setItem('compass_session', JSON.stringify(session));
-          setTimeout(() => { window.location.href = 'detect.html'; }, 700);
+          setProgress(100);
+          addLog('OK', 'Demo data loaded. Redirecting...');
+          setTimeout(() => { window.location.href = 'detect.html'; }, 800);
         })
         .catch(() => {
-          // Fallback: redirect anyway with a flag so detect.html uses its own bundled data
           session.detection = { _fallback: true };
           localStorage.setItem('compass_session', JSON.stringify(session));
-          setTimeout(() => { window.location.href = 'detect.html'; }, 700);
+          setProgress(100);
+          setTimeout(() => { window.location.href = 'detect.html'; }, 800);
         });
     }
+
+    // ---- Main analysis flow ----
+    async function runAnalysis() {
+      // Try to get file from window global set by upload.html
+      // (File objects survive same-tab navigation as window globals in most browsers)
+      const files = window.opener?._compassFiles || window._compassFiles;
+      const hasFiles = sessionStorage.getItem('compass_has_files') === 'true';
+
+      // Phase 1: Init (always show, real or demo)
+      await delay(200);
+      addLog('INFO', 'COMPASS engine initialized');
+      setProgress(8);
+
+      await delay(500);
+      addLog('INFO', `Reading DNS log entries — ${getRowCount()} rows across ${getFileCount()} file(s)`);
+      setProgress(18);
+
+      await delay(700);
+      addLog('INFO', 'Connecting to AI domain registry (Azure SQL)...');
+      setProgress(28);
+
+      // Phase 2: Attempt real API call if files are available
+      if (!hasFiles || !files || files.length === 0) {
+        // No real files — use demo data
+        await delay(500);
+        addLog('WARN', 'No live file detected — running in demonstration mode');
+        setProgress(40);
+        await delay(400);
+        loadFallbackAndRedirect('no file available');
+        return;
+      }
+
+      // Real file upload
+      const file = files[0]; // Use first file
+      const fileNames = files.map(f => f.name);
+
+      try {
+        addLog('INFO', `Uploading "${file.name}" to analysis engine...`);
+        setProgress(35);
+
+        const formData = new FormData();
+        formData.append('logfile', file);
+
+        // Fire the real API call
+        const responsePromise = fetch(AZURE_FN_URL, { method: 'POST', body: formData });
+
+        // Show progress animation while waiting (Azure Function cold start can be slow)
+        await delay(800);
+        addLog('INFO', 'Matching domains against live registry (1,199 entries)...');
+        setProgress(48);
+
+        await delay(1000);
+        addLog('INFO', 'Scoring risk levels using NIST AI RMF framework...');
+        setProgress(60);
+
+        await delay(800);
+        addLog('INFO', 'Correlating source IPs to detected tools...');
+        setProgress(72);
+
+        // Wait for actual response
+        const response = await responsePromise;
+
+        if (!response.ok) {
+          throw new Error(`API returned ${response.status}`);
+        }
+
+        const text = await response.text();
+
+        if (!text || text.startsWith('Error:')) {
+          throw new Error(text || 'Empty response from analysis engine');
+        }
+
+        setProgress(85);
+        addLog('INFO', 'Building detection findings...');
+
+        const parsed = parseAzureResponse(text);
+        const detection = buildDetectionPayload(parsed, fileNames);
+
+        await delay(600);
+        setProgress(95);
+
+        const highCount = parsed.risk.high;
+        const totalTools = parsed.top_domains.length;
+
+        if (highCount > 0) {
+          addLog('WARN', `${highCount} high-risk domain(s) flagged for immediate review`);
+        }
+
+        await delay(400);
+        addLog('INFO', `Analysis complete — ${totalTools} AI tools detected across ${parsed.flagged} events`);
+        setProgress(100);
+
+        // Save real results to session
+        session.detection = detection;
+        localStorage.setItem('compass_session', JSON.stringify(session));
+
+        // Clear the file signal
+        sessionStorage.removeItem('compass_has_files');
+        sessionStorage.removeItem('compass_file_count');
+
+        await delay(700);
+        addLog('OK', 'Redirecting to detection results...');
+        await delay(400);
+        window.location.href = 'detect.html';
+
+      } catch (err) {
+        console.error('Azure Function error:', err);
+        addLog('ERROR', `Analysis engine error: ${err.message}`);
+        await delay(500);
+        loadFallbackAndRedirect(err.message);
+      }
+    }
+
+    // ---- Kick off ----
+    runAnalysis();
   </script>
 </body>
 </html>
