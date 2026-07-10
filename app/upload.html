@@ -341,18 +341,38 @@
 
     // ---- Start analysis ----
     function startAnalysis() {
-      if (uploadedFiles.length === 0) return;
+  if (uploadedFiles.length === 0) return;
 
-      const analyzeBtn = document.getElementById('analyze-btn');
-      analyzeBtn.textContent = 'Starting...';
-      analyzeBtn.disabled = true;
+  const analyzeBtn = document.getElementById('analyze-btn');
+  analyzeBtn.textContent = 'Preparing...';
+  analyzeBtn.disabled = true;
 
-      // Save metadata to session for scanning.html to display
-      session.upload = {
-        files: uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
-        uploaded_at: new Date().toISOString(),
-        log_types: ['dns']
-      };
+  // Save metadata to session
+  session.upload = {
+    files: uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
+    uploaded_at: new Date().toISOString(),
+    log_types: ['dns']
+  };
+  localStorage.setItem('compass_session', JSON.stringify(session));
+
+  // Read the first file as base64 and store in sessionStorage
+  // so scanning.html can reconstruct it after navigation
+  const file = uploadedFiles[0].fileObj;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      sessionStorage.setItem('compass_file_data', e.target.result);
+      sessionStorage.setItem('compass_file_name', file.name);
+      sessionStorage.setItem('compass_file_type', file.type || 'text/csv');
+      sessionStorage.setItem('compass_has_files', 'true');
+    } catch (err) {
+      // sessionStorage full (file too large) — fall back to demo mode
+      sessionStorage.setItem('compass_has_files', 'false');
+    }
+    window.location.href = 'scanning.html';
+  };
+  reader.readAsDataURL(file);
+}
       localStorage.setItem('compass_session', JSON.stringify(session));
 
       // Store the actual File objects in sessionStorage via a global
