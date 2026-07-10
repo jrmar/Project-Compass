@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - Detection Results</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+
+    /* ---- KPI Row ---- */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 700px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+
+    .kpi-tile {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-tile::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .kpi-tile.k-danger::after  { background: var(--danger); }
+    .kpi-tile.k-blue::after    { background: var(--blue); }
+    .kpi-tile.k-teal::after    { background: var(--teal); }
+    .kpi-tile.k-neutral::after { background: rgba(208,212,226,0.18); }
+
+    .kpi-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi-tile.k-danger .kpi-value { color: var(--danger); }
+    .kpi-tile.k-blue   .kpi-value { color: var(--light); }
+    .kpi-tile.k-teal   .kpi-value { color: var(--teal); }
+    .kpi-tile.k-neutral .kpi-value { color: var(--light); }
+    .kpi-sub {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* ---- Risk Distribution Bar ---- */
+    .risk-bar-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .risk-bar-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .risk-bar-track {
+      display: flex;
+      height: 8px;
+      border-radius: 100px;
+      overflow: hidden;
+      gap: 2px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.04);
+    }
+    .risk-bar-seg {
+      height: 100%;
+      border-radius: 100px;
+      min-width: 3px;
+    }
+    .risk-legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .legend-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--light);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- Toolbar ---- */
+    .detect-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 3px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .filter-tab {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 5px 13px;
+      border-radius: 4px;
+      color: var(--muted);
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .filter-tab:hover { color: var(--light); }
+    .filter-tab.ft-active          { background: rgba(64,130,232,0.14); color: var(--light);   box-shadow: inset 0 0 0 1px rgba(64,130,232,0.28); }
+    .filter-tab.ft-active.fh       { background: rgba(224,92,92,0.12);  color: var(--danger);  box-shadow: inset 0 0 0 1px rgba(224,92,92,0.25); }
+    .filter-tab.ft-active.fm       { background: rgba(255,128,32,0.12); color: var(--orange);  box-shadow: inset 0 0 0 1px rgba(255,128,32,0.25); }
+    .filter-tab.ft-active.fl       { background: rgba(51,205,182,0.1);  color: var(--teal);    box-shadow: inset 0 0 0 1px rgba(51,205,182,0.2); }
+    .filter-tab.ft-active.fu       { background: rgba(208,212,226,0.06); color: var(--light);  box-shadow: inset 0 0 0 1px rgba(208,212,226,0.14); }
+    .detect-count { font-size: 11px; color: var(--muted); }
+    .detect-count strong { color: var(--light); font-variant-numeric: tabular-nums; }
+
+    /* ---- Risk Group Header ---- */
+    .risk-group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0 8px;
+    }
+    .risk-group-header:first-child { margin-top: 0; }
+    .risk-group-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .risk-group-line { flex: 1; height: 1px; background: var(--glass-border); }
+    .risk-group-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ---- Tool Row ---- */
+    .tool-wrapper { margin-bottom: 4px; }
+
+    .tool-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-left-width: 3px;
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .tool-row:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+    .tool-row.risk-high    { border-left-color: var(--danger); }
+    .tool-row.risk-medium  { border-left-color: var(--orange); }
+    .tool-row.risk-low     { border-left-color: var(--teal); }
+    .tool-row.risk-unknown { border-left-color: rgba(208,212,226,0.28); }
+
+    .tool-row:hover.risk-high    { background: rgba(224,92,92,0.05); }
+    .tool-row:hover.risk-medium  { background: rgba(255,128,32,0.05); }
+    .tool-row:hover.risk-low     { background: rgba(51,205,182,0.04); }
+    .tool-row:hover.risk-unknown { background: rgba(255,255,255,0.015); }
+
+    .tool-row.tr-expanded {
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      border-bottom-color: transparent;
+    }
+
+    .tool-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+    .tool-icon.risk-high    { background: rgba(224,92,92,0.12);   color: var(--danger); }
+    .tool-icon.risk-medium  { background: rgba(255,128,32,0.12);  color: var(--orange); }
+    .tool-icon.risk-low     { background: rgba(51,205,182,0.1);   color: var(--teal); }
+    .tool-icon.risk-unknown { background: rgba(208,212,226,0.06); color: var(--muted); }
+
+    .tool-name-col { flex: 1; min-width: 0; }
+    .tool-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--light);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tool-domain {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tool-category {
+      font-size: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) { .tool-category { display: none; } }
+
+    .tool-events-col {
+      text-align: right;
+      flex-shrink: 0;
+      min-width: 52px;
+    }
+    .tool-events-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--light);
+      font-variant-numeric: tabular-nums;
+    }
+    .tool-events-lbl {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .tool-chevron {
+      color: var(--muted);
+      font-size: 10px;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+      opacity: 0.5;
+    }
+    .tool-row.tr-expanded .tool-chevron { transform: rotate(90deg); opacity: 1; }
+
+    /* ---- Tool Detail Panel ---- */
+    .tool-detail {
+      display: none;
+      background: rgba(7,21,48,0.7);
+      border: 1px solid var(--glass-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      padding: 14px 16px 16px 16px;
+    }
+    .tool-detail.td-open { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+
+    .detail-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .detail-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .detail-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 2px 7px;
+      color: var(--light);
+    }
+    .detail-pill.dp-block  { color: var(--danger); border-color: rgba(224,92,92,0.2); background: rgba(224,92,92,0.07); }
+    .detail-pill.dp-review { color: var(--orange); border-color: rgba(255,128,32,0.2); background: rgba(255,128,32,0.06); }
+    .detail-pill.dp-ok     { color: var(--teal);   border-color: rgba(51,205,182,0.2); background: rgba(51,205,182,0.05); }
+
+    /* ---- Demo Banner ---- */
+    .demo-banner {
+      background: rgba(255,128,32,0.06);
+      border: 1px solid rgba(255,128,32,0.18);
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--orange);
+      margin-bottom: 20px;
+    }
+    .demo-banner span.db-note { color: var(--muted); }
+
+    /* ---- Empty State ---- */
+    .empty-state {
+      text-align: center;
+      padding: 52px 24px;
+      color: var(--muted);
+    }
+    .empty-state-icon { font-size: 28px; margin-bottom: 10px; }
+    .empty-state-text { font-size: 13px; }
+
+    /* ---- Proceed Footer ---- */
+    .proceed-bar {
+      position: sticky;
+      bottom: 0;
+      background: rgba(3,11,30,0.93);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--glass-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 100;
+    }
+    .proceed-meta { font-size: 12px; color: var(--muted); }
+    .proceed-meta strong { color: var(--light); }
+    .proceed-meta .pm-alert { color: var(--danger); }
+
+    @media (max-width: 540px) {
+      .proceed-bar { flex-direction: column; align-items: stretch; }
+      .proceed-bar .btn { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <a class="app-header-logo" href="login.html">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <div class="app-header-right">
+      <div class="org-badge">
+        <span class="org-badge-dot"></span>
+        <span id="header-org-name">Organization</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Step Bar ── -->
+  <div class="step-bar-wrapper">
+    <div class="step-bar">
+      <div class="step-item completed">
+        <div class="step-dot">&#10003;</div>
+        <div class="step-label">Upload</div>
+      </div>
+      <div class="step-connector done"></div>
+      <div class="step-item active">
+        <div class="step-dot">2</div>
+        <div class="step-label">Detect</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">3</div>
+        <div class="step-label">Inventory</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">4</div>
+        <div class="step-label">Assess</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">5</div>
+        <div class="step-label">Dashboard</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">6</div>
+        <div class="step-label">Report</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main ── -->
+  <main class="page-content-wide">
+
+    <!-- Demo Banner -->
+    <div class="demo-banner" id="demo-banner" style="display:none;">
+      <span>&#9888;</span>
+      <div>
+        <strong>Demonstration Mode&nbsp;</strong>
+        <span class="db-note">— Results are based on sample data, not a live log upload.</span>
+      </div>
+    </div>
+
+    <h1 class="page-title">Detection Results</h1>
+    <p class="page-subtitle" id="page-subtitle">AI tool activity identified in your DNS logs.</p>
+
+    <!-- KPI Tiles -->
+    <div class="kpi-row" id="kpi-row"></div>
+
+    <!-- Risk Distribution Bar -->
+    <div class="risk-bar-card">
+      <div class="risk-bar-title">Event Risk Distribution</div>
+      <div class="risk-bar-track" id="risk-track"></div>
+      <div class="risk-legend" id="risk-legend"></div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="detect-toolbar">
+      <div class="filter-tabs">
+        <button class="filter-tab ft-active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-tab" onclick="setFilter('high',this,'fh')">High</button>
+        <button class="filter-tab" onclick="setFilter('medium',this,'fm')">Medium</button>
+        <button class="filter-tab" onclick="setFilter('low',this,'fl')">Low</button>
+        <button class="filter-tab" onclick="setFilter('unknown',this,'fu')">Unknown</button>
+      </div>
+      <div class="detect-count">
+        Showing <strong id="vis-count">0</strong> of <strong id="tot-count">0</strong> tools
+      </div>
+    </div>
+
+    <!-- Tool List -->
+    <div id="tool-list"></div>
+
+    <div style="height: 88px;"></div>
+  </main>
+
+  <!-- ── Proceed Footer ── -->
+  <div class="proceed-bar">
+    <div class="proceed-meta" id="proceed-meta"></div>
+    <button class="btn btn-teal btn-lg" onclick="window.location.href='inventory.html'">
+      Proceed to Inventory &#8594;
+    </button>
+  </div>
+
+  <script>
+    // ── Session Guard ──
+    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
+    if (!session || !session.org_name) { window.location.href = 'login.html'; }
+    if (session) document.getElementById('header-org-name').textContent = session.org_name;
+
+    const det = (session && session.detection) ? session.detection : null;
+
+    // Demo banner
+    if (!det || det._fallback) {
+      document.getElementById('demo-banner').style.display = 'flex';
+    }
+
+    // ── Normalize tools ──
+    function normalizeTools(d) {
+      if (!d || !d.detected_tools) return [];
+      return d.detected_tools.map(t => ({
+        domain:          String(t.domain || ''),
+        tool_name:       String(t.tool_name || t.domain || 'Unknown'),
+        category:        String(t.category || 'Unclassified'),
+        risk_level:      String(t.risk_level || 'unknown').toLowerCase(),
+        approved_status: String(t.approved_status || 'review_required'),
+        event_count:     Number(t.event_count) || 0,
+        users:           Array.isArray(t.users)      ? t.users      : [],
+        source_ips:      Array.isArray(t.source_ips) ? t.source_ips : [],
+        sources:         Array.isArray(t.sources)    ? t.sources    : [],
+        actions:         Array.isArray(t.actions)    ? t.actions    : []
+      }));
+    }
+
+    const tools   = normalizeTools(det);
+    const summary = (det && det.summary) ? det.summary : {};
+    const riskCounts = summary.events_by_risk_level || { high:0, medium:0, low:0, unknown:0 };
+    const totalEvents = summary.total_events || tools.reduce((s,t) => s + t.event_count, 0) || 1;
+    const registrySize = (det && det._registry_size) ? det._registry_size : 1199;
+
+    // Page subtitle
+    if (det && det.assessment_name) {
+      document.getElementById('page-subtitle').textContent =
+        det.assessment_name + ' — ' + tools.length + ' AI tool' + (tools.length !== 1 ? 's' : '') +
+        ' identified across ' + totalEvents.toLocaleString() + ' events.';
+    }
+
+    // ── KPI Tiles ──
+    const usersObs    = Array.isArray(summary.users_observed) ? summary.users_observed.length : 0;
+    const highUnknown = (riskCounts.high || 0) + (riskCounts.unknown || 0);
+    const kpis = [
+      { label:'Events Parsed',      value:(totalEvents).toLocaleString(), sub:'DNS queries analyzed',           cls:'k-blue'    },
+      { label:'AI Tools Detected',  value:tools.length.toLocaleString(),  sub:usersObs ? usersObs+' users observed' : 'across your network', cls:'k-teal' },
+      { label:'High / Unknown Risk',value:highUnknown.toLocaleString(),   sub:'events requiring immediate review', cls:'k-danger' },
+      { label:'Registry Domains',   value:registrySize.toLocaleString(),  sub:'known AI domains checked',       cls:'k-neutral' }
+    ];
+    document.getElementById('kpi-row').innerHTML = kpis.map(k =>
+      `<div class="kpi-tile ${k.cls}">
+        <div class="kpi-label">${k.label}</div>
+        <div class="kpi-value">${k.value}</div>
+        <div class="kpi-sub">${k.sub}</div>
+      </div>`
+    ).join('');
+
+    // ── Risk Bar ──
+    const segments = [
+      { label:'High',    count:riskCounts.high    || 0, color:'var(--danger)' },
+      { label:'Medium',  count:riskCounts.medium  || 0, color:'var(--orange)' },
+      { label:'Low',     count:riskCounts.low     || 0, color:'var(--teal)'   },
+      { label:'Unknown', count:riskCounts.unknown || 0, color:'rgba(208,212,226,0.35)' }
+    ].filter(s => s.count > 0);
+
+    document.getElementById('risk-track').innerHTML = segments.map(s =>
+      `<div class="risk-bar-seg" style="width:${Math.max(0.5, (s.count/totalEvents)*100).toFixed(1)}%;background:${s.color};" title="${s.label}: ${s.count}"></div>`
+    ).join('');
+
+    document.getElementById('risk-legend').innerHTML = segments.map(s =>
+      `<div class="legend-item">
+        <div class="legend-dot" style="background:${s.color};"></div>
+        <span>${s.label}</span>
+        <span class="legend-val">${s.count}</span>
+      </div>`
+    ).join('');
+
+    // ── Render Helpers ──
+    const RISK_ORDER  = ['high','unknown','medium','low'];
+    const RISK_LABELS = { high:'High Risk', unknown:'Unknown Risk', medium:'Medium Risk', low:'Low Risk' };
+    const RISK_COLORS = { high:'var(--danger)', unknown:'rgba(208,212,226,0.4)', medium:'var(--orange)', low:'var(--teal)' };
+    const RISK_ICONS  = { high:'!', unknown:'?', medium:'~', low:'✓' };
+
+    function statusBadge(s) {
+      const map = {
+        review_required: ['badge-medium','Review Required'],
+        restricted:      ['badge-high',  'Restricted'],
+        blocked:         ['badge-high',  'Blocked'],
+        approved:        ['badge-low',   'Approved'],
+        monitor:         ['badge-info',  'Monitor']
+      };
+      const [cls, lbl] = map[s] || ['badge-info', s];
+      return `<span class="badge ${cls}">${lbl}</span>`;
+    }
+
+    function riskBadge(r) {
+      const cls = { high:'badge-high', medium:'badge-medium', low:'badge-low', unknown:'badge-info' }[r] || 'badge-info';
+      return `<span class="badge ${cls}">${r.toUpperCase()}</span>`;
+    }
+
+    function actionClass(a) {
+      if (['blocked','deny','reset-both'].includes(a))  return 'dp-block';
+      if (['review_required'].includes(a))               return 'dp-review';
+      if (['resolved','allowed','allow'].includes(a))    return 'dp-ok';
+      return '';
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderRow(t, idx) {
+      const hasDetail = t.users.length || t.source_ips.length || t.actions.length || t.sources.length;
+      const detailCols = [];
+
+      if (t.users.length)
+        detailCols.push(`<div>
+          <div class="detail-label">Users Observed</div>
+          <div class="detail-pills">${t.users.map(u=>`<span class="detail-pill">${esc(u)}</span>`).join('')}</div>
+        </div>`);
+
+      if (t.source_ips.length)
+        detailCols.push(`<div>
+          <div class="detail-label">Source IPs</div>
+          <div class="detail-pills">${t.source_ips.map(ip=>`<span class="detail-pill">${esc(ip)}</span>`).join('')}</div>
+        </div>`);
+
+      if (t.actions.length || t.sources.length)
+        detailCols.push(`<div>
+          <div class="detail-label">Actions / Sources</div>
+          <div class="detail-pills">
+            ${t.actions.map(a=>`<span class="detail-pill ${actionClass(a)}">${esc(a)}</span>`).join('')}
+            ${t.sources.map(s=>`<span class="detail-pill">${esc(s)}</span>`).join('')}
+          </div>
+        </div>`);
+
+      return `
+        <div class="tool-wrapper">
+          <div class="tool-row risk-${t.risk_level}" id="row-${idx}"
+               onclick="toggleRow(${idx})" role="button" tabindex="0"
+               onkeydown="if(event.key==='Enter'||event.key===' ')toggleRow(${idx})">
+            <div class="tool-icon risk-${t.risk_level}">${RISK_ICONS[t.risk_level]||'?'}</div>
+            <div class="tool-name-col">
+              <div class="tool-name">${esc(t.tool_name)}</div>
+              <div class="tool-domain">${esc(t.domain)}</div>
+            </div>
+            <div class="tool-category">${esc(t.category)}</div>
+            ${riskBadge(t.risk_level)}
+            ${statusBadge(t.approved_status)}
+            <div class="tool-events-col">
+              <div class="tool-events-num">${t.event_count.toLocaleString()}</div>
+              <div class="tool-events-lbl">events</div>
+            </div>
+            <span class="tool-chevron" aria-hidden="true">&#9658;</span>
+          </div>
+          ${hasDetail ? `<div class="tool-detail" id="detail-${idx}">${detailCols.join('')}</div>` : ''}
+        </div>`;
+    }
+
+    // ── Filter + Render ──
+    let currentFilter = 'all';
+
+    function renderTools(filter) {
+      const listEl   = document.getElementById('tool-list');
+      const filtered = filter === 'all' ? tools : tools.filter(t => t.risk_level === filter);
+
+      document.getElementById('vis-count').textContent = filtered.length;
+      document.getElementById('tot-count').textContent = tools.length;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">
+          <div class="empty-state-icon">&#128269;</div>
+          <div class="empty-state-text">No ${filter === 'all' ? '' : filter + '-risk '}tools detected in these logs.</div>
+        </div>`;
+        return;
+      }
+
+      if (filter !== 'all') {
+        listEl.innerHTML = filtered.map(t => renderRow(t, tools.indexOf(t))).join('');
+        return;
+      }
+
+      // Grouped by risk
+      let html = '';
+      const groups = {};
+      RISK_ORDER.forEach(r => { groups[r] = []; });
+      tools.forEach(t => { (groups[t.risk_level] || (groups['unknown'] = groups['unknown'] || [])).push(t); });
+
+      RISK_ORDER.forEach(r => {
+        if (!groups[r] || !groups[r].length) return;
+        html += `<div class="risk-group-header">
+          <span class="risk-group-title" style="color:${RISK_COLORS[r]};">${RISK_LABELS[r]}</span>
+          <div class="risk-group-line" style="background:${RISK_COLORS[r]};opacity:0.14;"></div>
+          <span class="risk-group-count">${groups[r].length} tool${groups[r].length!==1?'s':''}</span>
+        </div>`;
+        groups[r].forEach(t => { html += renderRow(t, tools.indexOf(t)); });
+      });
+
+      listEl.innerHTML = html;
+    }
+
+    function setFilter(filter, btn, colorCls) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-tab').forEach(b => {
+        b.classList.remove('ft-active','fh','fm','fl','fu');
+      });
+      btn.classList.add('ft-active');
+      if (colorCls) btn.classList.add(colorCls);
+      renderTools(filter);
+    }
+
+    function toggleRow(idx) {
+      const row    = document.getElementById('row-' + idx);
+      const detail = document.getElementById('detail-' + idx);
+      if (!row) return;
+      const open = row.classList.contains('tr-expanded');
+      row.classList.toggle('tr-expanded', !open);
+      if (detail) detail.classList.toggle('td-open', !open);
+    }
+
+    // ── Proceed Summary ──
+    const highToolCount = tools.filter(t => t.risk_level === 'high' || t.risk_level === 'unknown').length;
+    document.getElementById('proceed-meta').innerHTML = highToolCount > 0
+      ? `<span class="pm-alert">&#9888; <strong>${highToolCount}</strong> high / unknown risk tool${highToolCount!==1?'s':''} flagged</span> — review and prioritize in Inventory`
+      : `<strong>${tools.length}</strong> tool${tools.length!==1?'s':''} detected — proceed to build your AI inventory`;
+
+    // ── Initial Render ──
+    renderTools('all');
+  </script>
+</body>
+</html>
