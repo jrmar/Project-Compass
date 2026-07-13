@@ -59,6 +59,10 @@ DEMO_ANSWERS = {
     "MG-01": "No", "MG-02": "No", "MG-03": "Yes",
 }
 
+# How much credit each answer earns toward "control met" (0-100).
+# Yes = fully met, No = fully unmet, Unsure = half credit / half gap.
+ANSWER_SCORE = {"yes": 100, "no": 0, "unsure": 50}
+
 SEV_ICON = {"HIGH": "!", "MEDIUM": "~", "LOW": "i"}
 FN_LABEL = {
     "GOVERN":  "GOVERN -- Policies & Accountability",
@@ -98,8 +102,8 @@ def run_questionnaire():
 
     print("\n" + "=" * 72)
     print("  UC-2 -- GOVERNANCE QUESTIONNAIRE")
-    print("  13 yes/no questions mapped to NIST AI RMF controls.")
-    print("  Each No answer confirms specific controls as unmet.")
+    print("  13 yes/no/unsure questions mapped to NIST AI RMF controls.")
+    print("  Yes = met (0 gap), Unsure = half credit, No = fully unmet.")
     print("=" * 72)
 
     running_score = 0
@@ -132,22 +136,24 @@ def run_questionnaire():
                 while True:
                     raw = input("      Your answer (Yes / No / Unsure): ").strip().lower()
                     if raw in ("yes", "no", "unsure"):
-                        answer = "no" if raw == "unsure" else raw
+                        answer = raw
                         break
                     print("      Please type Yes, No, or Unsure.")
 
-            if answer.lower() == "no":
+            gap_frac = (100 - ANSWER_SCORE[answer.lower()]) / 100
+            if gap_frac > 0:
                 confirmed = get_controls_for_question(q.q_id)
                 if confirmed:
-                    pts = sum(c.severity_weight for c in confirmed)
+                    pts = sum(c.severity_weight * gap_frac for c in confirmed)
                     running_score += pts
                     ctrl_ids = ", ".join(c.control_id for c in confirmed)
-                    print(f"      -> Confirms UNMET: {ctrl_ids}  (+{pts} pts)  [Running: {running_score}]")
+                    label = "UNMET" if answer.lower() == "no" else "PARTIALLY MET (unsure, 50%)"
+                    print(f"      -> Confirms {label}: {ctrl_ids}  (+{pts:.1f} pts)  [Running: {running_score:.1f}]")
 
             answers[q.q_id] = answer.lower()
 
             for cq in QUESTIONS.get("CONDITIONAL", []):
-                if getattr(cq, "parent_q_id", None) == q.q_id and answer.lower() == "no":
+                if getattr(cq, "parent_q_id", None) == q.q_id and answer.lower() in ("no", "unsure"):
                     print(f"\n      -> [{cq.q_id}] {cq.question}")
                     if DEMO_MODE:
                         followup = DEMO_ANSWERS.get(cq.q_id, "No")
@@ -157,18 +163,23 @@ def run_questionnaire():
                         print(f"         (informational -- no gap score)")
 
     print(f"\n  {'─' * 70}")
-    print(f"  Questionnaire complete. Confirmed gap score: {running_score} pts")
+    print(f"  Questionnaire complete. Confirmed gap score: {running_score:.1f} pts")
     print(f"  {'─' * 70}")
     return answers
 
 
 def generate_report(answers):
+    def gap_fraction(qid):
+        # Yes -> 0.0 (fully met), Unsure -> 0.5 (half credit), No -> 1.0 (fully unmet)
+        ans = answers.get(qid, "yes")
+        return (100 - ANSWER_SCORE.get(ans, 100)) / 100
+
     tool_scores = []
     for t in DETECTED_TOOLS:
         applicable = query_controls(t["category"])
         potential = sum(c.severity_weight for c in applicable)
-        unmet = [c for c in applicable if answers.get(c.questionnaire_question_id) == "no"]
-        confirmed = sum(c.severity_weight for c in unmet)
+        unmet = [c for c in applicable if gap_fraction(c.questionnaire_question_id) > 0]
+        confirmed = sum(c.severity_weight * gap_fraction(c.questionnaire_question_id) for c in unmet)
         tool_scores.append((t, applicable, unmet, confirmed, potential))
 
     total_confirmed = sum(s[3] for s in tool_scores)
@@ -188,7 +199,7 @@ def generate_report(answers):
 {'#' * 72}
 
   {len(DETECTED_TOOLS)} AI tools detected -- none are formally governed.
-  Confirmed governance gap: {total_confirmed} of {total_potential} possible points ({pct}%).
+  Confirmed governance gap: {total_confirmed:.1f} of {total_potential} possible points ({pct}%).
 
   What this means:
   Employees are using AI tools that send data to external vendors
@@ -224,7 +235,7 @@ def generate_report(answers):
 
     for t, _, unmet, confirmed, potential in sorted(tool_scores, key=lambda x: -x[3]):
         pct_t = round(100 * confirmed / potential) if potential else 0
-        print(f"  {t['tool_name']:<18} {t['queries']:<9} {potential:<11} {confirmed:<11} {pct_t:>3}%")
+        print(f"  {t['tool_name']:<18} {t['queries']:<9} {potential:<11} {confirmed:<11.1f} {pct_t:>3}%")
 
     print(f"\n  Top unmet controls:")
     seen2 = set()
@@ -262,16 +273,19 @@ def generate_report(answers):
                 (q.question for qs in QUESTIONS.values()
                  for q in qs if q.q_id == c.questionnaire_question_id), "N/A"
             )
+            ans_val = answers.get(c.questionnaire_question_id, "no")
+            status = {"no": "UNMET", "unsure": "PARTIALLY MET", "yes": "MET"}.get(ans_val, "UNMET")
+            frac = gap_fraction(c.questionnaire_question_id)
             print(f"  Finding {finding_num:03d}")
             print(f"  {'─' * 60}")
             print(f"  Tool              : {t['tool_name']} ({t['domain']})")
             print(f"  NIST Reference    : {c.control_id} ({c.function})")
             print(f"  Description       : {c.description}")
-            print(f"  Control Status    : UNMET")
-            print(f"  Severity          : {c.severity_level} ({c.severity_weight} points)")
+            print(f"  Control Status    : {status}")
+            print(f"  Severity          : {c.severity_level} ({c.severity_weight * frac:.1f} of {c.severity_weight} points)")
             print(f"  Evidence          : {t['queries']} DNS queries to {t['domain']} in log scan")
             print(f"  Question          : {c.questionnaire_question_id} -- {q_text}")
-            print(f"  Answer            : No")
+            print(f"  Answer            : {ans_val.capitalize()}")
             print(f"  Recommendation    : {c.remediation}")
             print()
             finding_num += 1
