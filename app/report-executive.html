@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass — Executive Summary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    :root {
+      --navy: #030b1e; --blue: #4082E8; --teal: #33CDB6;
+      --orange: #FF8020; --danger: #e05c5c; --gold: #e5b800;
+      --text: #0f1c38; --muted: #5a6682; --border: #d8dff0;
+      --bg-light: #f4f6fc; --bg-white: #ffffff;
+    }
+
+    @page { size: A4 portrait; margin: 1.8cm 2cm 1.5cm; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 11pt;
+      color: var(--text);
+      background: white;
+      line-height: 1.5;
+    }
+
+    /* ── Print action bar (hidden on print) ── */
+    .print-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: var(--navy);
+      color: white;
+      padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 700;
+      z-index: 1000;
+    }
+    .print-bar-left { display: flex; align-items: center; gap: 10px; }
+    .print-bar-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; }
+    .print-btn {
+      background: var(--blue);
+      border: none; border-radius: 6px;
+      color: white; font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+      padding: 7px 18px; cursor: pointer;
+    }
+    .print-btn:hover { background: #3070d0; }
+    @media print { .print-bar { display: none; } }
+
+    /* ── Page wrapper ── */
+    .report-body {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 52px 0 0;
+    }
+    @media print { .report-body { padding: 0; max-width: 100%; } }
+
+    /* ── Cover strip ── */
+    .cover-strip {
+      background: var(--navy);
+      padding: 36px 40px 32px;
+      border-radius: 12px 12px 0 0;
+      page-break-inside: avoid;
+    }
+    @media print { .cover-strip { border-radius: 0; } }
+    .cover-logo-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .cover-logo-bar {
+      width: 4px; height: 32px;
+      background: linear-gradient(180deg, var(--blue), var(--teal));
+      border-radius: 2px;
+    }
+    .cover-logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 800;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+    .cover-report-type {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 8px;
+    }
+    .cover-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 26px; font-weight: 800;
+      color: white; line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .cover-meta {
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .cover-meta-item { font-size: 10px; color: rgba(255,255,255,0.5); }
+    .cover-meta-item strong { display: block; color: rgba(255,255,255,0.85); font-size: 11px; margin-bottom: 2px; }
+    .cover-confidential {
+      margin-top: 20px;
+      font-size: 9px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.05em;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 12px;
+    }
+
+    /* ── Body content ── */
+    .content-area {
+      padding: 32px 40px;
+      background: white;
+    }
+
+    /* ── Section headings ── */
+    .section-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px; font-weight: 800;
+      color: var(--text); margin-bottom: 14px;
+    }
+
+    /* ── KPI summary bar ── */
+    .kpi-summary {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      margin-bottom: 28px;
+      page-break-inside: avoid;
+    }
+    .kpi-cell {
+      padding: 16px 18px;
+      border-right: 1px solid var(--border);
+      background: var(--bg-light);
+    }
+    .kpi-cell:last-child { border-right: none; }
+    .kpi-cell-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .kpi-cell-value {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px; font-weight: 800;
+      line-height: 1; font-variant-numeric: tabular-nums;
+    }
+    .kpi-cell-sub { font-size: 9px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Two-column layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 200px; gap: 28px; align-items: start; margin-bottom: 28px; }
+    .two-col-left {}
+
+    /* ── Risk gauge SVG ── */
+    .gauge-wrap { text-align: center; }
+    .gauge-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-top: 6px;
+    }
+
+    /* ── Posture badge ── */
+    .posture-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 800;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    /* ── Summary text box ── */
+    .summary-box {
+      background: var(--bg-light);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 18px;
+      font-size: 11px; line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+    }
+
+    /* ── Tables ── */
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 10px; margin-bottom: 22px;
+      page-break-inside: avoid;
+    }
+    thead tr { background: var(--navy); }
+    thead th {
+      padding: 8px 12px;
+      text-align: left;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:nth-child(even) { background: var(--bg-light); }
+    tbody td { padding: 7px 12px; vertical-align: middle; }
+    .td-mono { font-family: 'Courier New', monospace; font-size: 9px; }
+
+    /* ── Risk pills ── */
+    .pill {
+      display: inline-block; padding: 2px 8px; border-radius: 100px;
+      font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .pill-high   { background: rgba(224,92,92,0.12);   color: #c03030; border: 1px solid rgba(224,92,92,0.3); }
+    .pill-medium { background: rgba(255,128,32,0.12);  color: #b85c00; border: 1px solid rgba(255,128,32,0.3); }
+    .pill-low    { background: rgba(51,205,182,0.12);  color: #1a8a78; border: 1px solid rgba(51,205,182,0.3); }
+    .pill-critical { background: rgba(224,92,92,0.18); color: #a02020; border: 1px solid rgba(224,92,92,0.4); }
+
+    /* ── Priority actions ── */
+    .action-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      page-break-inside: avoid;
+    }
+    .action-header {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-light);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .action-num {
+      width: 24px; height: 24px;
+      background: var(--blue); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 800; color: white;
+      flex-shrink: 0;
+    }
+    .action-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 800; color: var(--text);
+      flex: 1;
+    }
+    .action-ctrl {
+      font-family: 'Courier New', monospace;
+      font-size: 9px; color: var(--muted);
+      background: white; border: 1px solid var(--border);
+      border-radius: 4px; padding: 2px 6px;
+    }
+    .action-body { padding: 12px 14px; }
+    .action-body p { font-size: 10px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+
+    /* ── Platform tabs ── */
+    .platform-section { margin-bottom: 8px; }
+    .platform-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block; margin-bottom: 6px;
+    }
+    .pl-azure  { background: rgba(0,137,214,0.08); color: #0066b2; border: 1px solid rgba(0,137,214,0.25); }
+    .pl-aws    { background: rgba(255,153,0,0.08);  color: #c47600; border: 1px solid rgba(255,153,0,0.3); }
+    .pl-gcp    { background: rgba(66,133,244,0.08); color: #2c5bb8; border: 1px solid rgba(66,133,244,0.25); }
+    .step-list { list-style: none; padding: 0; }
+    .step-list li {
+      display: flex; gap: 8px;
+      font-size: 10px; color: var(--text);
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      line-height: 1.5;
+    }
+    .step-list li:last-child { border-bottom: none; }
+    .step-num {
+      width: 18px; height: 18px;
+      background: var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 800; color: var(--muted);
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── Gap bar chart ── */
+    .gap-chart { margin-bottom: 22px; page-break-inside: avoid; }
+    .gap-chart-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 7px;
+    }
+    .gap-chart-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+      width: 60px; flex-shrink: 0; color: var(--muted);
+    }
+    .gap-chart-track {
+      flex: 1; height: 10px; background: #e8ecf5; border-radius: 5px; overflow: hidden;
+    }
+    .gap-chart-fill { height: 100%; border-radius: 5px; }
+    .gap-chart-pts {
+      font-family: 'Courier New', monospace;
+      font-size: 9px; color: var(--muted); width: 55px; text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Footer ── */
+    .report-footer {
+      margin-top: 32px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-left { font-size: 8px; color: var(--muted); }
+    .footer-right { font-size: 8px; color: var(--muted); text-align: right; }
+    .footer-brand {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 800;
+      color: var(--blue);
+    }
+
+    /* ── Page break helpers ── */
+    .page-break { page-break-before: always; }
+    .no-break { page-break-inside: avoid; }
+
+    /* ── Spacer ── */
+    .spacer { margin-bottom: 22px; }
+  </style>
+</head>
+<body>
+
+  <!-- Print action bar -->
+  <div class="print-bar">
+    <div class="print-bar-left">
+      <div class="print-bar-dot"></div>
+      <span>Project Compass — Executive Summary</span>
+    </div>
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <div class="report-body">
+
+    <!-- Cover -->
+    <div class="cover-strip">
+      <div class="cover-logo-row">
+        <div class="cover-logo-bar"></div>
+        <span class="cover-logo-text">Project Compass</span>
+      </div>
+      <div class="cover-report-type">Executive Summary</div>
+      <div class="cover-title">AI Governance Risk<br>Assessment Report</div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><strong id="cv-org">Organization</strong>Organization</div>
+        <div class="cover-meta-item"><strong id="cv-date">—</strong>Assessment Date</div>
+        <div class="cover-meta-item"><strong>NIST AI RMF 1.0</strong>Framework</div>
+        <div class="cover-meta-item"><strong>Executive View</strong>Audience</div>
+      </div>
+      <div class="cover-confidential">CONFIDENTIAL — FOR INTERNAL USE ONLY · This document contains sensitive governance findings and should not be distributed externally.</div>
+    </div>
+
+    <!-- Body -->
+    <div class="content-area">
+
+      <!-- KPI Summary -->
+      <div class="section-label">Key Metrics</div>
+      <div class="kpi-summary">
+        <div class="kpi-cell">
+          <div class="kpi-cell-label">AI Tools Detected</div>
+          <div class="kpi-cell-value" id="m-tools" style="color:var(--blue);">—</div>
+          <div class="kpi-cell-sub" id="m-tools-sub">across all risk levels</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-cell-label">High Risk Tools</div>
+          <div class="kpi-cell-value" id="m-high" style="color:var(--danger);">—</div>
+          <div class="kpi-cell-sub">requiring immediate action</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-cell-label">Governance Gap Score</div>
+          <div class="kpi-cell-value" id="m-gap" style="color:var(--orange);">—</div>
+          <div class="kpi-cell-sub">of 1,300 possible pts</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-cell-label">Governance Risk Score</div>
+          <div class="kpi-cell-value" id="m-risk" style="color:var(--danger);">—<span style="font-size:12px;font-weight:600;color:#888;">/100</span></div>
+          <div class="kpi-cell-sub" id="m-maturity">NIST-based index</div>
+        </div>
+      </div>
+
+      <!-- Gauge + Summary -->
+      <div class="two-col">
+        <div class="two-col-left">
+          <div class="section-label">Executive Overview</div>
+          <div class="summary-box" id="exec-summary">Loading…</div>
+          <div id="posture-row" style="margin-bottom:14px;"></div>
+        </div>
+        <div>
+          <div class="gauge-wrap">
+            <svg id="risk-gauge" viewBox="0 0 160 160" width="160" height="160"></svg>
+            <div class="gauge-label">Governance Risk Score</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gap Breakdown Chart -->
+      <div class="section-label">NIST Function Gap Breakdown</div>
+      <div class="gap-chart" id="gap-chart"></div>
+
+      <!-- Tools Table -->
+      <div class="section-label">AI Tools Detected</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Domain</th>
+            <th>Category</th>
+            <th>Risk Level</th>
+            <th style="text-align:right;">DNS Queries</th>
+          </tr>
+        </thead>
+        <tbody id="tools-tbody"></tbody>
+      </table>
+
+      <!-- Priority Actions -->
+      <div class="page-break"></div>
+      <div class="section-label">Priority Actions &amp; Platform-Specific Steps</div>
+      <p style="font-size:10px;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+        The following actions address your highest-severity NIST control gaps. Steps are organized by cloud platform.
+        Engage your security team or cloud administrator to implement these controls.
+      </p>
+
+      <div id="actions-list"></div>
+
+      <!-- Footer -->
+      <div class="report-footer">
+        <div class="footer-left">
+          <span class="footer-brand">Project Compass</span><br>
+          Powered by NIST AI Risk Management Framework 1.0 + NIST-AI-600-1 GenAI Profile<br>
+          For internal use only. This report does not constitute a formal third-party audit.
+        </div>
+        <div class="footer-right" id="footer-date"></div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /report-body -->
+
+  <script>
+    // ── Load session data ──
+    const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
+    const det   = session.detection || {};
+    const quest = session.questionnaire || {};
+    const orgName = session.org_name || 'Your Organization';
+    const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+    const allTools    = det.detected_tools || [];
+    const gapScore    = quest.gap_score || 0;
+    const byFn        = quest.by_function || {};
+    const flagged     = quest.flagged_controls || [];
+    const riskScore   = Math.round((gapScore / 1300) * 100);
+    const maturity    = 100 - riskScore;
+
+    const highTools = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high');
+    const medTools  = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'medium');
+
+    function postureCalc() {
+      if (riskScore >= 75 || highTools.length >= 3) return { label:'CRITICAL', color:getComputedStyle(document.documentElement).getPropertyValue('--danger') || '#e05c5c', bg:'rgba(224,92,92,0.1)' };
+      if (riskScore >= 50 || highTools.length >= 1) return { label:'HIGH',     color:'#cc6600', bg:'rgba(255,128,32,0.1)' };
+      if (riskScore >= 25) return { label:'MODERATE', color:'#b89000', bg:'rgba(229,184,0,0.1)' };
+      return { label:'LOW', color:'#1a8a78', bg:'rgba(51,205,182,0.1)' };
+    }
+    const posture = postureCalc();
+
+    // ── Populate cover ──
+    document.getElementById('cv-org').textContent = orgName;
+    document.getElementById('cv-date').textContent = assessDate;
+    document.getElementById('footer-date').innerHTML = `Generated: ${assessDate}<br>${orgName}`;
+
+    // ── KPIs ──
+    const riskColor = riskScore >= 75 ? '#c03030' : riskScore >= 50 ? '#b85c00' : riskScore >= 25 ? '#b89000' : '#1a8a78';
+    document.getElementById('m-tools').textContent = allTools.length || '—';
+    document.getElementById('m-tools-sub').textContent = `${highTools.length} high · ${medTools.length} medium · ${allTools.length - highTools.length - medTools.length} low`;
+    document.getElementById('m-high').textContent = highTools.length || '0';
+    document.getElementById('m-gap').textContent = gapScore > 0 ? Math.round(gapScore).toLocaleString() : '—';
+    document.getElementById('m-risk').innerHTML = gapScore > 0 ? `${riskScore}<span style="font-size:12px;font-weight:600;color:#888;">/100</span>` : '—';
+    document.getElementById('m-risk').style.color = riskColor;
+    document.getElementById('m-maturity').textContent = gapScore > 0 ? `compliance maturity: ${maturity}%` : 'NIST-based index';
+
+    // ── Executive summary text ──
+    const summaryText = `${orgName}'s AI governance assessment identified <strong>${allTools.length} AI tools</strong>
+    actively used within the organization based on DNS log analysis, including
+    <strong>${highTools.length} high-risk</strong> and <strong>${medTools.length} medium-risk</strong> tools.
+    The organization's <strong>Governance Risk Score is ${riskScore}/100</strong> (${riskScore >= 50 ? 'indicating significant governance gaps that require immediate attention' : riskScore >= 25 ? 'indicating moderate governance gaps that should be addressed in the near term' : 'indicating a relatively well-governed AI posture'}).
+    A total of <strong>${flagged.length} NIST AI RMF controls</strong> were flagged as unmet or partially met across the
+    Govern, Map, Measure, and Manage functions. Without formal policy, ownership, and monitoring,
+    sensitive organizational data may be leaving the organization through unsanctioned AI services.`;
+    document.getElementById('exec-summary').innerHTML = summaryText;
+
+    // ── Posture badge ──
+    document.getElementById('posture-row').innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;color:#5a6682;">OVERALL RISK POSTURE</span>
+        <span class="pill" style="background:${posture.bg};color:${posture.color};border:1px solid ${posture.color}22;font-size:10px;padding:4px 14px;">${posture.label}</span>
+      </div>`;
+
+    // ── Risk gauge SVG ──
+    (function buildGauge() {
+      const r = 62, cx = 80, cy = 80;
+      const circ = 2 * Math.PI * r;
+      const filled = circ * (riskScore / 100);
+      const remaining = circ - filled;
+      const gaugeColor = riskScore >= 75 ? '#e05c5c' : riskScore >= 50 ? '#FF8020' : riskScore >= 25 ? '#e5b800' : '#33CDB6';
+      document.getElementById('risk-gauge').innerHTML = `
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e8ecf5" stroke-width="16"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${gaugeColor}" stroke-width="16"
+          stroke-dasharray="${filled.toFixed(2)} ${remaining.toFixed(2)}"
+          transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>
+        <text x="${cx}" y="${cy - 8}" text-anchor="middle" font-family="Montserrat" font-size="30" font-weight="800" fill="#0f1c38">${gapScore > 0 ? riskScore : '—'}</text>
+        <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-family="Montserrat" font-size="11" fill="#5a6682">/ 100</text>
+        <text x="${cx}" y="${cy + 28}" text-anchor="middle" font-family="Montserrat" font-size="9" fill="${gaugeColor}" font-weight="700">${posture.label}</text>`;
+    })();
+
+    // ── Gap bar chart ──
+    const FN_META = {
+      GOVERN:  { color:'#4082E8', potential:550 },
+      MAP:     { color:'#33CDB6', potential:300 },
+      MEASURE: { color:'#FF8020', potential:250 },
+      MANAGE:  { color:'#e05c5c', potential:200 },
+    };
+    document.getElementById('gap-chart').innerHTML = Object.entries(FN_META).map(([fn, m]) => {
+      const score = Math.round(byFn[fn] || 0);
+      const pct = m.potential > 0 ? Math.min(100, (score / m.potential) * 100) : 0;
+      return `<div class="gap-chart-row">
+        <div class="gap-chart-label">${fn}</div>
+        <div class="gap-chart-track"><div class="gap-chart-fill" style="width:${pct}%;background:${m.color};"></div></div>
+        <div class="gap-chart-pts">${score}/${m.potential} pts</div>
+      </div>`;
+    }).join('');
+
+    // ── Tools table ──
+    const sorted = [...allTools].sort((a,b) => {
+      const order = {high:0,medium:1,low:2,unknown:3};
+      return (order[(a.risk_level||a.risk||'unknown').toLowerCase()]||3) - (order[(b.risk_level||b.risk||'unknown').toLowerCase()]||3);
+    });
+    document.getElementById('tools-tbody').innerHTML = sorted.length > 0 ? sorted.map(t => {
+      const risk = (t.risk_level||t.risk||'unknown').toLowerCase();
+      const pillCls = risk === 'high' ? 'pill-high' : risk === 'medium' ? 'pill-medium' : 'pill-low';
+      return `<tr>
+        <td><strong>${t.tool_name||t.name||'—'}</strong></td>
+        <td class="td-mono">${t.domain||t.query_domain||'—'}</td>
+        <td>${(t.category||'—').replace(/_/g,' ')}</td>
+        <td><span class="pill ${pillCls}">${risk}</span></td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">${(t.queries||t.dns_queries||0).toLocaleString()}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:#888;font-style:italic;">No detection data available</td></tr>';
+
+    // ── Priority actions ──
+    const ACTIONS = [
+      {
+        num: 1, ctrl: 'GV.PO-1', severity: 'HIGH',
+        title: 'Establish a Written AI Acceptable Use Policy',
+        why: 'Without a formal policy, employees have no clear guidance on which AI tools are approved, how to use them responsibly, or what data may be shared with external AI services. This is the foundation of all other governance controls.',
+        azure: [
+          'Sign in to the Microsoft Purview Compliance Portal (compliance.microsoft.com).',
+          'Navigate to Solutions → Information Protection → Policies.',
+          'Draft your AI AUP document and upload it to SharePoint or a company-wide Teams channel.',
+          'In Microsoft Entra ID, create a Conditional Access policy requiring AUP acknowledgment on first login.',
+          'Configure Microsoft Entra Terms of Use (entra.microsoft.com → Protection → Terms of use) to present the AUP to all users.',
+          'Use Microsoft Viva Engage or Teams to announce the new policy organization-wide.'
+        ],
+        aws: [
+          'Draft the AI Acceptable Use Policy document and publish it to an S3 bucket with a static website or internal wiki.',
+          'In AWS Organizations (console.aws.amazon.com/organizations), create a policy acknowledgment tag requirement via Service Control Policies (SCPs).',
+          'Use AWS IAM Identity Center to create a login portal that presents the AUP before granting access to AWS resources.',
+          'Store the policy version in AWS Systems Manager Parameter Store (/org/policy/ai-aup) for audit traceability.',
+          'Configure AWS Config rules to verify that AI-related IAM roles have an AUP acknowledgment tag applied.',
+          'Send a company communication via email or Slack with a link to the published policy.'
+        ],
+        gcp: [
+          'Draft the AUP and publish it to Google Sites (sites.google.com) or an internal Confluence/Wiki page.',
+          'In Google Workspace Admin Console (admin.google.com), navigate to Account → Profile → Terms of Service.',
+          'Add the AUP as a required acknowledgment for all users under Reporting → User Reports.',
+          'Create a Google Form for users to acknowledge the policy and store responses in Google Sheets for audit trail.',
+          'Use Google Groups to distribute the policy announcement to all organizational units.',
+          'Schedule a quarterly review reminder via Google Calendar for the governance owner.'
+        ]
+      },
+      {
+        num: 2, ctrl: 'GV.OV-1', severity: 'HIGH',
+        title: 'Designate a Named AI Governance Owner',
+        why: 'Without a named owner, AI governance decisions fall through the cracks. A designated person ensures policy is maintained, incidents are escalated, and the AI risk posture is reviewed on a regular schedule.',
+        azure: [
+          'Open Microsoft Entra ID (entra.microsoft.com) → Roles and Administrators.',
+          'Create a custom role named "AI Governance Officer" with read access to Purview audit logs and Defender for Cloud Apps reports.',
+          'Assign the role to the designated individual and document the assignment in a governance register.',
+          'Create a shared mailbox (ai-governance@yourdomain.com) using Microsoft 365 Admin Center for governance inquiries.',
+          'Add the governance owner to the Microsoft Sentinel workspace as a Reader so they can review AI-related alerts.',
+          'Schedule a recurring 30-min monthly review meeting in Microsoft Outlook with relevant stakeholders.'
+        ],
+        aws: [
+          'In AWS IAM, create a role named AIGovernanceOfficer with read-only policies: ViewOnlyAccess + SecurityAudit.',
+          'In AWS IAM Identity Center, create a permission set that maps to this role for the designated person.',
+          'Create an AWS Organizations tag policy to tag all AI-related resources with "GovernanceOwner": [name].',
+          'Use Amazon WorkMail or your email system to create a shared governance alias (ai-governance@company.com).',
+          'Add the governance owner as a Subscriber to AWS Security Hub findings summary notifications via SNS.',
+          'Document the owner assignment in AWS Systems Manager OpsCenter as a recurring governance OpsItem.'
+        ],
+        gcp: [
+          'In Google Cloud IAM (console.cloud.google.com/iam-admin/iam), grant the designated person the "Security Reviewer" role at organization level.',
+          'Also assign "Logs Viewer" and "Cloud Asset Viewer" roles to allow audit log review.',
+          'Create a Google Group named ai-governance@yourorganization.com and add the governance owner.',
+          'Use Google Workspace Admin → Directory → Groups to set the governance owner as the group manager.',
+          'Configure Google Cloud Security Command Center to send email summaries to the governance group.',
+          'Document the owner in your organization\'s RACI matrix and Google Drive governance folder.'
+        ]
+      },
+      {
+        num: 3, ctrl: 'MS.AN-1', severity: 'HIGH',
+        title: 'Implement Active Monitoring for AI Tool Usage',
+        why: 'Project Compass provides a point-in-time view. Continuous monitoring detects new AI tools as they appear, alerts on policy violations, and provides the audit trail needed for compliance reporting.',
+        azure: [
+          'Open Microsoft Sentinel in the Azure Portal (portal.azure.com → Microsoft Sentinel).',
+          'Navigate to Data Connectors → search "DNS" → enable the DNS (Preview) connector or Azure Firewall DNS proxy logs.',
+          'In Analytics, click Create → Scheduled query rule. Use this KQL to alert on AI domains:\n     DnsEvents | where QueryName has_any ("openai","anthropic","midjourney","copilot","perplexity","gemini","character.ai") | summarize count() by QueryName, ClientIP, Computer | where count_ > 10',
+          'Set alert threshold and assign to your governance owner or SOC team.',
+          'In Microsoft Defender for Cloud Apps (security.microsoft.com), enable the Cloud Discovery feature to continuously classify AI app traffic from firewall or proxy logs.',
+          'Set up a weekly Cloud Discovery snapshot report emailed to your governance owner.'
+        ],
+        aws: [
+          'Open Amazon Route 53 Resolver in the AWS Console → DNS Firewall → Query Logging.',
+          'Create a query log configuration and direct logs to Amazon CloudWatch Logs group: /aws/dns/queries.',
+          'In CloudWatch, create a Metric Filter on the log group: filter pattern = [timestamp, requestid, version, accountid, querytype, queryclass, queryname="*openai*" OR queryname="*anthropic*" OR queryname="*gemini*"].',
+          'Create a CloudWatch Alarm on this metric: threshold > 50 queries per hour → SNS notification to governance owner.',
+          'Enable Amazon GuardDuty (console.aws.amazon.com/guardduty) for automated threat detection including unusual DNS query patterns.',
+          'Configure GuardDuty findings to appear in AWS Security Hub for centralized visibility.'
+        ],
+        gcp: [
+          'Open Google Cloud Console → Network services → Cloud DNS → Response Policies.',
+          'Enable DNS query logging for each managed zone: Edit zone → Cloud Logging → Enable.',
+          'In Cloud Logging, create a log-based metric: resource.type="dns_query" AND jsonPayload.queryName=~"openai|anthropic|gemini|character.ai|copilot".',
+          'Create an Alerting Policy in Cloud Monitoring on this metric: any count > 0 per hour → email notification.',
+          'Enable Google Cloud Security Command Center Standard or Premium tier for AI-related anomaly detection.',
+          'Configure weekly log export to BigQuery for trend analysis and compliance reporting.'
+        ]
+      },
+      {
+        num: 4, ctrl: 'MS.DW-1', severity: 'HIGH',
+        title: 'Implement Controls Preventing Sensitive Data Input into AI Tools',
+        why: 'Employees may inadvertently paste customer PII, financial data, or proprietary IP into consumer AI tools. Data loss prevention controls reduce the risk of sensitive data being sent to external AI providers.',
+        azure: [
+          'Open Microsoft Defender for Cloud Apps (security.microsoft.com → Cloud Apps).',
+          'Navigate to Cloud App Catalog → search for each detected AI tool → tag as "Unsanctioned" or "Monitored" based on policy.',
+          'Create a Session Policy: Policies → Conditional Access App Control → Create policy → Monitor uploads to AI apps.',
+          'In Microsoft Purview (compliance.microsoft.com), create a DLP policy: Data Loss Prevention → Policies → Create → select sensitive info types (SSN, credit card, PHI) → apply to Cloud Apps.',
+          'Set action: Block upload + notify user with a custom message referencing your AI AUP.',
+          'Review DLP policy matches weekly in Purview Activity Explorer to tune false positives.'
+        ],
+        aws: [
+          'Enable Amazon Macie (console.aws.amazon.com/macie) to discover and classify sensitive data across S3 buckets that may be used as AI tool inputs.',
+          'In AWS Network Firewall, create a stateful rule group to block HTTP POST requests with sensitive content patterns to known AI endpoints.',
+          'Use AWS WAF on any application load balancers to inspect outbound API calls: create a custom rule matching AI tool domain names in request URIs.',
+          'Configure AWS Macie findings to export to Security Hub and create CloudWatch alarms for HIGH severity findings.',
+          'Consider deploying a CASB solution (e.g., Netskope, Zscaler) integrated with AWS to enforce DLP policies for SaaS AI tools.',
+          'Document approved vs. blocked AI tools in a configuration item within AWS Systems Manager.'
+        ],
+        gcp: [
+          'Enable Cloud Data Loss Prevention API (console.cloud.google.com/security/dlp).',
+          'Create an inspection template covering sensitive info types: PERSON_NAME, EMAIL_ADDRESS, PHONE_NUMBER, CREDIT_CARD_NUMBER, US_SOCIAL_SECURITY_NUMBER.',
+          'Create a DLP job trigger to inspect data that flows through your organization\'s AI-facing proxies or shared cloud storage.',
+          'In Chrome Browser Cloud Management (admin.google.com → Devices → Chrome), configure URL filtering to warn or block uploads to unapproved AI tools.',
+          'Use Google Cloud Armor security policies to add custom rules inspecting POST request body content to AI service domains.',
+          'Review DLP findings weekly in the Security Command Center under Vulnerabilities → Data incidents.'
+        ]
+      }
+    ];
+
+    document.getElementById('actions-list').innerHTML = ACTIONS.map(a => `
+      <div class="action-item">
+        <div class="action-header">
+          <div class="action-num">${a.num}</div>
+          <div class="action-title">${a.title}</div>
+          <span class="action-ctrl">${a.ctrl}</span>
+          <span class="pill pill-high" style="font-size:8px;">${a.severity}</span>
+        </div>
+        <div class="action-body">
+          <p>${a.why}</p>
+          <div class="platform-section">
+            <span class="platform-label pl-azure">Microsoft Azure</span>
+            <ol class="step-list">${a.azure.map((s,i) => `<li><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+          </div>
+          <div class="platform-section" style="margin-top:10px;">
+            <span class="platform-label pl-aws">Amazon Web Services</span>
+            <ol class="step-list">${a.aws.map((s,i) => `<li><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+          </div>
+          <div class="platform-section" style="margin-top:10px;">
+            <span class="platform-label pl-gcp">Google Cloud Platform</span>
+            <ol class="step-list">${a.gcp.map((s,i) => `<li><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+          </div>
+        </div>
+      </div>`).join('');
+
+    // Auto-print
+    window.addEventListener('load', () => { setTimeout(() => window.print(), 1400); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass — Auditor Evidence Package</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    :root {
+      --navy: #030b1e; --blue: #4082E8; --teal: #33CDB6;
+      --orange: #FF8020; --danger: #e05c5c;
+      --text: #0f1c38; --muted: #5a6682; --border: #d8dff0;
+      --bg-light: #f4f6fc;
+    }
+
+    @page { size: A4 portrait; margin: 1.8cm 2cm 1.5cm; }
+
+    body { font-family: 'Inter', system-ui, sans-serif; font-size: 11pt; color: var(--text); background: white; line-height: 1.5; }
+
+    .print-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: var(--navy); color: white; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; z-index: 1000;
+    }
+    .print-bar-left { display: flex; align-items: center; gap: 10px; }
+    .print-bar-dot { width: 8px; height: 8px; background: var(--orange); border-radius: 50%; }
+    .print-btn { background: var(--orange); border: none; border-radius: 6px; color: white; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; padding: 7px 18px; cursor: pointer; }
+    @media print { .print-bar { display: none; } }
+
+    .report-body { max-width: 760px; margin: 0 auto; padding: 52px 0 0; }
+    @media print { .report-body { padding: 0; max-width: 100%; } }
+
+    /* Cover */
+    .cover-page { background: var(--navy); min-height: 320px; padding: 48px 40px 40px; position: relative; border-radius: 12px 12px 0 0; }
+    @media print { .cover-page { border-radius: 0; } }
+    .cover-badge { display: inline-block; background: rgba(255,128,32,0.15); border: 1px solid rgba(255,128,32,0.3); border-radius: 4px; padding: 4px 12px; font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); margin-bottom: 20px; }
+    .cover-title { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 12px; }
+    .cover-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 28px; }
+    .cover-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; }
+    .cover-grid-cell { padding: 14px 18px; border-right: 1px solid rgba(255,255,255,0.1); }
+    .cover-grid-cell:nth-child(even) { border-right: none; }
+    .cover-grid-cell:nth-child(3), .cover-grid-cell:nth-child(4) { border-top: 1px solid rgba(255,255,255,0.1); }
+    .cgc-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .cgc-value { font-size: 12px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .cover-confidential { margin-top: 24px; font-size: 8px; color: rgba(255,255,255,0.25); letter-spacing: 0.04em; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; }
+
+    .content-area { padding: 32px 40px; background: white; }
+
+    .section-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); margin-bottom: 6px; margin-top: 22px; display: flex; align-items: center; gap: 8px; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-label:first-child { margin-top: 0; }
+
+    h3 { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+
+    /* Metadata table */
+    .meta-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 20px; }
+    .meta-table td { padding: 6px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .meta-table td:first-child { width: 180px; font-weight: 600; color: var(--muted); background: var(--bg-light); }
+    .meta-table tr:last-child td { border-bottom: none; }
+
+    /* Summary stats */
+    .summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; page-break-inside: avoid; }
+    .stat-box { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; background: var(--bg-light); }
+    .stat-box-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .stat-box-val { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .stat-box-sub { font-size: 9px; color: var(--muted); margin-top: 3px; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 20px; page-break-inside: avoid; }
+    thead tr { background: var(--navy); }
+    thead th { padding: 8px 10px; text-align: left; font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:nth-child(even) { background: var(--bg-light); }
+    tbody td { padding: 6px 10px; vertical-align: middle; line-height: 1.4; }
+    .td-mono { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 9px; }
+
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 100px; font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .pill-high   { background: rgba(224,92,92,0.1);   color: #c03030; border: 1px solid rgba(224,92,92,0.3); }
+    .pill-medium { background: rgba(255,128,32,0.1);  color: #b85c00; border: 1px solid rgba(255,128,32,0.3); }
+    .pill-low    { background: rgba(51,205,182,0.1);  color: #1a8a78; border: 1px solid rgba(51,205,182,0.3); }
+    .pill-met    { background: rgba(51,205,182,0.1);  color: #1a8a78; border: 1px solid rgba(51,205,182,0.3); }
+    .pill-unmet  { background: rgba(224,92,92,0.1);   color: #c03030; border: 1px solid rgba(224,92,92,0.3); }
+    .pill-partial { background: rgba(255,128,32,0.1); color: #b85c00; border: 1px solid rgba(255,128,32,0.3); }
+
+    /* Control matrix */
+    .ctrl-matrix { margin-bottom: 22px; page-break-inside: avoid; }
+
+    /* Findings */
+    .finding-block { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 14px; page-break-inside: avoid; }
+    .finding-header { background: var(--bg-light); padding: 8px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .finding-num { font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.08em; color: var(--orange); }
+    .finding-ctrl { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); background: white; border: 1px solid var(--border); border-radius: 3px; padding: 2px 6px; }
+    .finding-title { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; color: var(--text); flex: 1; }
+    .finding-body { padding: 10px 14px; }
+    .finding-row { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .finding-row:last-child { border-bottom: none; }
+    .finding-key { width: 140px; flex-shrink: 0; padding: 5px 8px; font-size: 9px; font-weight: 600; color: var(--muted); background: var(--bg-light); }
+    .finding-val { flex: 1; padding: 5px 8px; font-size: 9px; color: var(--text); }
+
+    /* Certification box */
+    .cert-box { background: var(--bg-light); border: 1px solid var(--border); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0; padding: 16px 18px; margin-bottom: 20px; page-break-inside: avoid; }
+    .cert-title { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .cert-text { font-size: 10px; color: var(--muted); line-height: 1.6; }
+
+    .report-footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .footer-left { font-size: 8px; color: var(--muted); }
+    .footer-brand { font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 800; color: var(--orange); }
+    .footer-right { font-size: 8px; color: var(--muted); text-align: right; }
+    .page-break { page-break-before: always; }
+  </style>
+</head>
+<body>
+
+  <div class="print-bar">
+    <div class="print-bar-left">
+      <div class="print-bar-dot"></div>
+      <span>Project Compass — Auditor Evidence Package</span>
+    </div>
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <div class="report-body">
+
+    <!-- Cover -->
+    <div class="cover-page">
+      <div class="cover-badge">Auditor Evidence Package</div>
+      <div class="cover-title">AI Governance Compliance<br>Assessment — Evidence Record</div>
+      <div class="cover-sub">NIST AI Risk Management Framework 1.0 + NIST-AI-600-1 GenAI Profile</div>
+      <div class="cover-grid">
+        <div class="cover-grid-cell"><div class="cgc-label">Organization</div><div class="cgc-value" id="cv-org">—</div></div>
+        <div class="cover-grid-cell"><div class="cgc-label">Assessment Date</div><div class="cgc-value" id="cv-date">—</div></div>
+        <div class="cover-grid-cell"><div class="cgc-label">Framework Version</div><div class="cgc-value">NIST AI RMF 1.0 (Jan 2023)</div></div>
+        <div class="cover-grid-cell"><div class="cgc-label">GenAI Profile</div><div class="cgc-value">NIST-AI-600-1 (Jul 2024)</div></div>
+      </div>
+      <div class="cover-confidential">RESTRICTED — FOR COMPLIANCE AND AUDIT USE ONLY · This document contains formal assessment evidence and should be treated as confidential compliance documentation.</div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Assessment Metadata -->
+      <div class="section-label">Assessment Metadata</div>
+      <table class="meta-table">
+        <tr><td>Assessment Type</td><td>DNS Log Analysis + Governance Questionnaire (Self-Assessment)</td></tr>
+        <tr><td>Methodology</td><td>Automated DNS log scan against AI domain registry + 13-question NIST AI RMF–mapped governance questionnaire</td></tr>
+        <tr><td>Scope</td><td>Organization-wide DNS traffic; AI tool governance posture across all NIST AI RMF functions (Govern, Map, Measure, Manage)</td></tr>
+        <tr><td>Controls Assessed</td><td>19 NIST AI RMF controls across 4 functions</td></tr>
+        <tr><td>Assessor</td><td>Project Compass (automated assessment tool)</td></tr>
+        <tr><td>Assessment Basis</td><td>Self-reported answers to governance questionnaire; DNS log evidence from submitted log file</td></tr>
+        <tr><td>Limitations</td><td>This assessment is based on DNS log data and self-reported responses. It does not constitute a formal third-party audit. Findings should be validated through independent controls testing prior to formal compliance submissions.</td></tr>
+      </table>
+
+      <!-- Summary Statistics -->
+      <div class="section-label">Summary Statistics</div>
+      <div class="summary-stats">
+        <div class="stat-box">
+          <div class="stat-box-label">AI Tools Detected</div>
+          <div class="stat-box-val" id="ss-tools" style="color:var(--blue);">—</div>
+          <div class="stat-box-sub" id="ss-tools-sub">DNS log evidence</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Governance Risk Score</div>
+          <div class="stat-box-val" id="ss-risk" style="color:var(--danger);">—<span style="font-size:12px;color:#888;">/100</span></div>
+          <div class="stat-box-sub">NIST-based index</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Controls Flagged</div>
+          <div class="stat-box-val" id="ss-ctrls" style="color:var(--orange);">—</div>
+          <div class="stat-box-sub">of 19 assessed</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Gap Score</div>
+          <div class="stat-box-val" id="ss-gap" style="color:var(--text);">—</div>
+          <div class="stat-box-sub">of 1,300 possible</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Risk Posture</div>
+          <div class="stat-box-val" id="ss-posture" style="font-size:16px;padding-top:4px;">—</div>
+          <div class="stat-box-sub" id="ss-posture-sub"></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Compliance Maturity</div>
+          <div class="stat-box-val" id="ss-maturity" style="color:var(--teal);">—<span style="font-size:12px;color:#888;">%</span></div>
+          <div class="stat-box-sub">inverse of risk score</div>
+        </div>
+      </div>
+
+      <!-- Function Compliance Table -->
+      <div class="section-label">NIST Function Compliance Summary</div>
+      <table>
+        <thead>
+          <tr><th>Function</th><th>Description</th><th>Gap Score</th><th>Max Potential</th><th>% Unmet</th><th>Controls Flagged</th></tr>
+        </thead>
+        <tbody id="fn-tbody"></tbody>
+      </table>
+
+      <!-- Control Status Matrix -->
+      <div class="page-break"></div>
+      <div class="section-label">Control Status Matrix — All 19 Controls</div>
+      <table>
+        <thead>
+          <tr><th>Control ID</th><th>Function</th><th>Description</th><th>Severity</th><th>Question</th><th>Status</th></tr>
+        </thead>
+        <tbody id="matrix-tbody"></tbody>
+      </table>
+
+      <!-- Structured Findings -->
+      <div class="page-break"></div>
+      <div class="section-label">Structured Findings</div>
+      <p style="font-size:10px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        The following findings document each unmet or partially met control, including the evidence basis,
+        NIST reference, and recommended remediation. Findings are ranked by severity.
+      </p>
+      <div id="findings-list"></div>
+
+      <!-- Evidence Summary -->
+      <div class="section-label">Evidence Summary</div>
+      <table>
+        <thead>
+          <tr><th>Evidence Type</th><th>Source</th><th>Coverage</th><th>Limitations</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DNS Query Log Analysis</td>
+            <td>Organization-submitted DNS log file</td>
+            <td>DNS-layer AI tool access; domain, IP, query volume</td>
+            <td>Point-in-time snapshot; does not capture content or user intent</td>
+          </tr>
+          <tr>
+            <td>Governance Questionnaire</td>
+            <td>Self-reported by organization representative</td>
+            <td>13 questions across 4 NIST AI RMF functions</td>
+            <td>Self-reported; not independently verified against documentation</td>
+          </tr>
+          <tr>
+            <td>AI Domain Registry</td>
+            <td>Project Compass approved AI domain registry (Azure SQL Ledger)</td>
+            <td>1,000+ known AI tool domains with risk classification</td>
+            <td>Registry may not include newly released AI tools</td>
+          </tr>
+          <tr>
+            <td>NIST Control Mapping</td>
+            <td>NIST AI RMF 1.0 (Jan 2023) + NIST-AI-600-1 (Jul 2024)</td>
+            <td>19 controls mapped to questionnaire responses</td>
+            <td>Mapping reflects Project Compass interpretation; consult NIST documentation for authoritative mapping</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Certification -->
+      <div class="section-label">Certification Statement</div>
+      <div class="cert-box">
+        <div class="cert-title">Automated Assessment Certification</div>
+        <div class="cert-text" id="cert-text">Loading…</div>
+      </div>
+
+      <!-- Footer -->
+      <div class="report-footer">
+        <div class="footer-left">
+          <span class="footer-brand">Project Compass</span><br>
+          NIST AI RMF 1.0 (January 2023) + NIST-AI-600-1 GenAI Profile (July 2024)<br>
+          For compliance and audit use only. Results should be reviewed by a qualified information security professional.
+        </div>
+        <div class="footer-right" id="footer-date"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
+    const det   = session.detection || {};
+    const quest = session.questionnaire || {};
+    const orgName = session.org_name || 'Your Organization';
+    const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+    const allTools  = det.detected_tools || [];
+    const gapScore  = quest.gap_score || 0;
+    const byFn      = quest.by_function || {};
+    const flagged   = quest.flagged_controls || [];
+    const answers   = quest.answers || {};
+    const riskScore = Math.round((gapScore / 1300) * 100);
+    const maturity  = 100 - riskScore;
+    const highTools = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high');
+
+    function postureCalc() {
+      if (riskScore >= 75 || highTools.length >= 3) return { label:'CRITICAL', color:'#c03030' };
+      if (riskScore >= 50 || highTools.length >= 1) return { label:'HIGH',     color:'#b85c00' };
+      if (riskScore >= 25) return { label:'MODERATE', color:'#b89000' };
+      return { label:'LOW', color:'#1a8a78' };
+    }
+    const posture = postureCalc();
+
+    document.getElementById('cv-org').textContent = orgName;
+    document.getElementById('cv-date').textContent = assessDate;
+    document.getElementById('footer-date').innerHTML = `Report Date: ${assessDate}<br>Organization: ${orgName}`;
+
+    const riskColor = riskScore >= 75 ? '#c03030' : riskScore >= 50 ? '#b85c00' : riskScore >= 25 ? '#b89000' : '#1a8a78';
+    document.getElementById('ss-tools').textContent = allTools.length || '—';
+    document.getElementById('ss-tools-sub').textContent = `${highTools.length} high · ${allTools.filter(t=>(t.risk_level||t.risk||'').toLowerCase()==='medium').length} medium`;
+    document.getElementById('ss-risk').innerHTML = gapScore > 0 ? `${riskScore}<span style="font-size:12px;color:#888;">/100</span>` : '—';
+    document.getElementById('ss-risk').style.color = riskColor;
+    document.getElementById('ss-ctrls').textContent = flagged.length;
+    document.getElementById('ss-gap').textContent = gapScore > 0 ? Math.round(gapScore).toLocaleString() : '—';
+    document.getElementById('ss-posture').textContent = posture.label;
+    document.getElementById('ss-posture').style.color = posture.color;
+    document.getElementById('ss-posture-sub').textContent = 'overall posture';
+    document.getElementById('ss-maturity').innerHTML = gapScore > 0 ? `${maturity}<span style="font-size:12px;color:#888;">%</span>` : '—';
+
+    // Function compliance table
+    const FN_META = {
+      GOVERN:  { desc:'Policies, accountability, and AI governance culture', potential:550 },
+      MAP:     { desc:'AI tool identification, inventory, and risk classification', potential:300 },
+      MEASURE: { desc:'Monitoring, analysis, and data protection controls', potential:250 },
+      MANAGE:  { desc:'Incident response, enforcement, and review cadence', potential:200 },
+    };
+    const CTRL_FN = {
+      'GV.PO-1':'GOVERN','GV.PO-2':'GOVERN','GV.OV-1':'GOVERN','GV.OV-2':'GOVERN','GV.AT-2':'GOVERN','GV.OV-3':'GOVERN','GV.AT-1':'GOVERN',
+      'MP.AC-1':'MAP','MP.AC-2':'MAP','MP.AI-1':'MAP','MP.RD-1':'MAP',
+      'MS.AN-1':'MEASURE','MS.MC-1':'MEASURE','MS.AN-2':'MEASURE','MS.DW-1':'MEASURE',
+      'MG.AN-1':'MANAGE','MG.PO-1':'MANAGE','MG.DM-1':'MANAGE','MG.RR-1':'MANAGE',
+    };
+    const fnCounts = { GOVERN:0, MAP:0, MEASURE:0, MANAGE:0 };
+    flagged.forEach(c => { const fn = CTRL_FN[c]; if (fn) fnCounts[fn]++; });
+
+    document.getElementById('fn-tbody').innerHTML = Object.entries(FN_META).map(([fn, m]) => {
+      const score = Math.round(byFn[fn] || 0);
+      const pct = m.potential > 0 ? Math.round((score / m.potential) * 100) : 0;
+      const metPct = 100 - pct;
+      const statusCls = metPct >= 75 ? 'pill-met' : metPct >= 50 ? 'pill-partial' : 'pill-unmet';
+      return `<tr>
+        <td><strong>${fn}</strong></td>
+        <td style="font-size:9px;">${m.desc}</td>
+        <td style="font-variant-numeric:tabular-nums;">${score}</td>
+        <td style="font-variant-numeric:tabular-nums;">${m.potential}</td>
+        <td>${pct}% unmet</td>
+        <td>${fnCounts[fn]} control${fnCounts[fn]!==1?'s':''}</td>
+      </tr>`;
+    }).join('');
+
+    // All 19 controls matrix
+    const ALL_CONTROLS = [
+      { id:'GV.PO-1', fn:'GOVERN', desc:'AI acceptable use policy established', sev:'HIGH', q:'G-01' },
+      { id:'GV.PO-2', fn:'GOVERN', desc:'Policy communicated to all staff', sev:'HIGH', q:'G-01' },
+      { id:'GV.OV-1', fn:'GOVERN', desc:'AI governance owner designated', sev:'HIGH', q:'G-02' },
+      { id:'GV.OV-2', fn:'GOVERN', desc:'Accountability structure defined', sev:'HIGH', q:'G-02' },
+      { id:'GV.AT-2', fn:'GOVERN', desc:'Staff briefed on AI governance roles', sev:'MEDIUM', q:'G-02' },
+      { id:'GV.OV-3', fn:'GOVERN', desc:'AI risks in formal risk reporting', sev:'MEDIUM', q:'G-03' },
+      { id:'GV.AT-1', fn:'GOVERN', desc:'Staff training on responsible AI use', sev:'MEDIUM', q:'G-04' },
+      { id:'MP.AC-1', fn:'MAP',    desc:'Formal AI tool inventory maintained', sev:'HIGH', q:'M-01' },
+      { id:'MP.AC-2', fn:'MAP',    desc:'Business purpose documented per tool', sev:'MEDIUM', q:'M-02' },
+      { id:'MP.AI-1', fn:'MAP',    desc:'Risk assessment per AI tool', sev:'HIGH', q:'M-03' },
+      { id:'MP.RD-1', fn:'MAP',    desc:'Residual risk documented', sev:'MEDIUM', q:'M-03' },
+      { id:'MS.AN-1', fn:'MEASURE',desc:'Active monitoring of AI usage', sev:'HIGH', q:'MS-01' },
+      { id:'MS.MC-1', fn:'MEASURE',desc:'Continuous measurement in place', sev:'LOW', q:'MS-01' },
+      { id:'MS.AN-2', fn:'MEASURE',desc:'Human review of AI-generated outputs', sev:'MEDIUM', q:'MS-02' },
+      { id:'MS.DW-1', fn:'MEASURE',desc:'Data input controls enforced', sev:'HIGH', q:'MS-03' },
+      { id:'MG.AN-1', fn:'MANAGE', desc:'AI incident response process documented', sev:'MEDIUM', q:'MG-01' },
+      { id:'MG.PO-1', fn:'MANAGE', desc:'Policy enforcement mechanism', sev:'HIGH', q:'MG-02' },
+      { id:'MG.DM-1', fn:'MANAGE', desc:'Decommission/block process for non-compliant tools', sev:'MEDIUM', q:'MG-02' },
+      { id:'MG.RR-1', fn:'MANAGE', desc:'Governance policy review cadence', sev:'LOW', q:'MG-03' },
+    ];
+
+    // Map question answers to controls
+    const Q_TO_ANS = {
+      'G-01': answers['G-01'], 'G-02': answers['G-02'], 'G-03': answers['G-03'], 'G-04': answers['G-04'],
+      'M-01': answers['M-01'], 'M-02': answers['M-02'], 'M-03': answers['M-03'],
+      'MS-01': answers['MS-01'], 'MS-02': answers['MS-02'], 'MS-03': answers['MS-03'],
+      'MG-01': answers['MG-01'], 'MG-02': answers['MG-02'], 'MG-03': answers['MG-03'],
+    };
+
+    document.getElementById('matrix-tbody').innerHTML = ALL_CONTROLS.map(c => {
+      const ans = Q_TO_ANS[c.q];
+      const isFlagged = flagged.includes(c.id);
+      const sevCls = c.sev === 'HIGH' ? 'pill-high' : c.sev === 'MEDIUM' ? 'pill-medium' : 'pill-low';
+      let statusPill, statusText;
+      if (!ans) {
+        statusPill = ''; statusText = '<span style="color:#aaa;font-style:italic;">Not assessed</span>';
+      } else if (ans === 'yes') {
+        statusText = '<span class="pill pill-met">Met</span>';
+      } else if (ans === 'unsure') {
+        statusText = '<span class="pill pill-partial">Partial</span>';
+      } else {
+        statusText = '<span class="pill pill-unmet">Unmet</span>';
+      }
+      return `<tr style="${isFlagged ? 'background:rgba(224,92,92,0.04);' : ''}">
+        <td class="td-mono">${c.id}</td>
+        <td style="font-size:9px;color:var(--muted);">${c.fn}</td>
+        <td>${c.desc}</td>
+        <td><span class="pill ${sevCls}">${c.sev}</span></td>
+        <td class="td-mono" style="color:var(--muted);">${c.q}</td>
+        <td>${statusText}</td>
+      </tr>`;
+    }).join('');
+
+    // Structured findings
+    const findingControls = ALL_CONTROLS.filter(c => flagged.includes(c.id));
+    const sevOrder = { HIGH:0, MEDIUM:1, LOW:2 };
+    findingControls.sort((a,b) => (sevOrder[a.sev]||1) - (sevOrder[b.sev]||1));
+
+    const CTRL_REMEDIATION = {
+      'GV.PO-1': 'Draft and publish an AI Acceptable Use Policy; distribute via Microsoft Entra Terms of Use (Azure), AWS Systems Manager (AWS), or Google Workspace Admin (GCP). Require acknowledgment from all staff.',
+      'GV.PO-2': 'Once the AUP exists, communicate it through email, intranet, or learning management system. Document communication evidence (delivery receipts, training completion records).',
+      'GV.OV-1': 'Designate a named AI Governance Officer. Document the assignment in a governance RACI matrix and record the role in your identity provider (Entra ID, IAM, or GCP IAM).',
+      'GV.OV-2': 'Define and document the governance accountability structure: who owns AI policy, who reviews incidents, who approves new tools. Publish in an organization policy register.',
+      'GV.AT-2': 'Brief all relevant staff on their AI governance roles. Provide role-specific training documents and maintain training completion records.',
+      'GV.OV-3': 'Include AI risk as a standing agenda item in formal risk committee meetings. Produce a quarterly AI risk summary report for leadership.',
+      'GV.AT-1': 'Deliver AI responsible use training to all staff who use AI tools. Use LMS completion records as audit evidence.',
+      'MP.AC-1': 'Create and maintain a formal AI tool inventory register. Compass DNS scan provides a starting point; augment with procurement records and user surveys.',
+      'MP.AC-2': 'For each inventoried AI tool, document the business purpose, tool owner, data types involved, and approval status.',
+      'MP.AI-1': 'Conduct a formal risk assessment for each detected AI tool using a documented methodology (e.g., NIST AI RMF MAP function). Document results in the AI inventory register.',
+      'MP.RD-1': 'After risk assessment, document the residual risk for each tool and obtain formal acceptance from a risk owner.',
+      'MS.AN-1': 'Deploy continuous AI tool monitoring via SIEM (Azure Sentinel / AWS CloudWatch / GCP Cloud Monitoring). Configure alerts for anomalous AI tool usage patterns.',
+      'MS.MC-1': 'Implement automated metrics collection for AI tool usage (query volumes, unique users, data volume). Review metrics on a defined schedule.',
+      'MS.AN-2': 'For GenAI tools in active use, implement a human-in-the-loop review process before AI-generated outputs are used in business decisions or external communications.',
+      'MS.DW-1': 'Implement DLP controls via Microsoft Purview / Amazon Macie + Network Firewall / GCP Cloud DLP to prevent sensitive data from being entered into AI tools.',
+      'MG.AN-1': 'Document an AI-specific incident response procedure covering: detection → escalation → containment → evidence preservation → root cause analysis → remediation.',
+      'MG.PO-1': 'Establish and document a formal process for enforcing AI policy: who can approve/block tools, how enforcement is logged, and how policy changes are communicated.',
+      'MG.DM-1': 'Implement technical controls to block or restrict non-compliant AI tools at the DNS, network, or browser layer. Document the block list and update process.',
+      'MG.RR-1': 'Schedule and document AI governance policy reviews on a defined cadence (at minimum annually; recommended quarterly). Evidence: dated review meeting minutes or change log.',
+    };
+
+    document.getElementById('findings-list').innerHTML = findingControls.length > 0 ? findingControls.map((c, i) => {
+      const ans = Q_TO_ANS[c.q] || 'no';
+      const status = ans === 'unsure' ? 'Partially Met' : 'Unmet';
+      const sevCls = c.sev === 'HIGH' ? 'pill-high' : c.sev === 'MEDIUM' ? 'pill-medium' : 'pill-low';
+      const evidence = allTools.length > 0
+        ? `DNS log evidence: ${allTools.length} AI tools detected in organization DNS traffic. Questionnaire response to ${c.q}: "${ans}".`
+        : `Governance questionnaire response to ${c.q}: "${ans}". No DNS log evidence available.`;
+      return `<div class="finding-block">
+        <div class="finding-header">
+          <span class="finding-num">Finding ${String(i+1).padStart(3,'0')}</span>
+          <span class="finding-ctrl">${c.id}</span>
+          <span class="finding-title">${c.desc}</span>
+          <span class="pill ${sevCls}">${c.sev}</span>
+        </div>
+        <div class="finding-body">
+          <div class="finding-row"><div class="finding-key">NIST Reference</div><div class="finding-val">${c.id} — ${c.fn} Function (NIST AI RMF 1.0)</div></div>
+          <div class="finding-row"><div class="finding-key">Control Status</div><div class="finding-val"><span class="pill ${ans==='unsure'?'pill-partial':'pill-unmet'}">${status}</span></div></div>
+          <div class="finding-row"><div class="finding-key">Severity</div><div class="finding-val"><span class="pill ${sevCls}">${c.sev}</span></div></div>
+          <div class="finding-row"><div class="finding-key">Questionnaire Q</div><div class="finding-val">${c.q} — Answer: <strong>${ans}</strong></div></div>
+          <div class="finding-row"><div class="finding-key">Evidence Basis</div><div class="finding-val">${evidence}</div></div>
+          <div class="finding-row"><div class="finding-key">Recommendation</div><div class="finding-val">${CTRL_REMEDIATION[c.id] || 'Implement controls per NIST AI RMF guidance for this control.'}</div></div>
+        </div>
+      </div>`;
+    }).join('') : '<p style="font-size:10px;color:var(--muted);font-style:italic;">No findings — complete the governance assessment first.</p>';
+
+    // Certification
+    document.getElementById('cert-text').textContent =
+      `This AI Governance Risk Assessment for ${orgName} was generated on ${assessDate} by Project Compass, ` +
+      `an automated governance assessment tool. The assessment is based on DNS query log analysis and self-reported ` +
+      `governance questionnaire responses mapped to the NIST AI Risk Management Framework 1.0 (January 2023) and ` +
+      `the NIST-AI-600-1 GenAI Profile (July 2024). A total of ${ALL_CONTROLS.length} controls were assessed; ` +
+      `${flagged.length} were found to be unmet or partially met. The Governance Risk Score of ${riskScore}/100 ` +
+      `indicates a compliance maturity of ${maturity}%. This document should be reviewed by a qualified ` +
+      `information security professional prior to use in formal compliance submissions or regulatory filings. ` +
+      `This assessment does not constitute a formal third-party audit.`;
+
+    window.addEventListener('load', () => { setTimeout(() => window.print(), 1400); });
+  </script>
+</body>
+</html>

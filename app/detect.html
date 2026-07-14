@@ -412,21 +412,16 @@
       <div class="step-connector"></div>
       <div class="step-item pending">
         <div class="step-dot">3</div>
-        <div class="step-label">Inventory</div>
-      </div>
-      <div class="step-connector"></div>
-      <div class="step-item pending">
-        <div class="step-dot">4</div>
         <div class="step-label">Assess</div>
       </div>
       <div class="step-connector"></div>
       <div class="step-item pending">
-        <div class="step-dot">5</div>
+        <div class="step-dot">4</div>
         <div class="step-label">Dashboard</div>
       </div>
       <div class="step-connector"></div>
       <div class="step-item pending">
-        <div class="step-dot">6</div>
+        <div class="step-dot">5</div>
         <div class="step-label">Report</div>
       </div>
     </div>
@@ -480,8 +475,8 @@
   <!-- ── Proceed Footer ── -->
   <div class="proceed-bar">
     <div class="proceed-meta" id="proceed-meta"></div>
-    <button class="btn btn-teal btn-lg" onclick="window.location.href='inventory.html'">
-      Proceed to Inventory &#8594;
+    <button class="btn btn-teal btn-lg" onclick="window.location.href='assess.html'">
+      Proceed to Assess &#8594;
     </button>
   </div>
 
@@ -711,8 +706,8 @@
     // ── Proceed Summary ──
     const highToolCount = tools.filter(t => t.risk_level === 'high' || t.risk_level === 'unknown').length;
     document.getElementById('proceed-meta').innerHTML = highToolCount > 0
-      ? `<span class="pm-alert">&#9888; <strong>${highToolCount}</strong> high / unknown risk tool${highToolCount!==1?'s':''} flagged</span> — review and prioritize in Inventory`
-      : `<strong>${tools.length}</strong> tool${tools.length!==1?'s':''} detected — proceed to build your AI inventory`;
+      ? `<span class="pm-alert">&#9888; <strong>${highToolCount}</strong> high / unknown risk tool${highToolCount!==1?'s':''} flagged</span> — continue to governance assessment`
+      : `<strong>${tools.length}</strong> tool${tools.length!==1?'s':''} detected — proceed to governance assessment`;
 
     // ── Initial Render ──
     renderTools('all');

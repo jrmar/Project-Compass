@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - Governance Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+
+    /* ── Assess Layout ── */
+    .assess-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .assess-grid { grid-template-columns: 1fr; }
+      .score-panel { order: -1; }
+    }
+
+    /* ── Section Nav ── */
+    .section-nav {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .section-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .section-tab-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 800;
+      border: 2px solid;
+      transition: all 0.2s ease;
+    }
+    .section-tab.st-done .section-tab-dot   { background: var(--teal); border-color: var(--teal); color: var(--navy); }
+    .section-tab.st-active .section-tab-dot { background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 0 14px rgba(64,130,232,0.5); }
+    .section-tab.st-pending .section-tab-dot { background: transparent; border-color: rgba(208,212,226,0.18); color: rgba(208,212,226,0.35); }
+    .section-tab-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .section-tab.st-done .section-tab-label   { color: var(--teal); }
+    .section-tab.st-active .section-tab-label { color: var(--blue); }
+    .section-tab.st-pending .section-tab-label { color: rgba(208,212,226,0.3); }
+    .section-connector {
+      flex: 1; height: 2px;
+      background: rgba(208,212,226,0.1);
+      margin-bottom: 15px;
+      min-width: 20px;
+    }
+    .section-connector.sc-done { background: var(--teal); }
+
+    /* ── Section Header ── */
+    .section-header {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-left: 3px solid var(--fn-color, var(--blue));
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .section-fn-ref {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--fn-color, var(--blue));
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+    .section-fn-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px; font-weight: 800;
+      color: var(--light);
+      margin-bottom: 4px;
+    }
+    .section-fn-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── Question Card ── */
+    .q-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      margin-bottom: 10px;
+      transition: border-color 0.2s;
+    }
+    .q-card.answered { border-color: rgba(64,130,232,0.25); }
+    .q-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .q-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .q-genai-tag {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      background: rgba(64,130,232,0.1);
+      border: 1px solid rgba(64,130,232,0.2);
+      border-radius: 100px;
+      padding: 2px 8px;
+      color: var(--blue);
+    }
+    .q-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--light);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .q-note {
+      font-size: 11px;
+      color: var(--muted);
+      background: rgba(64,130,232,0.05);
+      border-left: 2px solid rgba(64,130,232,0.25);
+      border-radius: 0 4px 4px 0;
+      padding: 6px 10px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .q-controls-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: rgba(208,212,226,0.3);
+      margin-bottom: 10px;
+    }
+
+    /* ── Answer Buttons ── */
+    .answer-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .answer-btn {
+      flex: 1;
+      min-width: 80px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 9px 12px;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .answer-btn:hover { color: var(--light); border-color: rgba(208,212,226,0.25); }
+    .answer-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+    .answer-btn.ab-yes.ab-sel  { background: rgba(51,205,182,0.12); border-color: rgba(51,205,182,0.4); color: var(--teal); }
+    .answer-btn.ab-no.ab-sel   { background: rgba(224,92,92,0.12);  border-color: rgba(224,92,92,0.4);  color: var(--danger); }
+    .answer-btn.ab-unk.ab-sel  { background: rgba(255,128,32,0.12); border-color: rgba(255,128,32,0.4); color: var(--orange); }
+
+    /* ── Conditional Follow-up ── */
+    .conditional-wrap {
+      margin-top: 12px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      border-left: 2px solid var(--orange);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 12px 14px;
+    }
+    .conditional-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 6px;
+    }
+    .conditional-text { font-size: 13px; color: var(--light); margin-bottom: 10px; line-height: 1.5; }
+    .conditional-note { font-size: 10px; color: var(--muted); margin-top: 8px; font-style: italic; }
+    .conditional-btns { display: flex; gap: 6px; }
+    .conditional-btns .answer-btn { flex: 0 0 auto; min-width: 64px; font-size: 10px; padding: 6px 10px; }
+
+    /* ── Assess Navigation ── */
+    .assess-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .nav-section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Score Panel ── */
+    .score-panel {
+      position: sticky;
+      top: 80px;
+      padding: 20px;
+    }
+    .score-panel-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .gap-score-big {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 36px; font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--light);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .gap-score-sub {
+      font-size: 11px; color: var(--muted);
+      margin-top: 4px; margin-bottom: 12px;
+    }
+    .gap-bar-track {
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px; height: 6px;
+      overflow: hidden; margin-bottom: 20px;
+    }
+    .gap-bar-fill {
+      height: 100%; border-radius: 100px;
+      background: linear-gradient(90deg, var(--teal), var(--orange));
+      transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .fn-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 8px;
+    }
+    .fn-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      width: 58px; flex-shrink: 0;
+    }
+    .fn-bar-track {
+      flex: 1; height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px; overflow: hidden;
+    }
+    .fn-bar-fill { height: 100%; border-radius: 100px; transition: width 0.4s ease; }
+    .fn-pts {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; color: var(--muted);
+      width: 40px; text-align: right; flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .flagged-section { margin-top: 16px; }
+    .flagged-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .flagged-pill {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      background: rgba(224,92,92,0.1);
+      border: 1px solid rgba(224,92,92,0.2);
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: var(--danger);
+      margin: 2px 2px 2px 0;
+    }
+    .flagged-pill.fp-medium {
+      background: rgba(255,128,32,0.1);
+      border-color: rgba(255,128,32,0.2);
+      color: var(--orange);
+    }
+    .flagged-pill.fp-low {
+      background: rgba(208,212,226,0.06);
+      border-color: rgba(208,212,226,0.12);
+      color: var(--muted);
+    }
+
+    .section-complete-msg {
+      text-align: center;
+      padding: 20px;
+      color: var(--teal);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <a class="app-header-logo" href="login.html">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <div class="app-header-right">
+      <div class="org-badge">
+        <span class="org-badge-dot"></span>
+        <span id="header-org-name">Organization</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Step Bar ── -->
+  <div class="step-bar-wrapper">
+    <div class="step-bar">
+      <div class="step-item completed">
+        <div class="step-dot">&#10003;</div>
+        <div class="step-label">Upload</div>
+      </div>
+      <div class="step-connector done"></div>
+      <div class="step-item completed">
+        <div class="step-dot">&#10003;</div>
+        <div class="step-label">Detect</div>
+      </div>
+      <div class="step-connector done"></div>
+      <div class="step-item active">
+        <div class="step-dot">3</div>
+        <div class="step-label">Assess</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">4</div>
+        <div class="step-label">Dashboard</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">5</div>
+        <div class="step-label">Report</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main ── -->
+  <main class="page-content-wide">
+    <h1 class="page-title">Governance Assessment</h1>
+    <p class="page-subtitle">
+      13 questions mapped to the NIST AI Risk Management Framework 1.0.
+      Answers confirm governance gaps across your detected AI environment.
+    </p>
+
+    <div class="assess-grid">
+
+      <!-- Main column: questions -->
+      <div class="assess-main">
+        <div class="section-nav" id="section-nav"></div>
+        <div id="section-content"></div>
+        <div class="assess-nav">
+          <button class="btn btn-ghost" id="btn-back" onclick="goBack()">&#8592; Back</button>
+          <span class="nav-section-label" id="nav-label">Section 1 of 4</span>
+          <button class="btn btn-primary" id="btn-next" onclick="goNext()">Next Section &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Score sidebar -->
+      <div class="score-panel glass-card">
+        <div class="score-panel-title">Running Gap Score</div>
+        <div class="gap-score-big" id="gap-score">0</div>
+        <div class="gap-score-sub" id="gap-sub">of 1,300 possible points</div>
+        <div class="gap-bar-track">
+          <div class="gap-bar-fill" id="gap-bar" style="width:0%"></div>
+        </div>
+
+        <div class="score-panel-title">By Function</div>
+        <div id="fn-rows"></div>
+
+        <div class="flagged-section" id="flagged-section" style="display:none;">
+          <div class="flagged-title">Flagged Controls</div>
+          <div id="flagged-pills"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:32px;"></div>
+  </main>
+
+  <script>
+    // ── Session guard ──
+    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
+    if (!session || !session.org_name) { window.location.href = 'login.html'; }
+    if (session) document.getElementById('header-org-name').textContent = session.org_name;
+
+    // ── Detect whether GenAI tools were found ──
+    function hasGenAI() {
+      const det = session && session.detection;
+      if (!det || !det.detected_tools) return true;
+      return det.detected_tools.some(t => {
+        const c = (t.category || '').toLowerCase();
+        return c.includes('generative') || c.includes('llm') || c.includes('gpt') || c.includes('genai');
+      });
+    }
+    const SHOW_GENAI = hasGenAI();
+
+    // ── NIST question data ──
+    const SECTIONS = [
+      {
+        id: 'GOVERN', label: 'Govern',
+        nist_ref: 'NIST AI RMF 1.0 — GOVERN Function',
+        description: 'Policies, accountability structures, and organizational culture for AI governance.',
+        color: 'var(--blue)',
+        questions: [
+          { q_id:'G-01', severity:'HIGH', weight:200,
+            text:'Does your organization have a written AI acceptable use policy?',
+            controls:['GV.PO-1','GV.PO-2'],
+            conditional:{ q_id:'G-01-C', text:'Do you plan to create one in the next 90 days?' } },
+          { q_id:'G-02', severity:'HIGH', weight:250,
+            text:'Does your organization have a named person accountable for AI governance decisions?',
+            controls:['GV.OV-1','GV.OV-2','GV.AT-2'],
+            conditional:{ q_id:'G-02-C', text:'Is assigning an AI governance owner on your near-term roadmap (next 90 days)?' } },
+          { q_id:'G-03', severity:'MEDIUM', weight:50,
+            text:"Are AI risks included in your organization's formal risk reporting?",
+            controls:['GV.OV-3'] },
+          { q_id:'G-04', severity:'MEDIUM', weight:50,
+            text:'Have staff who use AI tools received training on responsible use and associated risks?',
+            controls:['GV.AT-1'] }
+        ]
+      },
+      {
+        id: 'MAP', label: 'Map',
+        nist_ref: 'NIST AI RMF 1.0 — MAP Function',
+        description: 'Identifying AI tools in use, documenting their purpose, and assessing tool-specific risks.',
+        color: 'var(--teal)',
+        questions: [
+          { q_id:'M-01', severity:'HIGH', weight:100,
+            text:'Has your organization formally inventoried all AI tools currently in use?',
+            controls:['MP.AC-1'],
+            note:'Compass log scan partially answers this — this confirms whether a formal process exists beyond automated scanning.' },
+          { q_id:'M-02', severity:'MEDIUM', weight:50,
+            text:'Is the intended business purpose documented for each AI tool your organization uses?',
+            controls:['MP.AC-2'] },
+          { q_id:'M-03', severity:'HIGH', weight:150,
+            text:'Has your organization conducted a risk assessment for the AI tools detected in this scan?',
+            controls:['MP.AI-1','MP.RD-1'] }
+        ]
+      },
+      {
+        id: 'MEASURE', label: 'Measure',
+        nist_ref: 'NIST AI RMF 1.0 — MEASURE Function',
+        description: 'Monitoring AI tool usage, reviewing outputs for accuracy, and controlling sensitive data inputs.',
+        color: 'var(--orange)',
+        questions: [
+          { q_id:'MS-01', severity:'HIGH', weight:100,
+            text:'Does your organization actively monitor AI tool usage through logs, alerts, or SIEM?',
+            controls:['MS.AN-1','MS.MC-1'],
+            note:'Compass provides a point-in-time scan. This confirms whether continuous monitoring exists beyond Compass.',
+            conditional:{ q_id:'MS-01-C', text:'Do you have any other manual review process for AI tool usage (e.g., periodic audits)?' } },
+          { q_id:'MS-02', severity:'MEDIUM', weight:50,
+            text:'Are AI-generated outputs reviewed by a human before being used in business decisions?',
+            controls:['MS.AN-2'],
+            genai_specific:true,
+            note:'This applies when generative AI tools are in active use at your organization.' },
+          { q_id:'MS-03', severity:'HIGH', weight:100,
+            text:'Does your organization have controls preventing sensitive data from being entered into AI tools?',
+            controls:['MS.DW-1'] }
+        ]
+      },
+      {
+        id: 'MANAGE', label: 'Manage',
+        nist_ref: 'NIST AI RMF 1.0 — MANAGE Function',
+        description: 'Responding to AI-related incidents, enforcing policy decisions, and sustaining governance over time.',
+        color: 'var(--danger)',
+        questions: [
+          { q_id:'MG-01', severity:'MEDIUM', weight:50,
+            text:'Does your organization have a documented process for responding to AI-related incidents?',
+            controls:['MG.AN-1'] },
+          { q_id:'MG-02', severity:'HIGH', weight:150,
+            text:'Does your organization have a process to block or restrict AI tools that violate policy?',
+            controls:['MG.PO-1','MG.DM-1'] },
+          { q_id:'MG-03', severity:'LOW', weight:0,
+            text:'Are your AI governance policies reviewed and updated on a regular schedule?',
+            controls:['MG.RR-1'] }
+        ]
+      }
+    ];
+
+    const FN_POTENTIAL = { GOVERN:550, MAP:300, MEASURE:250, MANAGE:200 };
+    const TOTAL_POTENTIAL = 1300;
+
+    // Controls meta for flagged pills
+    const CTRL_SEVERITY = {
+      'GV.PO-1':'HIGH','GV.PO-2':'HIGH','GV.OV-1':'HIGH','GV.OV-2':'HIGH',
+      'GV.AT-2':'MEDIUM','GV.OV-3':'MEDIUM','GV.AT-1':'MEDIUM',
+      'MP.AC-1':'HIGH','MP.AC-2':'MEDIUM','MP.AI-1':'HIGH','MP.RD-1':'MEDIUM',
+      'MS.AN-1':'HIGH','MS.MC-1':'LOW','MS.AN-2':'MEDIUM','MS.DW-1':'HIGH',
+      'MG.AN-1':'MEDIUM','MG.PO-1':'HIGH','MG.DM-1':'MEDIUM','MG.RR-1':'LOW'
+    };
+
+    const ANSWER_SCORE = { yes:100, no:0, unsure:50 };
+
+    // ── State ──
+    let currentSection = 0;
+    let answers = {};
+
+    // Restore from session if exists
+    if (session && session.questionnaire && session.questionnaire.answers) {
+      answers = session.questionnaire.answers;
+    }
+
+    // ── Scoring ──
+    function computeScore() {
+      let total = 0;
+      const byFn = { GOVERN:0, MAP:0, MEASURE:0, MANAGE:0 };
+      const flagged = [];
+
+      SECTIONS.forEach(sec => {
+        sec.questions.forEach(q => {
+          if (q.genai_specific && !SHOW_GENAI) return;
+          const ans = answers[q.q_id];
+          if (!ans) return; // skip unanswered — no gap contribution
+          const gf = (100 - ANSWER_SCORE[ans]) / 100;
+          if (gf > 0) {
+            const pts = q.weight * gf;
+            total += pts;
+            byFn[sec.id] += pts;
+            q.controls.forEach(c => { if (!flagged.includes(c)) flagged.push(c); });
+          }
+        });
+      });
+
+      return { total, byFn, flagged };
+    }
+
+    // ── Save to session ──
+    function saveToSession() {
+      const { total, byFn, flagged } = computeScore();
+      const pct = TOTAL_POTENTIAL > 0 ? (total / TOTAL_POTENTIAL) * 100 : 0;
+      if (!session) return;
+      session.questionnaire = {
+        answers,
+        gap_score: Math.round(total * 10) / 10,
+        potential_score: TOTAL_POTENTIAL,
+        gap_percent: Math.round(pct * 10) / 10,
+        flagged_controls: flagged,
+        by_function: byFn,
+        completed_at: new Date().toISOString()
+      };
+      localStorage.setItem('compass_session', JSON.stringify(session));
+    }
+
+    // ── Update score sidebar ──
+    function updateScore() {
+      const { total, byFn, flagged } = computeScore();
+      const pct = (total / TOTAL_POTENTIAL) * 100;
+
+      document.getElementById('gap-score').textContent = Math.round(total).toLocaleString();
+      document.getElementById('gap-sub').textContent = `of ${TOTAL_POTENTIAL.toLocaleString()} possible points (${Math.round(pct)}%)`;
+      document.getElementById('gap-bar').style.width = Math.min(100, pct) + '%';
+
+      const FN_COLORS = { GOVERN:'var(--blue)', MAP:'var(--teal)', MEASURE:'var(--orange)', MANAGE:'var(--danger)' };
+      document.getElementById('fn-rows').innerHTML = Object.entries(FN_POTENTIAL).map(([fn, pot]) => {
+        const score = byFn[fn] || 0;
+        const fp = pot > 0 ? (score / pot) * 100 : 0;
+        return `<div class="fn-row">
+          <span class="fn-label" style="color:${FN_COLORS[fn]};">${fn}</span>
+          <div class="fn-bar-track"><div class="fn-bar-fill" style="width:${Math.min(100,fp)}%;background:${FN_COLORS[fn]};"></div></div>
+          <span class="fn-pts">${Math.round(score)}/${pot}</span>
+        </div>`;
+      }).join('');
+
+      const fsec = document.getElementById('flagged-section');
+      if (flagged.length > 0) {
+        fsec.style.display = 'block';
+        document.getElementById('flagged-pills').innerHTML = flagged.map(c => {
+          const sev = CTRL_SEVERITY[c] || 'HIGH';
+          const cls = sev === 'MEDIUM' ? 'fp-medium' : sev === 'LOW' ? 'fp-low' : '';
+          return `<span class="flagged-pill ${cls}">${c}</span>`;
+        }).join('');
+      } else {
+        fsec.style.display = 'none';
+      }
+    }
+
+    // ── Section nav ──
+    function renderSectionNav() {
+      const navEl = document.getElementById('section-nav');
+      navEl.innerHTML = SECTIONS.map((s, i) => {
+        const state = i < currentSection ? 'st-done' : i === currentSection ? 'st-active' : 'st-pending';
+        const dot = i < currentSection ? '&#10003;' : (i + 1);
+        const conn = i < SECTIONS.length - 1
+          ? `<div class="section-connector ${i < currentSection ? 'sc-done' : ''}"></div>`
+          : '';
+        return `<div class="section-tab ${state}" onclick="jumpTo(${i})" role="button" tabindex="0"
+                     onkeydown="if(event.key==='Enter')jumpTo(${i})">
+          <div class="section-tab-dot">${dot}</div>
+          <div class="section-tab-label">${s.label}</div>
+        </div>${conn}`;
+      }).join('');
+    }
+
+    function jumpTo(idx) {
+      currentSection = idx;
+      renderSection();
+    }
+
+    // ── Render section ──
+    function renderSection() {
+      renderSectionNav();
+      const sec = SECTIONS[currentSection];
+      const contentEl = document.getElementById('section-content');
+
+      const questionsHtml = sec.questions.map(q => {
+        if (q.genai_specific && !SHOW_GENAI) return '';
+        const ans = answers[q.q_id];
+        const sevCls = { HIGH:'badge-high', MEDIUM:'badge-medium', LOW:'badge-low' }[q.severity] || 'badge-info';
+        const showCond = q.conditional && (ans === 'no' || ans === 'unsure');
+        const condAns = answers[q.conditional && q.conditional.q_id];
+
+        return `<div class="q-card ${ans ? 'answered' : ''}" id="qc-${q.q_id}">
+          <div class="q-header">
+            <span class="badge ${sevCls}">${q.severity}</span>
+            <span class="q-id">${q.q_id}</span>
+            ${q.genai_specific ? '<span class="q-genai-tag">GenAI</span>' : ''}
+          </div>
+          <div class="q-text">${q.text}</div>
+          ${q.note ? `<div class="q-note">${q.note}</div>` : ''}
+          <div class="q-controls-hint">Controls: ${q.controls.join(', ')}</div>
+          <div class="answer-group">
+            <button class="answer-btn ab-yes ${ans==='yes'?'ab-sel':''}"
+                    onclick="setAnswer('${q.q_id}', 'yes')" aria-pressed="${ans==='yes'}">&#10003; Yes</button>
+            <button class="answer-btn ab-no ${ans==='no'?'ab-sel':''}"
+                    onclick="setAnswer('${q.q_id}', 'no')" aria-pressed="${ans==='no'}">&#10007; No</button>
+            <button class="answer-btn ab-unk ${ans==='unsure'?'ab-sel':''}"
+                    onclick="setAnswer('${q.q_id}', 'unsure')" aria-pressed="${ans==='unsure'}">? Unsure</button>
+          </div>
+          ${showCond ? `<div class="conditional-wrap">
+            <div class="conditional-label">&#8618; Follow-up</div>
+            <div class="conditional-text">${q.conditional.text}</div>
+            <div class="conditional-btns">
+              <button class="answer-btn ab-yes ${condAns==='yes'?'ab-sel':''}"
+                      onclick="setAnswer('${q.conditional.q_id}','yes')">Yes</button>
+              <button class="answer-btn ab-no ${condAns==='no'?'ab-sel':''}"
+                      onclick="setAnswer('${q.conditional.q_id}','no')">No</button>
+            </div>
+            <div class="conditional-note">Informational only — no impact on gap score.</div>
+          </div>` : ''}
+        </div>`;
+      }).join('');
+
+      contentEl.innerHTML = `
+        <div class="section-header" style="--fn-color:${sec.color};">
+          <div class="section-fn-ref">${sec.nist_ref}</div>
+          <div class="section-fn-title">${sec.id} — ${sec.label.toUpperCase()}</div>
+          <div class="section-fn-desc">${sec.description}</div>
+        </div>
+        <div class="question-list">${questionsHtml}</div>`;
+
+      // Nav buttons
+      const btnBack = document.getElementById('btn-back');
+      const btnNext = document.getElementById('btn-next');
+      const navLabel = document.getElementById('nav-label');
+
+      btnBack.style.visibility = currentSection === 0 ? 'hidden' : 'visible';
+      navLabel.textContent = `Section ${currentSection + 1} of ${SECTIONS.length}`;
+
+      if (currentSection === SECTIONS.length - 1) {
+        btnNext.textContent = 'Complete Assessment →';
+        btnNext.className = 'btn btn-teal';
+      } else {
+        btnNext.textContent = 'Next Section →';
+        btnNext.className = 'btn btn-primary';
+      }
+
+      updateScore();
+    }
+
+    // ── Answer handler ──
+    function setAnswer(qId, ans) {
+      answers[qId] = ans;
+      saveToSession();
+      renderSection();
+    }
+
+    // ── Navigation ──
+    function goBack() {
+      if (currentSection > 0) { currentSection--; renderSection(); window.scrollTo(0,0); }
+    }
+
+    function goNext() {
+      if (currentSection < SECTIONS.length - 1) {
+        currentSection++;
+        renderSection();
+        window.scrollTo(0, 0);
+      } else {
+        saveToSession();
+        window.location.href = 'dashboard.html';
+      }
+    }
+
+    // ── Init ──
+    renderSection();
+  </script>
+</body>
+</html>

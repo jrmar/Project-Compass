@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+
+    /* ── KPI Row ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1100px) { .kpi-row { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 560px)  { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+    .kpi-tile {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+    .kpi-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px; font-weight: 800;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Main Grid ── */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 860px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+    /* ── Panel Titles ── */
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .panel-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--light);
+    }
+    .panel-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+    }
+
+    /* ── Tool Rows ── */
+    .tool-row {
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 6px;
+      transition: border-color 0.15s;
+    }
+    .tool-row-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      user-select: none;
+    }
+    .tool-row-header:hover { background: rgba(255,255,255,0.04); }
+    .tool-stripe {
+      width: 3px; height: 100%; border-radius: 2px;
+      align-self: stretch; flex-shrink: 0;
+    }
+    .ts-high   { background: var(--danger); }
+    .ts-medium { background: var(--orange); }
+    .tool-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--light); }
+    .tool-domain {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+    }
+    .tool-chevron {
+      font-size: 10px; color: var(--muted);
+      transition: transform 0.2s ease;
+    }
+    .tool-chevron.open { transform: rotate(90deg); }
+
+    .tool-accordion {
+      display: none;
+      background: rgba(255,255,255,0.015);
+      border-top: 1px solid var(--glass-border);
+      padding: 12px 14px;
+    }
+    .tool-accordion.open { display: block; }
+
+    .rule-tabs {
+      display: flex; gap: 4px; flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .rule-tab {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--muted); cursor: pointer;
+      padding: 4px 10px;
+      transition: all 0.15s;
+    }
+    .rule-tab.rt-active {
+      background: rgba(64,130,232,0.12);
+      border-color: rgba(64,130,232,0.3);
+      color: var(--blue);
+    }
+    .rule-block {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--teal);
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+      position: relative;
+    }
+    .copy-rule-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(64,130,232,0.15);
+      border: 1px solid rgba(64,130,232,0.25);
+      border-radius: 4px;
+      color: var(--blue);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.05em;
+      padding: 3px 8px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-rule-btn:hover { background: rgba(64,130,232,0.25); }
+
+    .rule-note {
+      font-size: 10px; color: var(--muted);
+      margin-top: 6px; line-height: 1.5;
+    }
+
+    /* ── NIST Gap Panel ── */
+    .fn-block {
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .fn-block-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.025);
+    }
+    .fn-block-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 800;
+      letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .fn-block-bar-track {
+      flex: 1; height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px; overflow: hidden;
+    }
+    .fn-block-bar-fill { height: 100%; border-radius: 100px; }
+    .fn-block-pts {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+    .fn-ctrl-list { padding: 8px 14px 10px; }
+    .ctrl-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .ctrl-row:last-child { border-bottom: none; }
+    .ctrl-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--muted);
+      min-width: 70px; flex-shrink: 0;
+    }
+    .ctrl-desc { font-size: 11px; color: var(--light); line-height: 1.4; flex: 1; }
+    .ctrl-sev { flex-shrink: 0; }
+
+    /* ── Risk Posture Gauge ── */
+    .posture-display {
+      text-align: center; padding: 8px 0 4px;
+    }
+    .posture-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px; font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .posture-desc { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Reports Section ── */
+    .reports-section {
+      margin-top: 8px;
+    }
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 720px) { .reports-grid { grid-template-columns: 1fr; } }
+
+    .report-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 18px 18px 16px;
+      display: flex; flex-direction: column;
+      transition: border-color 0.15s;
+    }
+    .report-card:hover { border-color: rgba(64,130,232,0.2); }
+    .report-audience {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .report-title { font-size: 14px; font-weight: 600; color: var(--light); margin-bottom: 8px; }
+    .report-preview {
+      font-size: 11px; color: var(--muted);
+      line-height: 1.6; flex: 1;
+      margin-bottom: 14px;
+      border-left: 2px solid var(--glass-border);
+      padding-left: 10px;
+      font-style: italic;
+    }
+
+    /* ── Section divider ── */
+    .section-divider {
+      border: none; border-top: 1px solid var(--glass-border);
+      margin: 24px 0;
+    }
+    .section-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 12px;
+    }
+
+    /* ── No data state ── */
+    .no-data-row {
+      padding: 16px;
+      font-size: 12px; color: var(--muted);
+      text-align: center; font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <a class="app-header-logo" href="login.html">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <div class="app-header-right">
+      <div class="org-badge">
+        <span class="org-badge-dot"></span>
+        <span id="header-org-name">Organization</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Step Bar ── -->
+  <div class="step-bar-wrapper">
+    <div class="step-bar">
+      <div class="step-item completed">
+        <div class="step-dot">&#10003;</div>
+        <div class="step-label">Upload</div>
+      </div>
+      <div class="step-connector done"></div>
+      <div class="step-item completed">
+        <div class="step-dot">&#10003;</div>
+        <div class="step-label">Detect</div>
+      </div>
+      <div class="step-connector done"></div>
+      <div class="step-item completed">
+        <div class="step-dot">&#10003;</div>
+        <div class="step-label">Assess</div>
+      </div>
+      <div class="step-connector done"></div>
+      <div class="step-item active">
+        <div class="step-dot">4</div>
+        <div class="step-label">Dashboard</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item pending">
+        <div class="step-dot">5</div>
+        <div class="step-label">Report</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main ── -->
+  <main class="page-content-wide">
+    <h1 class="page-title">Assessment Dashboard</h1>
+    <p class="page-subtitle">
+      Combined view of AI tool risk from your log scan and governance gaps from your NIST assessment.
+    </p>
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-tile">
+        <div class="kpi-label">Total Events</div>
+        <div class="kpi-value" id="kpi-events" style="color:var(--light);">—</div>
+        <div class="kpi-sub">DNS queries parsed</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Tools Detected</div>
+        <div class="kpi-value" id="kpi-tools" style="color:var(--blue);">—</div>
+        <div class="kpi-sub" id="kpi-tools-sub">across all categories</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Governance Gap</div>
+        <div class="kpi-value" id="kpi-gap" style="color:var(--orange);">—</div>
+        <div class="kpi-sub">of 1,300 potential pts</div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Risk Posture</div>
+        <div class="posture-display">
+          <div class="posture-label" id="kpi-posture">—</div>
+          <div class="posture-desc" id="kpi-posture-desc"></div>
+        </div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Governance Risk Score</div>
+        <div style="display:flex;align-items:baseline;gap:2px;">
+          <div class="kpi-value" id="kpi-risk-pct">—</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:var(--muted);line-height:1;">%</div>
+        </div>
+        <div class="kpi-sub" id="kpi-risk-sub">score: — of 100</div>
+        <svg width="100%" height="5" viewBox="0 0 100 5" style="margin-top:9px;display:block;">
+          <rect x="0" y="0" width="100" height="5" rx="2.5" fill="rgba(255,255,255,0.06)"/>
+          <rect x="0" y="0" id="kpi-risk-bar" width="0" height="5" rx="2.5" fill="var(--danger)"/>
+        </svg>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Compliance Maturity</div>
+        <div style="display:flex;align-items:baseline;gap:2px;">
+          <div class="kpi-value" id="kpi-maturity">—</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:var(--muted);line-height:1;">%</div>
+        </div>
+        <div class="kpi-sub">controls estimated met</div>
+        <svg width="100%" height="5" viewBox="0 0 100 5" style="margin-top:9px;display:block;">
+          <rect x="0" y="0" width="100" height="5" rx="2.5" fill="rgba(255,255,255,0.06)"/>
+          <rect x="0" y="0" id="kpi-maturity-bar" width="0" height="5" rx="2.5" fill="var(--teal)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Two-column grid -->
+    <div class="dashboard-grid">
+
+      <!-- Left: Tools Requiring Attention -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="panel-header">
+          <div class="panel-title">Tools Requiring Attention</div>
+          <span class="panel-count" id="tools-count">— tools</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">
+          Medium and high risk tools from log scan. Expand each to generate block rules.
+        </div>
+        <div id="tool-list">
+          <div class="no-data-row">Loading detection data…</div>
+        </div>
+      </div>
+
+      <!-- Right: NIST Gap Breakdown -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="panel-header">
+          <div class="panel-title">NIST Governance Gaps</div>
+          <span class="panel-count" id="controls-count">— flagged</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">
+          Controls unmet or partially met based on your governance assessment.
+        </div>
+        <div id="nist-gap-list">
+          <div class="no-data-row">Loading assessment data…</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid var(--glass-border);">
+      <button class="btn btn-ghost" onclick="window.location.href='detect.html'">
+        &#8592; Back to Detection
+      </button>
+      <button class="btn btn-teal" onclick="window.location.href='report.html'">
+        Proceed to Reports &#8594;
+      </button>
+    </div>
+
+    <div style="height:40px;"></div>
+  </main>
+
+  <script>
+    // ── Session guard ──
+    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
+    if (!session || !session.org_name) { window.location.href = 'login.html'; }
+    if (session) document.getElementById('header-org-name').textContent = session.org_name;
+
+    const det = (session && session.detection) || {};
+    const quest = (session && session.questionnaire) || {};
+    const orgName = (session && session.org_name) || 'Your Organization';
+    const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+    // ── Detection data ──
+    const allTools = det.detected_tools || [];
+    const totalEvents = det.total_events || det.events_parsed || 0;
+    const riskTools = allTools.filter(t => ['high','medium'].includes((t.risk_level || t.risk || '').toLowerCase()));
+
+    // ── Questionnaire data ──
+    const gapScore  = quest.gap_score || 0;
+    const byFn      = quest.by_function || {};
+    const flaggedCtrls = quest.flagged_controls || [];
+
+    // ── Risk score (0–100, NIST gap-based) ──
+    function computeRiskScore() {
+      return gapScore > 0 ? Math.round((gapScore / 1300) * 100) : 0;
+    }
+
+    // ── Posture calc ──
+    function computePosture() {
+      const highCount = allTools.filter(t => (t.risk_level || t.risk || '').toLowerCase() === 'high').length;
+      const gapPct = gapScore / 1300;
+      if (highCount >= 3 || gapPct >= 0.55) return { label:'CRITICAL', color:'var(--danger)', desc:'Immediate action required' };
+      if (highCount >= 1 || gapPct >= 0.35) return { label:'HIGH', color:'var(--orange)', desc:'Significant gaps identified' };
+      if (gapPct >= 0.15) return { label:'MODERATE', color:'#e5b800', desc:'Several gaps to address' };
+      return { label:'LOW', color:'var(--teal)', desc:'Well-governed posture' };
+    }
+
+    // ── Render KPIs ──
+    function renderKPIs() {
+      document.getElementById('kpi-events').textContent = totalEvents > 0 ? totalEvents.toLocaleString() : (det._fallback ? '14,203' : '—');
+      document.getElementById('kpi-tools').textContent = allTools.length || '—';
+      document.getElementById('kpi-tools-sub').textContent = `${riskTools.filter(t=>(t.risk_level||t.risk||'').toLowerCase()==='high').length} high · ${riskTools.filter(t=>(t.risk_level||t.risk||'').toLowerCase()==='medium').length} medium`;
+      document.getElementById('kpi-gap').textContent = gapScore > 0 ? Math.round(gapScore).toLocaleString() : '—';
+
+      const p = computePosture();
+      document.getElementById('kpi-posture').textContent = p.label;
+      document.getElementById('kpi-posture').style.color = p.color;
+      document.getElementById('kpi-posture-desc').textContent = p.desc;
+
+      const rs = computeRiskScore();
+      const maturity = 100 - rs;
+      const rsColor = rs >= 75 ? 'var(--danger)' : rs >= 50 ? 'var(--orange)' : rs >= 25 ? '#e5b800' : 'var(--teal)';
+
+      // Risk score tile — percentage first
+      const rsPctEl = document.getElementById('kpi-risk-pct');
+      rsPctEl.textContent = gapScore > 0 ? rs : '—';
+      rsPctEl.style.color = rsColor;
+      document.getElementById('kpi-risk-sub').textContent = gapScore > 0 ? `score: ${rs} of 100` : 'complete assessment first';
+      const riskBar = document.getElementById('kpi-risk-bar');
+      riskBar.setAttribute('width', gapScore > 0 ? rs : 0);
+      riskBar.setAttribute('fill', rsColor);
+
+      // Compliance maturity tile
+      const matEl = document.getElementById('kpi-maturity');
+      matEl.textContent = gapScore > 0 ? maturity : '—';
+      matEl.style.color = maturity >= 75 ? 'var(--teal)' : maturity >= 50 ? '#e5b800' : 'var(--orange)';
+      const matBar = document.getElementById('kpi-maturity-bar');
+      matBar.setAttribute('width', gapScore > 0 ? maturity : 0);
+    }
+
+    // ── Block rule generator ──
+    const RULE_FORMATS = {
+      pihole:   { label:'Pi-hole', gen: d => `||${d}^` },
+      winsink:  { label:'Windows Sinkhole', gen: d => `0.0.0.0 ${d}` },
+      umbrella: { label:'Cisco Umbrella', gen: d => d },
+      sentinel: { label:'Sentinel KQL', gen: d => `// Sentinel KQL — Monitor ${d}\nDnsEvents\n| where QueryName has "${d}"\n| project TimeGenerated, Computer, ClientIP, QueryName, ResultCode\n| order by TimeGenerated desc` }
+    };
+
+    function getRuleContent(domain, formatKey) {
+      const f = RULE_FORMATS[formatKey];
+      return f ? f.gen(domain) : domain;
+    }
+
+    function toggleTool(idx) {
+      const acc = document.getElementById(`acc-${idx}`);
+      const chev = document.getElementById(`chev-${idx}`);
+      const isOpen = acc.classList.contains('open');
+      acc.classList.toggle('open', !isOpen);
+      chev.classList.toggle('open', !isOpen);
+    }
+
+    function switchRuleTab(idx, fmt) {
+      document.querySelectorAll(`.rt-${idx}`).forEach(el => el.classList.remove('rt-active'));
+      document.getElementById(`rtab-${idx}-${fmt}`).classList.add('rt-active');
+      const domain = riskTools[idx] && (riskTools[idx].domain || riskTools[idx].query_domain || '');
+      document.getElementById(`rule-content-${idx}`).textContent = getRuleContent(domain, fmt);
+    }
+
+    function copyRule(idx) {
+      const txt = document.getElementById(`rule-content-${idx}`).textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        const btn = document.getElementById(`copy-btn-${idx}`);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1400);
+      });
+    }
+
+    // ── Render tool list ──
+    function renderTools() {
+      const el = document.getElementById('tool-list');
+      const countEl = document.getElementById('tools-count');
+
+      const tools = riskTools.length > 0 ? riskTools : allTools.slice(0, 6);
+      countEl.textContent = `${tools.length} tool${tools.length !== 1 ? 's' : ''}`;
+
+      if (tools.length === 0) {
+        el.innerHTML = '<div class="no-data-row">No detection data. Complete the log scan first.</div>';
+        return;
+      }
+
+      el.innerHTML = tools.map((t, i) => {
+        const risk = (t.risk_level || t.risk || 'unknown').toLowerCase();
+        const domain = t.domain || t.query_domain || '';
+        const name = t.tool_name || t.name || domain || 'Unknown Tool';
+        const queries = t.queries || t.dns_queries || 0;
+        const stripe = risk === 'high' ? 'ts-high' : 'ts-medium';
+        const badge = risk === 'high'
+          ? '<span class="badge badge-high">HIGH</span>'
+          : '<span class="badge badge-medium">MEDIUM</span>';
+
+        const defaultFmt = 'pihole';
+        const defaultRule = getRuleContent(domain, defaultFmt);
+
+        return `<div class="tool-row">
+          <div class="tool-row-header" onclick="toggleTool(${i})">
+            <div class="tool-stripe ${stripe}"></div>
+            ${badge}
+            <span class="tool-name">${escHtml(name)}</span>
+            <span class="tool-domain">${escHtml(domain)}</span>
+            ${queries > 0 ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);">${queries.toLocaleString()}q</span>` : ''}
+            <span class="tool-chevron" id="chev-${i}">&#9658;</span>
+          </div>
+          <div class="tool-accordion" id="acc-${i}">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Generate block rule for <strong style="color:var(--light);">${escHtml(domain)}</strong></div>
+            <div class="rule-tabs">
+              ${Object.entries(RULE_FORMATS).map(([k, f]) =>
+                `<button class="rule-tab rt-${i} ${k===defaultFmt?'rt-active':''}" id="rtab-${i}-${k}"
+                         onclick="switchRuleTab(${i},'${k}')">${escHtml(f.label)}</button>`
+              ).join('')}
+            </div>
+            <div class="rule-block">
+              <pre id="rule-content-${i}">${escHtml(defaultRule)}</pre>
+              <button class="copy-rule-btn" id="copy-btn-${i}" onclick="copyRule(${i})">Copy</button>
+            </div>
+            <div class="rule-note">
+              Block rules are generated for informational purposes. Apply only after change-management review.
+              Sentinel KQL requires your workspace log tables to include DnsEvents.
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ── NIST gap data ──
+    const FN_META = {
+      GOVERN:  { color:'var(--blue)',   potential:550, label:'Govern', desc:'Policies & Accountability' },
+      MAP:     { color:'var(--teal)',   potential:300, label:'Map',    desc:'Risk Identification' },
+      MEASURE: { color:'var(--orange)', potential:250, label:'Measure',desc:'Monitoring & Analysis' },
+      MANAGE:  { color:'var(--danger)', potential:200, label:'Manage', desc:'Response & Remediation' },
+    };
+
+    const CTRL_DESCRIPTIONS = {
+      'GV.PO-1':'AI acceptable use policy established','GV.PO-2':'Policy communicated to all staff',
+      'GV.OV-1':'AI governance owner designated','GV.OV-2':'Accountability structure defined',
+      'GV.AT-2':'Staff briefed on AI governance roles','GV.OV-3':'AI risks in formal risk reporting',
+      'GV.AT-1':'Staff training on responsible AI use',
+      'MP.AC-1':'Formal AI tool inventory maintained','MP.AC-2':'Business purpose documented per tool',
+      'MP.AI-1':'Risk assessment per AI tool','MP.RD-1':'Residual risk documented',
+      'MS.AN-1':'Active monitoring of AI usage','MS.MC-1':'Continuous measurement in place',
+      'MS.AN-2':'Human review of AI-generated outputs','MS.DW-1':'Data input controls enforced',
+      'MG.AN-1':'AI incident response process documented','MG.PO-1':'Policy enforcement mechanism',
+      'MG.DM-1':'Decommission/block process for non-compliant tools','MG.RR-1':'Governance policy review cadence',
+    };
+
+    const CTRL_FUNCTION = {
+      'GV.PO-1':'GOVERN','GV.PO-2':'GOVERN','GV.OV-1':'GOVERN','GV.OV-2':'GOVERN',
+      'GV.AT-2':'GOVERN','GV.OV-3':'GOVERN','GV.AT-1':'GOVERN',
+      'MP.AC-1':'MAP','MP.AC-2':'MAP','MP.AI-1':'MAP','MP.RD-1':'MAP',
+      'MS.AN-1':'MEASURE','MS.MC-1':'MEASURE','MS.AN-2':'MEASURE','MS.DW-1':'MEASURE',
+      'MG.AN-1':'MANAGE','MG.PO-1':'MANAGE','MG.DM-1':'MANAGE','MG.RR-1':'MANAGE',
+    };
+
+    const CTRL_SEV = {
+      'GV.PO-1':'HIGH','GV.PO-2':'HIGH','GV.OV-1':'HIGH','GV.OV-2':'HIGH',
+      'GV.AT-2':'MEDIUM','GV.OV-3':'MEDIUM','GV.AT-1':'MEDIUM',
+      'MP.AC-1':'HIGH','MP.AC-2':'MEDIUM','MP.AI-1':'HIGH','MP.RD-1':'MEDIUM',
+      'MS.AN-1':'HIGH','MS.MC-1':'LOW','MS.AN-2':'MEDIUM','MS.DW-1':'HIGH',
+      'MG.AN-1':'MEDIUM','MG.PO-1':'HIGH','MG.DM-1':'MEDIUM','MG.RR-1':'LOW',
+    };
+
+    function renderNistGaps() {
+      const el = document.getElementById('nist-gap-list');
+      const countEl = document.getElementById('controls-count');
+      countEl.textContent = `${flaggedCtrls.length} flagged`;
+
+      if (flaggedCtrls.length === 0 && gapScore === 0) {
+        el.innerHTML = '<div class="no-data-row">No assessment data. Complete the governance questionnaire first.</div>';
+        return;
+      }
+
+      // Group by function
+      const grouped = {};
+      Object.keys(FN_META).forEach(fn => { grouped[fn] = []; });
+      flaggedCtrls.forEach(cid => {
+        const fn = CTRL_FUNCTION[cid] || 'GOVERN';
+        grouped[fn].push(cid);
+      });
+
+      el.innerHTML = Object.entries(FN_META).map(([fn, meta]) => {
+        const ctrls = grouped[fn] || [];
+        const score = byFn[fn] || 0;
+        const pct = meta.potential > 0 ? (score / meta.potential) * 100 : 0;
+
+        const ctrlRows = ctrls.map(cid => {
+          const sev = CTRL_SEV[cid] || 'HIGH';
+          const sevCls = { HIGH:'badge-high', MEDIUM:'badge-medium', LOW:'badge-low' }[sev] || 'badge-info';
+          return `<div class="ctrl-row">
+            <span class="ctrl-id">${cid}</span>
+            <span class="ctrl-desc">${CTRL_DESCRIPTIONS[cid] || cid}</span>
+            <span class="ctrl-sev"><span class="badge ${sevCls}" style="font-size:8px;">${sev}</span></span>
+          </div>`;
+        }).join('');
+
+        return `<div class="fn-block">
+          <div class="fn-block-header">
+            <span class="fn-block-name" style="color:${meta.color};">${fn}</span>
+            <div class="fn-block-bar-track">
+              <div class="fn-block-bar-fill" style="width:${Math.min(100,pct)}%;background:${meta.color};"></div>
+            </div>
+            <span class="fn-block-pts">${Math.round(score)}/${meta.potential} pts</span>
+          </div>
+          ${ctrls.length > 0 ? `<div class="fn-ctrl-list">${ctrlRows}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    // ── Legacy text builders (unused — reports live in report.html) ──
+    function buildExecutiveReport() {
+      const highTools = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase()==='high');
+      const gapPct = Math.round((gapScore / 1300) * 100);
+      const posture = computePosture();
+      return `PROJECT COMPASS — EXECUTIVE SUMMARY
+${orgName}
+Assessment Date: ${assessDate}
+Framework: NIST AI Risk Management Framework 1.0
+
+OVERVIEW
+${allTools.length} AI tools detected across your organization's DNS traffic.
+${highTools.length} high-risk tool${highTools.length !== 1 ? 's' : ''} require immediate governance attention.
+Governance gap score: ${Math.round(gapScore)} of 1,300 possible points (${gapPct}%).
+Overall risk posture: ${posture.label} — ${posture.desc}.
+
+WHAT THIS MEANS
+Employees are accessing AI tools without formal governance controls.
+Without policy, oversight, and monitoring, sensitive organizational data
+may be leaving the organization through unsanctioned AI services.
+
+KEY RISKS
+${highTools.slice(0,3).map((t,i) => `${i+1}. ${t.tool_name||t.name||t.domain} — ${(t.risk_level||t.risk||'').toUpperCase()} risk, ${t.queries||t.dns_queries||0} queries observed`).join('\n')}
+
+TOP PRIORITY ACTIONS
+1. Establish a written AI acceptable use policy (GV.PO-1)
+2. Designate a named AI governance owner (GV.OV-1)
+3. Implement monitoring for AI tool access (MS.AN-1)
+4. Conduct formal risk assessments for detected tools (MP.AI-1)
+
+NEXT STEPS
+Review the full findings with your security and compliance teams.
+Begin with policy creation and governance ownership assignment.
+Schedule a follow-up Compass scan in 90 days to measure progress.
+
+---
+Generated by Project Compass · ${assessDate}
+NIST AI RMF 1.0 | For internal use only`;
+    }
+
+    function buildSecurityReport() {
+      const gapPct = Math.round((gapScore / 1300) * 100);
+      const highTools = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase()==='high');
+      const medTools  = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase()==='medium');
+      return `PROJECT COMPASS — SECURITY TEAM FINDINGS
+${orgName}
+Assessment Date: ${assessDate}
+Framework: NIST AI Risk Management Framework 1.0 + NIST-AI-600-1 GenAI Profile
+
+DETECTION SUMMARY
+Total DNS Events Parsed: ${totalEvents > 0 ? totalEvents.toLocaleString() : 'N/A'}
+Total AI Tools Detected: ${allTools.length}
+  High Risk:   ${highTools.length} tools
+  Medium Risk: ${medTools.length} tools
+  Low Risk:    ${allTools.length - highTools.length - medTools.length} tools
+
+GOVERNANCE GAP SCORE: ${Math.round(gapScore)} / 1,300 pts (${gapPct}%)
+  GOVERN:  ${Math.round(byFn.GOVERN||0)} / 550 pts
+  MAP:     ${Math.round(byFn.MAP||0)} / 300 pts
+  MEASURE: ${Math.round(byFn.MEASURE||0)} / 250 pts
+  MANAGE:  ${Math.round(byFn.MANAGE||0)} / 200 pts
+
+FLAGGED NIST CONTROLS (${flaggedCtrls.length} controls)
+${flaggedCtrls.map(c => `  [${CTRL_SEV[c]||'?'}] ${c} — ${CTRL_DESCRIPTIONS[c]||c}`).join('\n')}
+
+HIGH RISK TOOLS
+${highTools.length === 0 ? '  None detected.' : highTools.map(t =>
+  `  ${(t.tool_name||t.name||t.domain||'?').padEnd(20)} ${(t.domain||t.query_domain||'').padEnd(30)} ${(t.queries||t.dns_queries||0)} queries`
+).join('\n')}
+
+MEDIUM RISK TOOLS
+${medTools.length === 0 ? '  None detected.' : medTools.map(t =>
+  `  ${(t.tool_name||t.name||t.domain||'?').padEnd(20)} ${(t.domain||t.query_domain||'').padEnd(30)} ${(t.queries||t.dns_queries||0)} queries`
+).join('\n')}
+
+RECOMMENDED IMMEDIATE ACTIONS
+1. Block high-risk tools via DNS sinkhole or firewall rule
+2. Review MS.DW-1: Implement data input controls for all AI tools
+3. Implement SIEM alerts for AI tool DNS queries (MS.AN-1)
+4. Initiate risk assessment for top 5 tools by query volume (MP.AI-1)
+
+---
+Generated by Project Compass · ${assessDate}
+For authorized security personnel only`;
+    }
+
+    function buildAuditorReport() {
+      const gapPct = Math.round((gapScore / 1300) * 100);
+      const posture = computePosture();
+      let findings = '';
+      let fNum = 1;
+      flaggedCtrls.slice(0,10).forEach(cid => {
+        findings += `Finding ${String(fNum).padStart(3,'0')}
+  NIST Control   : ${cid}
+  Description    : ${CTRL_DESCRIPTIONS[cid]||cid}
+  Function       : ${CTRL_FUNCTION[cid]||'?'}
+  Severity       : ${CTRL_SEV[cid]||'?'}
+  Control Status : UNMET / PARTIALLY MET
+  Evidence       : DNS query log scan + governance questionnaire response
+  Framework Ref  : NIST AI RMF 1.0
+
+`;
+        fNum++;
+      });
+
+      return `PROJECT COMPASS — AUDITOR EVIDENCE PACKAGE
+${orgName}
+Assessment Date: ${assessDate}
+
+ASSESSMENT METADATA
+Framework:        NIST AI Risk Management Framework 1.0 (January 2023)
+GenAI Profile:    NIST-AI-600-1 (July 2024)
+Assessment Type:  DNS Log Analysis + Governance Questionnaire
+Methodology:      Automated log scan + 13-question NIST-mapped questionnaire
+Scope:            Organization-wide DNS traffic; AI tool governance posture
+Assessor:         Project Compass (automated)
+
+SUMMARY STATISTICS
+AI Tools Detected:      ${allTools.length}
+High-Risk Tools:        ${allTools.filter(t=>(t.risk_level||t.risk||'').toLowerCase()==='high').length}
+Governance Gap Score:   ${Math.round(gapScore)} / 1,300 pts (${gapPct}%)
+Overall Risk Posture:   ${posture.label}
+Controls Flagged:       ${flaggedCtrls.length} of 19 assessed
+
+CONTROL STATUS SUMMARY
+${['GOVERN','MAP','MEASURE','MANAGE'].map(fn => {
+  const score = Math.round(byFn[fn]||0);
+  const pot   = FN_META[fn].potential;
+  const pct2  = Math.round((score/pot)*100);
+  return `  ${fn.padEnd(10)} ${score}/${pot} pts gap  (${pct2}% unmet)`;
+}).join('\n')}
+
+STRUCTURED FINDINGS
+${findings}
+
+EVIDENCE BASIS
+Log scan results are derived from DNS query logs submitted by ${orgName}.
+Questionnaire responses represent self-reported governance posture.
+This assessment does not constitute a formal third-party audit.
+Organizations should supplement with independent controls testing.
+
+CERTIFICATION
+This report was generated programmatically by Project Compass on ${assessDate}.
+Results should be reviewed by a qualified information security professional
+prior to use in compliance submissions.
+
+---
+Project Compass | Powered by NIST AI RMF 1.0
+${assessDate}`;
+    }
+
+    // ── Render reports ──
+    function renderReports() {
+      const rs = computeRiskScore();
+      const reports = [
+        {
+          type: 'executive',
+          audience: 'Executive',
+          color: 'var(--blue)',
+          title: 'Executive Summary',
+          desc: 'Risk score, plain-language overview, risk gauge, tool summary table, and platform-specific priority actions.',
+          preview: `${allTools.length} AI tools detected · Risk Score ${rs}/100 · Posture: ${computePosture().label}`
+        },
+        {
+          type: 'security',
+          audience: 'Security Team',
+          color: 'var(--teal)',
+          title: 'Security Team Findings',
+          desc: 'Full tool table, NIST gap bar chart, flagged controls, and Azure/AWS/GCP remediation steps.',
+          preview: `${flaggedCtrls.length} NIST controls flagged · ${allTools.filter(t=>(t.risk_level||t.risk||'').toLowerCase()==='high').length} high-risk tools · DNS block rules included`
+        },
+        {
+          type: 'auditor',
+          audience: 'Auditor',
+          color: 'var(--orange)',
+          title: 'Auditor Evidence Package',
+          desc: 'Control status matrix, structured findings, evidence chain, and framework compliance statement.',
+          preview: `${flaggedCtrls.length} structured findings · NIST AI RMF 1.0 + NIST-AI-600-1 · ${assessDate}`
+        }
+      ];
+
+      document.getElementById('reports-grid').innerHTML = reports.map(r => `
+        <div class="report-card">
+          <div class="report-audience" style="color:${r.color};">${r.audience}</div>
+          <div class="report-title">${r.title}</div>
+          <div class="report-preview">${r.preview}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">${r.desc}</div>
+          <button class="btn btn-primary" style="width:100%;font-size:11px;padding:8px 0;"
+                  onclick="openReport('${r.type}')">
+            &#8599; Open &amp; Save as PDF
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // ── Helpers ──
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Init ──
+    renderKPIs();
+    renderTools();
+    renderNistGaps();
+  </script>
+</body>
+</html>

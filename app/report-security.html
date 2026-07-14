@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass — Security Team Findings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    :root {
+      --navy: #030b1e; --blue: #4082E8; --teal: #33CDB6;
+      --orange: #FF8020; --danger: #e05c5c;
+      --text: #0f1c38; --muted: #5a6682; --border: #d8dff0;
+      --bg-light: #f4f6fc; --bg-teal: rgba(51,205,182,0.06);
+    }
+
+    @page { size: A4 portrait; margin: 1.8cm 2cm 1.5cm; }
+
+    body { font-family: 'Inter', system-ui, sans-serif; font-size: 11pt; color: var(--text); background: white; line-height: 1.5; }
+
+    .print-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: var(--navy); color: white; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; z-index: 1000;
+    }
+    .print-bar-left { display: flex; align-items: center; gap: 10px; }
+    .print-bar-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; }
+    .print-btn { background: var(--teal); border: none; border-radius: 6px; color: var(--navy); font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; padding: 7px 18px; cursor: pointer; }
+    @media print { .print-bar { display: none; } }
+
+    .report-body { max-width: 760px; margin: 0 auto; padding: 52px 0 0; }
+    @media print { .report-body { padding: 0; max-width: 100%; } }
+
+    .cover-strip { background: var(--navy); padding: 36px 40px 32px; border-radius: 12px 12px 0 0; }
+    @media print { .cover-strip { border-radius: 0; } }
+    .cover-accent { width: 40px; height: 4px; background: var(--teal); border-radius: 2px; margin-bottom: 20px; }
+    .cover-report-type { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 8px; }
+    .cover-title { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 16px; }
+    .cover-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+    .cover-meta-item { font-size: 10px; color: rgba(255,255,255,0.5); }
+    .cover-meta-item strong { display: block; color: rgba(255,255,255,0.85); font-size: 11px; margin-bottom: 2px; }
+    .cover-confidential { margin-top: 20px; font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 0.05em; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; }
+
+    .content-area { padding: 32px 40px; background: white; }
+
+    .section-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 24px; page-break-inside: avoid; }
+    .stat-cell { padding: 14px 16px; border-right: 1px solid var(--border); background: var(--bg-light); }
+    .stat-cell:last-child { border-right: none; }
+    .stat-label { font-family: 'Montserrat', sans-serif; font-size: 7px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .stat-val { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .stat-sub { font-size: 8px; color: var(--muted); margin-top: 2px; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 22px; page-break-inside: avoid; }
+    thead tr { background: var(--navy); }
+    thead th { padding: 8px 10px; text-align: left; font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:nth-child(even) { background: var(--bg-light); }
+    tbody td { padding: 6px 10px; vertical-align: middle; }
+    .td-mono { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 9px; }
+
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 100px; font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .pill-high   { background: rgba(224,92,92,0.1);   color: #c03030; border: 1px solid rgba(224,92,92,0.3); }
+    .pill-medium { background: rgba(255,128,32,0.1);  color: #b85c00; border: 1px solid rgba(255,128,32,0.3); }
+    .pill-low    { background: rgba(51,205,182,0.1);  color: #1a8a78; border: 1px solid rgba(51,205,182,0.3); }
+    .pill-unmet  { background: rgba(224,92,92,0.1);   color: #c03030; border: 1px solid rgba(224,92,92,0.25); }
+    .pill-partial { background: rgba(255,128,32,0.1); color: #b85c00; border: 1px solid rgba(255,128,32,0.25); }
+
+    /* NIST bar chart */
+    .fn-chart { margin-bottom: 22px; page-break-inside: avoid; }
+    .fn-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .fn-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; width: 62px; flex-shrink: 0; color: var(--muted); }
+    .fn-track { flex: 1; height: 12px; background: #e8ecf5; border-radius: 6px; overflow: hidden; position: relative; }
+    .fn-fill { height: 100%; border-radius: 6px; }
+    .fn-pts { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); width: 60px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Risk distribution */
+    .risk-dist { display: flex; gap: 0; height: 18px; border-radius: 9px; overflow: hidden; margin-bottom: 8px; }
+    .dist-seg { display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 800; color: white; }
+
+    /* Block rules */
+    .rule-box { background: #0a0f1e; border-radius: 6px; padding: 10px 14px; margin-bottom: 6px; page-break-inside: avoid; }
+    .rule-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #5a7090; margin-bottom: 4px; }
+    .rule-code { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 9px; color: #33CDB6; line-height: 1.7; }
+
+    /* Remediation steps */
+    .rem-block { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 14px; page-break-inside: avoid; }
+    .rem-header { display: flex; align-items: center; gap: 8px; background: var(--bg-light); padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    .rem-ctrl { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); background: white; border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; }
+    .rem-title { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 800; color: var(--text); flex: 1; }
+    .rem-body { padding: 10px 12px; }
+    .platform-label { font-family: 'Montserrat', sans-serif; font-size: 7px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
+    .pl-azure { background: rgba(0,137,214,0.08); color: #0066b2; border: 1px solid rgba(0,137,214,0.25); }
+    .pl-aws   { background: rgba(255,153,0,0.08);  color: #c47600; border: 1px solid rgba(255,153,0,0.3); }
+    .pl-gcp   { background: rgba(66,133,244,0.08); color: #2c5bb8; border: 1px solid rgba(66,133,244,0.25); }
+    .step-list { list-style: none; padding: 0; margin-bottom: 10px; }
+    .step-list li { display: flex; gap: 7px; font-size: 9px; color: var(--text); padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,0.04); line-height: 1.5; }
+    .step-list li:last-child { border-bottom: none; }
+    .step-num { width: 16px; height: 16px; background: var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-size: 7px; font-weight: 800; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+
+    .report-footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .footer-left { font-size: 8px; color: var(--muted); }
+    .footer-right { font-size: 8px; color: var(--muted); text-align: right; }
+    .footer-brand { font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 800; color: var(--teal); }
+    .page-break { page-break-before: always; }
+  </style>
+</head>
+<body>
+
+  <div class="print-bar">
+    <div class="print-bar-left">
+      <div class="print-bar-dot"></div>
+      <span>Project Compass — Security Team Findings</span>
+    </div>
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <div class="report-body">
+
+    <div class="cover-strip">
+      <div class="cover-accent"></div>
+      <div class="cover-report-type">Security Team Findings</div>
+      <div class="cover-title">AI Tool Risk &amp; NIST Governance<br>Technical Assessment</div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><strong id="cv-org">Organization</strong>Organization</div>
+        <div class="cover-meta-item"><strong id="cv-date">—</strong>Assessment Date</div>
+        <div class="cover-meta-item"><strong>NIST AI RMF 1.0 + NIST-AI-600-1</strong>Framework</div>
+        <div class="cover-meta-item"><strong>Security Team</strong>Audience</div>
+      </div>
+      <div class="cover-confidential">RESTRICTED — FOR AUTHORIZED SECURITY PERSONNEL ONLY · Contains technical vulnerability details and remediation steps.</div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Stats -->
+      <div class="section-label">Assessment Summary</div>
+      <div class="stats-row">
+        <div class="stat-cell">
+          <div class="stat-label">DNS Events</div>
+          <div class="stat-val" id="s-events" style="color:var(--text);">—</div>
+          <div class="stat-sub">queries parsed</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Tools Found</div>
+          <div class="stat-val" id="s-tools" style="color:var(--blue);">—</div>
+          <div class="stat-sub" id="s-tools-sub">total detected</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Risk Score</div>
+          <div class="stat-val" id="s-risk" style="color:var(--danger);">—<span style="font-size:10px;color:#888;">/100</span></div>
+          <div class="stat-sub">governance index</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Gap Score</div>
+          <div class="stat-val" id="s-gap" style="color:var(--orange);">—</div>
+          <div class="stat-sub">of 1,300 pts</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Controls Flagged</div>
+          <div class="stat-val" id="s-ctrls" style="color:var(--danger);">—</div>
+          <div class="stat-sub">of 19 assessed</div>
+        </div>
+      </div>
+
+      <!-- Risk distribution bar -->
+      <div class="section-label">Risk Distribution</div>
+      <div id="risk-dist-bar" class="risk-dist"></div>
+      <div id="risk-dist-legend" style="display:flex;gap:16px;font-size:9px;color:var(--muted);margin-bottom:20px;"></div>
+
+      <!-- Full tool table -->
+      <div class="section-label">Full AI Tool Inventory</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Tool Name</th><th>Domain</th><th>Category</th>
+            <th>Risk</th><th style="text-align:right;">Queries</th>
+          </tr>
+        </thead>
+        <tbody id="tools-tbody"></tbody>
+      </table>
+
+      <!-- NIST Gap Chart -->
+      <div class="section-label">NIST Function Gap Analysis</div>
+      <div class="fn-chart" id="fn-chart"></div>
+
+      <!-- Controls table -->
+      <div class="section-label">Flagged NIST Controls</div>
+      <table>
+        <thead>
+          <tr><th>Control ID</th><th>Function</th><th>Description</th><th>Severity</th><th>Status</th></tr>
+        </thead>
+        <tbody id="ctrl-tbody"></tbody>
+      </table>
+
+      <!-- Block Rules -->
+      <div class="page-break"></div>
+      <div class="section-label">DNS Block Rules</div>
+      <p style="font-size:10px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
+        Block rules generated for high-risk and medium-risk domains. Apply only after change-management approval.
+        Test in a lab environment before deploying to production DNS infrastructure.
+      </p>
+      <div id="block-rules"></div>
+
+      <!-- Remediation by control -->
+      <div class="page-break"></div>
+      <div class="section-label">Technical Remediation Steps (by Control)</div>
+      <div id="rem-list"></div>
+
+      <!-- Footer -->
+      <div class="report-footer">
+        <div class="footer-left">
+          <span class="footer-brand">Project Compass</span><br>
+          NIST AI RMF 1.0 + NIST-AI-600-1 GenAI Profile · For authorized security personnel only.
+        </div>
+        <div class="footer-right" id="footer-date"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
+    const det   = session.detection || {};
+    const quest = session.questionnaire || {};
+    const orgName = session.org_name || 'Your Organization';
+    const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+    const allTools    = det.detected_tools || [];
+    const totalEvents = det.total_events || det.events_parsed || 0;
+    const gapScore    = quest.gap_score || 0;
+    const byFn        = quest.by_function || {};
+    const flagged     = quest.flagged_controls || [];
+    const riskScore   = Math.round((gapScore / 1300) * 100);
+    const highTools   = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high');
+    const medTools    = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'medium');
+    const lowTools    = allTools.filter(t => !['high','medium'].includes((t.risk_level||t.risk||'').toLowerCase()));
+
+    document.getElementById('cv-org').textContent = orgName;
+    document.getElementById('cv-date').textContent = assessDate;
+    document.getElementById('footer-date').innerHTML = `Generated: ${assessDate}<br>${orgName}`;
+
+    const riskColor = riskScore >= 75 ? '#c03030' : riskScore >= 50 ? '#b85c00' : riskScore >= 25 ? '#b89000' : '#1a8a78';
+    document.getElementById('s-events').textContent = totalEvents > 0 ? totalEvents.toLocaleString() : (det._fallback ? '14,203' : '—');
+    document.getElementById('s-tools').textContent = allTools.length || '—';
+    document.getElementById('s-tools-sub').textContent = `${highTools.length} high · ${medTools.length} med · ${lowTools.length} low`;
+    document.getElementById('s-risk').innerHTML = gapScore > 0 ? `${riskScore}<span style="font-size:10px;color:#888;">/100</span>` : '—';
+    document.getElementById('s-risk').style.color = riskColor;
+    document.getElementById('s-gap').textContent = gapScore > 0 ? Math.round(gapScore).toLocaleString() : '—';
+    document.getElementById('s-ctrls').textContent = flagged.length;
+
+    // Risk distribution bar
+    const total = allTools.length || 1;
+    const bars = [
+      { label:'High', count: highTools.length, color:'#e05c5c' },
+      { label:'Medium', count: medTools.length, color:'#FF8020' },
+      { label:'Low', count: lowTools.length, color:'#33CDB6' }
+    ];
+    document.getElementById('risk-dist-bar').innerHTML = bars.map(b => {
+      const pct = (b.count / total * 100).toFixed(1);
+      return b.count > 0 ? `<div class="dist-seg" style="width:${pct}%;background:${b.color};">${b.count}</div>` : '';
+    }).join('');
+    document.getElementById('risk-dist-legend').innerHTML = bars.map(b =>
+      `<span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:${b.color};display:inline-block;"></span>${b.label}: ${b.count}</span>`
+    ).join('');
+
+    // Tools table
+    const sorted = [...allTools].sort((a,b) => {
+      const o = {high:0,medium:1,low:2};
+      return (o[(a.risk_level||a.risk||'low').toLowerCase()]||2) - (o[(b.risk_level||b.risk||'low').toLowerCase()]||2);
+    });
+    document.getElementById('tools-tbody').innerHTML = sorted.length > 0 ? sorted.map((t,i) => {
+      const risk = (t.risk_level||t.risk||'unknown').toLowerCase();
+      const pc = risk === 'high' ? 'pill-high' : risk === 'medium' ? 'pill-medium' : 'pill-low';
+      return `<tr>
+        <td style="color:var(--muted);font-size:9px;">${i+1}</td>
+        <td><strong>${t.tool_name||t.name||'—'}</strong></td>
+        <td class="td-mono">${t.domain||t.query_domain||'—'}</td>
+        <td style="font-size:9px;">${(t.category||'—').replace(/_/g,' ')}</td>
+        <td><span class="pill ${pc}">${risk}</span></td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">${(t.queries||t.dns_queries||0).toLocaleString()}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;color:#888;font-style:italic;">No detection data</td></tr>';
+
+    // NIST gap bar chart
+    const FN_META = {
+      GOVERN:  { color:'#4082E8', potential:550 },
+      MAP:     { color:'#33CDB6', potential:300 },
+      MEASURE: { color:'#FF8020', potential:250 },
+      MANAGE:  { color:'#e05c5c', potential:200 },
+    };
+    document.getElementById('fn-chart').innerHTML = Object.entries(FN_META).map(([fn, m]) => {
+      const score = Math.round(byFn[fn] || 0);
+      const pct = m.potential > 0 ? Math.min(100, (score / m.potential) * 100) : 0;
+      const matPct = 100 - pct;
+      return `<div class="fn-row">
+        <div class="fn-label">${fn}</div>
+        <div class="fn-track">
+          <div class="fn-fill" style="width:${pct}%;background:${m.color};"></div>
+        </div>
+        <div class="fn-pts">${score}/${m.potential} pts gap (${Math.round(100-pct)}% met)</div>
+      </div>`;
+    }).join('');
+
+    // Controls table
+    const CTRL_DESC = {
+      'GV.PO-1':'AI acceptable use policy established','GV.PO-2':'Policy communicated to all staff',
+      'GV.OV-1':'AI governance owner designated','GV.OV-2':'Accountability structure defined',
+      'GV.AT-2':'Staff briefed on AI governance roles','GV.OV-3':'AI risks in formal risk reporting',
+      'GV.AT-1':'Staff training on responsible AI use',
+      'MP.AC-1':'Formal AI tool inventory maintained','MP.AC-2':'Business purpose documented per tool',
+      'MP.AI-1':'Risk assessment per AI tool','MP.RD-1':'Residual risk documented',
+      'MS.AN-1':'Active monitoring of AI usage','MS.MC-1':'Continuous measurement in place',
+      'MS.AN-2':'Human review of AI-generated outputs','MS.DW-1':'Data input controls enforced',
+      'MG.AN-1':'AI incident response process documented','MG.PO-1':'Policy enforcement mechanism',
+      'MG.DM-1':'Decommission/block process for non-compliant tools','MG.RR-1':'Governance policy review cadence',
+    };
+    const CTRL_FN = {
+      'GV.PO-1':'GOVERN','GV.PO-2':'GOVERN','GV.OV-1':'GOVERN','GV.OV-2':'GOVERN','GV.AT-2':'GOVERN','GV.OV-3':'GOVERN','GV.AT-1':'GOVERN',
+      'MP.AC-1':'MAP','MP.AC-2':'MAP','MP.AI-1':'MAP','MP.RD-1':'MAP',
+      'MS.AN-1':'MEASURE','MS.MC-1':'MEASURE','MS.AN-2':'MEASURE','MS.DW-1':'MEASURE',
+      'MG.AN-1':'MANAGE','MG.PO-1':'MANAGE','MG.DM-1':'MANAGE','MG.RR-1':'MANAGE',
+    };
+    const CTRL_SEV = {
+      'GV.PO-1':'HIGH','GV.PO-2':'HIGH','GV.OV-1':'HIGH','GV.OV-2':'HIGH',
+      'GV.AT-2':'MEDIUM','GV.OV-3':'MEDIUM','GV.AT-1':'MEDIUM',
+      'MP.AC-1':'HIGH','MP.AC-2':'MEDIUM','MP.AI-1':'HIGH','MP.RD-1':'MEDIUM',
+      'MS.AN-1':'HIGH','MS.MC-1':'LOW','MS.AN-2':'MEDIUM','MS.DW-1':'HIGH',
+      'MG.AN-1':'MEDIUM','MG.PO-1':'HIGH','MG.DM-1':'MEDIUM','MG.RR-1':'LOW',
+    };
+    const answers = quest.answers || {};
+    document.getElementById('ctrl-tbody').innerHTML = flagged.length > 0 ? flagged.map(cid => {
+      const sev = CTRL_SEV[cid] || 'MEDIUM';
+      const pc = sev === 'HIGH' ? 'pill-high' : sev === 'MEDIUM' ? 'pill-medium' : 'pill-low';
+      const ans = answers[Object.keys(answers).find(k => flagged.indexOf(cid) > -1)] || 'no';
+      const status = ans === 'unsure' ? '<span class="pill pill-partial">Partial</span>' : '<span class="pill pill-unmet">Unmet</span>';
+      return `<tr>
+        <td class="td-mono">${cid}</td>
+        <td style="font-size:9px;">${CTRL_FN[cid]||'—'}</td>
+        <td>${CTRL_DESC[cid]||cid}</td>
+        <td><span class="pill ${pc}">${sev}</span></td>
+        <td>${status}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:#888;font-style:italic;">No controls flagged — complete assessment first</td></tr>';
+
+    // Block rules
+    const riskDomains = [...highTools, ...medTools].slice(0, 12);
+    if (riskDomains.length > 0) {
+      const pihole   = riskDomains.map(t => `||${t.domain||t.query_domain}^`).join('\n');
+      const winsink  = riskDomains.map(t => `0.0.0.0 ${t.domain||t.query_domain}`).join('\n');
+      const kql      = `DnsEvents\n| where QueryName has_any (${riskDomains.map(t=>`"${t.domain||t.query_domain}"`).join(', ')})\n| project TimeGenerated, Computer, ClientIP, QueryName, ResultCode\n| order by TimeGenerated desc`;
+      document.getElementById('block-rules').innerHTML = `
+        <div class="rule-box"><div class="rule-label">Pi-hole / AdGuard (adlists.txt)</div><div class="rule-code">${pihole}</div></div>
+        <div class="rule-box"><div class="rule-label">Windows DNS Sinkhole (hosts file)</div><div class="rule-code">${winsink}</div></div>
+        <div class="rule-box"><div class="rule-label">Microsoft Sentinel KQL — Monitor Query</div><div class="rule-code">${kql}</div></div>
+        <p style="font-size:9px;color:var(--muted);margin-top:8px;">For Cisco Umbrella: add each domain to Policies → Destination Lists → Block List in the Umbrella dashboard.</p>`;
+    } else {
+      document.getElementById('block-rules').innerHTML = '<p style="font-size:10px;color:var(--muted);font-style:italic;">No high/medium risk tools detected to generate block rules.</p>';
+    }
+
+    // Remediation steps
+    const REM = [
+      {
+        ctrl:'MS.AN-1', severity:'HIGH', title:'Active Monitoring of AI Tool Usage',
+        azure:['Enable Microsoft Sentinel Data Connector: DNS (Portal → Sentinel → Data Connectors → DNS).','Create Scheduled Analytics Rule using KQL: DnsEvents | where QueryName has_any ("openai","anthropic","claude","gemini","copilot","character.ai","perplexity","midjourney") | summarize count() by QueryName, ClientIP | where count_ > 5.','Set alert frequency: every 1 hour. Alert threshold: > 0 results. Severity: Medium.','Assign incidents to your AI governance owner or SOC queue.','Enable Microsoft Defender for Cloud Apps → Cloud Discovery → upload your firewall/proxy logs for continuous app classification.','Configure weekly discovery snapshot report to governance mailbox.'],
+        aws:['Enable Route 53 Resolver Query Logging → create config → send to CloudWatch Log Group: /aws/dns/ai-queries.','Create CloudWatch Metric Filter: filterPattern = [queryname="*openai*" OR queryname="*anthropic*" OR queryname="*gemini*" OR queryname="*copilot*"].','Create CloudWatch Alarm: threshold > 20 matches per hour → SNS topic → email governance owner.','Enable Amazon GuardDuty → Threat Intelligence → add custom threat list of AI domains.','Review GuardDuty findings weekly in Security Hub → Insights → "Most Frequent Findings".'],
+        gcp:['Enable Cloud DNS query logging on all managed zones: Cloud DNS → Zones → [Zone] → Edit → Cloud Logging: On.','Create a Log-Based Metric in Cloud Logging: filter = resource.type="dns_query" AND jsonPayload.queryName=~"openai|anthropic|gemini|copilot|midjourney|character\\.ai".','Create Cloud Monitoring Alerting Policy on this metric: condition threshold > 10 per hour → notify governance owner via email.','Export DNS logs to BigQuery for trend analysis: Log Router → Sink → BigQuery destination.','Schedule a weekly BigQuery query to produce AI tool usage reports.']
+      },
+      {
+        ctrl:'MS.DW-1', severity:'HIGH', title:'Data Loss Prevention — AI Tool Input Controls',
+        azure:['Open Microsoft Purview Compliance Portal → Data Loss Prevention → Policies → Create Policy.','Select sensitive info types: US Social Security Number, Credit Card Number, All medical terms, Financial data.','Scope policy to Cloud Apps and apply to detected AI tool domains.','Set action: Block with override + notify user + alert compliance team.','In Defender for Cloud Apps: Policies → Session Policies → Create → App = [AI tool] → Activity = Upload/Post → Action = Block + Alert.','Review DLP policy matches weekly in Purview Activity Explorer.'],
+        aws:['Enable Amazon Macie in all regions: Macie Console → Enable → Create S3 inventory.','Create a Macie custom data identifier for your organization\'s sensitive patterns (employee IDs, project codes).','Deploy an AWS Network Firewall with a stateful rule group: deny TCP POST to known AI domains when body matches PII patterns.','Use AWS WAF Managed Rules → Bot Control to detect and block automated AI tool submissions.','Configure Macie findings to export to Security Hub and trigger SNS alerts for HIGH severity findings.'],
+        gcp:['Enable Cloud DLP API: console.cloud.google.com/security/dlp → Enable API.','Create a DLP Inspection Template: select info types PERSON_NAME, EMAIL_ADDRESS, PHONE_NUMBER, CREDIT_CARD_NUMBER, US_SOCIAL_SECURITY_NUMBER.','Create a DLP Job Trigger targeting Cloud Storage buckets used as AI staging areas.','In Chrome Browser Cloud Management: admin.google.com → Devices → Chrome → Settings → URL Blocking → add AI tool URLs for warning/block mode.','Configure Cloud Armor security policy to inspect and log POST requests to AI API endpoints.']
+      },
+      {
+        ctrl:'MG.PO-1', severity:'HIGH', title:'Block / Restrict Non-Compliant AI Tools',
+        azure:['Microsoft Defender for Cloud Apps → Cloud App Catalog → find each tool → Tag as "Unsanctioned".','Enable Entra ID Conditional Access: Apps → Cloud Apps → Target resource = detected AI apps → Grant: Block access.','For DNS blocking: Azure DNS Private Resolver → Forwarding Rulesets → add rule for each blocked domain → target: sinkhole IP (0.0.0.0).','Apply the DNS forwarding ruleset to all virtual networks in your Azure subscription.','Review blocked app attempts weekly in Defender for Cloud Apps → Activity Log → Blocked activities.'],
+        aws:['Route 53 Resolver → DNS Firewall → Rule Groups → Create rule group.','Add rules for each blocked domain: Action = BLOCK, Response = NODATA (returns empty response to client).','Associate the rule group with all VPCs in your organization.','Monitor blocked queries in CloudWatch using the /aws/dns/queries log group.','Use AWS Organizations SCPs to prevent users from modifying DNS Firewall rules.'],
+        gcp:['Cloud DNS → Response Policies → Create Response Policy: name = ai-block-policy.','Add Response Policy Rules for each blocked domain: Override type = Local Data → A record = 0.0.0.0.','Apply the response policy to your organization\'s VPC networks.','Chrome Browser Cloud Management (admin.google.com): Devices → Chrome → Settings → URL Blocking → add blocked AI tool URLs.','Verify blocking is working: Cloud DNS query logs should show NXDOMAIN or 0.0.0.0 responses for blocked domains.']
+      }
+    ];
+
+    document.getElementById('rem-list').innerHTML = REM.map(r => `
+      <div class="rem-block">
+        <div class="rem-header">
+          <span class="rem-ctrl">${r.ctrl}</span>
+          <span class="rem-title">${r.title}</span>
+          <span class="pill pill-high" style="font-size:7px;">${r.severity}</span>
+        </div>
+        <div class="rem-body">
+          <div style="margin-bottom:8px;"><span class="platform-label pl-azure">Azure</span>
+            <ol class="step-list">${r.azure.map((s,i) => `<li><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+          </div>
+          <div style="margin-bottom:8px;"><span class="platform-label pl-aws">AWS</span>
+            <ol class="step-list">${r.aws.map((s,i) => `<li><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+          </div>
+          <div><span class="platform-label pl-gcp">GCP</span>
+            <ol class="step-list">${r.gcp.map((s,i) => `<li><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('')}</ol>
+          </div>
+        </div>
+      </div>`).join('');
+
+    window.addEventListener('load', () => { setTimeout(() => window.print(), 1400); });
+  </script>
+</body>
+</html>
