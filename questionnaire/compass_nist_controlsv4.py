@@ -7,10 +7,10 @@ Frameworks:
     - NIST AI RMF 1.0 (January 2023)
     - NIST-AI-600-1 GenAI Profile (July 2024)
 
-Owner: Mena Li — Security + NIST Framework
-Version: 1.0
 
-Usage (Shivali's scoring engine):
+Version: 2.0
+
+Usage (Shivali scoring engine):
     from compass_nist_controls import query_controls, QUESTIONS, GENAI_RISKS
 
     # Get all controls that apply to a detected tool category
@@ -31,13 +31,20 @@ from typing import Optional
 # ---------------------------------------------------------------------------
 # Severity weights — used by Shivali's gap scoring algorithm
 # total_gap_score = sum of severity_weight for each unmet control
+# Same 100 / 50 / 0 scale as ANSWER_SCORE (compass_questionnaire.py) and
+# VENDOR_CREDIT below, so every score in the pipeline speaks the same units.
 # ---------------------------------------------------------------------------
 
 SEVERITY_WEIGHT = {
-    "HIGH":   15,
-    "MEDIUM":  7,
-    "LOW":     2,
+    "HIGH":   100,
+    "MEDIUM":  50,
+    "LOW":      0,
 }
+
+# Credit scale for vendor auto-scoring (score_vendor_gaps below) -- mirrors
+# the 0 / 50 / 100 scale used for Yes / Unsure / No answers in
+# compass_questionnaire.py's ANSWER_SCORE.
+VENDOR_CREDIT = {"pass": 100, "partial": 50, "fail": 0}
 
 
 # ---------------------------------------------------------------------------
@@ -58,7 +65,7 @@ class NistControl:
     subcategory: str                     # e.g. GV.PO
     description: str
     severity_level: str                  # HIGH | MEDIUM | LOW
-    severity_weight: int                 # 15 | 7 | 2
+    severity_weight: int                 # 100 | 50 | 0
     applies_to_categories: list[str]     # tool categories that trigger this control
     questionnaire_question_id: str       # which question confirms this gap
     questionnaire_confirms: bool         # True = questionnaire confirms a pre-flagged gap
@@ -117,7 +124,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="GV.OV-1",
         function="GOVERN", subcategory="GV.OV",
         description="Organization has designated AI governance roles and accountability structures.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant",
                                "image_generation", "open_source_model", "internal_llm"],
         questionnaire_question_id="G-02", questionnaire_confirms=True,
@@ -128,7 +135,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="GV.OV-2",
         function="GOVERN", subcategory="GV.OV",
         description="Organization has established oversight processes for AI tool approvals.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant",
                                "image_generation", "voice_ai", "data_ai",
                                "open_source_model", "internal_llm"],
@@ -140,7 +147,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="GV.OV-3",
         function="GOVERN", subcategory="GV.OV",
         description="AI risks are included in organizational risk reporting and board-level visibility.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "internal_llm", "data_ai"],
         questionnaire_question_id="G-03", questionnaire_confirms=True,
         genai_risks_linked=["societal_impacts", "info_integrity"],
@@ -152,7 +159,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="GV.PO-1",
         function="GOVERN", subcategory="GV.PO",
         description="Organization has a written AI acceptable use policy covering approved tools and prohibited uses.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant",
                                "image_generation", "voice_ai", "data_ai",
                                "open_source_model", "internal_llm"],
@@ -164,7 +171,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="GV.PO-2",
         function="GOVERN", subcategory="GV.PO",
         description="AI policy includes specific provisions for generative AI and LLM tools.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "internal_llm"],
         questionnaire_question_id="G-01", questionnaire_confirms=True,
         genai_risks_linked=["data_privacy", "prompt_injection", "confabulation", "ip_exposure"],
@@ -176,7 +183,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="GV.AT-1",
         function="GOVERN", subcategory="GV.AT",
         description="Staff who use AI tools have received training on responsible use and associated risks.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant",
                                "open_source_model", "internal_llm"],
         questionnaire_question_id="G-04", questionnaire_confirms=True,
@@ -187,7 +194,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="GV.AT-2",
         function="GOVERN", subcategory="GV.AT",
         description="AI governance accountability is documented and assigned to specific individuals.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "internal_llm", "data_ai"],
         questionnaire_question_id="G-02", questionnaire_confirms=True,
         genai_risks_linked=["human_ai_config", "societal_impacts"],
@@ -199,7 +206,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MP.AC-1",
         function="MAP", subcategory="MP.AC",
         description="Organization has mapped all AI tools in use, including shadow AI detected in network logs.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant",
                                "image_generation", "voice_ai", "data_ai",
                                "open_source_model", "internal_llm", "unknown"],
@@ -212,7 +219,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MP.AC-2",
         function="MAP", subcategory="MP.AC",
         description="Each AI tool's intended use case and business purpose is documented.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "internal_llm", "data_ai"],
         questionnaire_question_id="M-02", questionnaire_confirms=True,
         genai_risks_linked=["human_ai_config", "info_integrity"],
@@ -224,7 +231,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MP.AI-1",
         function="MAP", subcategory="MP.AI",
         description="AI-specific risks have been identified and documented for each tool in use.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "open_source_model", "internal_llm"],
         questionnaire_question_id="M-03", questionnaire_confirms=True,
         genai_risks_linked=["confabulation", "data_privacy", "prompt_injection", "data_poisoning"],
@@ -236,7 +243,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MP.RD-1",
         function="MAP", subcategory="MP.RD",
         description="AI risk documentation is maintained and accessible to relevant stakeholders.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "open_source_model", "internal_llm", "data_ai"],
         questionnaire_question_id="M-03", questionnaire_confirms=True,
         genai_risks_linked=["info_integrity", "human_ai_config"],
@@ -248,7 +255,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MS.AN-1",
         function="MEASURE", subcategory="MS.AN",
         description="Organization actively monitors AI tool usage — logs reviewed, anomalies flagged.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "internal_llm",
                                "data_ai", "open_source_model"],
         questionnaire_question_id="MS-01", questionnaire_confirms=True,
@@ -260,7 +267,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MS.AN-2",
         function="MEASURE", subcategory="MS.AN",
         description="AI tool outputs are reviewed for accuracy and potential harm before use in decisions.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "internal_llm"],
         questionnaire_question_id="MS-02", questionnaire_confirms=True,
         genai_risks_linked=["confabulation", "info_integrity", "human_replication"],
@@ -272,7 +279,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MS.DW-1",
         function="MEASURE", subcategory="MS.DW",
         description="Data inputs to AI tools are reviewed to prevent sensitive or confidential data exposure.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant", "internal_llm"],
         questionnaire_question_id="MS-03", questionnaire_confirms=True,
         genai_risks_linked=["data_privacy", "ip_exposure", "info_security"],
@@ -284,7 +291,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MS.MC-1",
         function="MEASURE", subcategory="MS.MC",
         description="AI risk metrics are tracked over time and reviewed at defined intervals.",
-        severity_level="LOW", severity_weight=2,
+        severity_level="LOW", severity_weight=0,
         applies_to_categories=["generative_ai", "internal_llm", "data_ai"],
         questionnaire_question_id="MS-01", questionnaire_confirms=True,
         genai_risks_linked=["societal_impacts"],
@@ -296,7 +303,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MG.AN-1",
         function="MANAGE", subcategory="MG.AN",
         description="Organization has a defined process to respond to AI-related incidents or policy violations.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "code_assistant", "internal_llm", "open_source_model"],
         questionnaire_question_id="MG-01", questionnaire_confirms=True,
         genai_risks_linked=["info_security", "harmful_content", "data_privacy"],
@@ -308,7 +315,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MG.DM-1",
         function="MANAGE", subcategory="MG.DM",
         description="Decisions to approve, restrict, or block AI tools are documented and revisited regularly.",
-        severity_level="MEDIUM", severity_weight=7,
+        severity_level="MEDIUM", severity_weight=50,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant",
                                "image_generation", "open_source_model"],
         questionnaire_question_id="MG-02", questionnaire_confirms=True,
@@ -321,7 +328,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MG.PO-1",
         function="MANAGE", subcategory="MG.PO",
         description="Organization has a process to block or restrict AI tools that violate policy.",
-        severity_level="HIGH", severity_weight=15,
+        severity_level="HIGH", severity_weight=100,
         applies_to_categories=["generative_ai", "code_assistant", "writing_assistant",
                                "image_generation", "voice_ai", "data_ai",
                                "open_source_model", "internal_llm"],
@@ -333,7 +340,7 @@ ALL_CONTROLS: list[NistControl] = [
         control_id="MG.RR-1",
         function="MANAGE", subcategory="MG.RR",
         description="AI governance policies are reviewed and updated when new tools are detected or risks change.",
-        severity_level="LOW", severity_weight=2,
+        severity_level="LOW", severity_weight=0,
         applies_to_categories=["generative_ai", "internal_llm"],
         questionnaire_question_id="MG-03", questionnaire_confirms=True,
         genai_risks_linked=["info_integrity", "societal_impacts"],
@@ -609,22 +616,25 @@ def get_question(q_id: str) -> Optional[QuestionnaireQuestion]:
     return None
 
 
-def score_vendor_gaps(registry_attributes) -> tuple[int, list[str]]:
+def score_vendor_gaps(registry_attributes) -> tuple[float, list[str]]:
     """
     Auto-scores vendor-based gaps from RegistryAttributes.
     Called by the scoring engine after log parse — no analyst input needed.
+
+    Uses the same 0 / 50 / 100 credit scale as compass_questionnaire.py's
+    Yes / Unsure / No answers:
+        100 (pass)    -> field fully satisfies the control -- no gap
+         50 (partial)  -> field is missing / unclear -- counted as half a gap
+          0 (fail)     -> field fails the control -- full gap
 
     Args:
         registry_attributes: An AgentRecord.registry_attributes object.
                              Pass None for shadow AI candidates.
 
     Returns:
-        (vendor_gap_score, unmet_control_ids)
-
-    Example:
-        score, controls = score_vendor_gaps(agent.registry_attributes)
-        agent.vendor_gap_score = score
-        agent.vendor_unmet_control_ids = controls
+        (vendor_gap_score, unmet_control_ids). Score can be fractional now
+        that a "partial" (unknown/unclear) field contributes half of a
+        control's severity_weight instead of the full amount.
     """
     if registry_attributes is None:
         return 0, []
@@ -636,16 +646,34 @@ def score_vendor_gaps(registry_attributes) -> tuple[int, list[str]]:
         field = q.auto_score_from
         val = getattr(registry_attributes, field, None)
 
-        # Determine if this vendor check failed
+        # Determine credit level: pass (100) / partial (50) / fail (0)
         if field == "trains_on_inputs":
-            failed = val is True          # trains_on_inputs=True is the bad outcome
+            if val is True:
+                credit = "fail"          # trains_on_inputs=True is the bad outcome
+            elif val is False:
+                credit = "pass"
+            else:
+                credit = "partial"       # unknown -- half credit
         elif field == "privacy_policy_grade":
-            failed = val in ("C", "D")   # C or D grade is a gap
+            if val in ("A", "B"):
+                credit = "pass"
+            elif val == "C":
+                credit = "partial"       # C grade -- half credit
+            elif val == "D":
+                credit = "fail"
+            else:
+                credit = "partial"       # ungraded/unknown -- half credit
         else:
-            failed = val is False        # all other fields: False = gap
+            if val is True:
+                credit = "pass"
+            elif val is False:
+                credit = "fail"
+            else:
+                credit = "partial"       # unknown -- half credit
 
-        if failed:
-            score += SEVERITY_WEIGHT[q.severity_if_no]
+        gap_frac = (100 - VENDOR_CREDIT[credit]) / 100
+        if gap_frac > 0:
+            score += SEVERITY_WEIGHT[q.severity_if_no] * gap_frac
             unmet.extend(q.controls_if_no)
 
     return score, unmet
