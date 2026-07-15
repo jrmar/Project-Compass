@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - AI Inventory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    /* ---- Inventory Table ---- */
+    .inv-table-wrap { overflow-x: auto; }
+
+    .inv-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .inv-table th {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      white-space: nowrap;
+    }
+
+    .inv-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(64, 130, 232, 0.07);
+      color: var(--light);
+      vertical-align: middle;
+    }
+
+    .inv-table tr:last-child td { border-bottom: none; }
+
+    .inv-table tr:hover td { background: rgba(64, 130, 232, 0.04); }
+
+    .tool-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tool-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(64, 130, 232, 0.12);
+      border: 1px solid rgba(64, 130, 232, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .tool-name { font-weight: 600; }
+    .tool-vendor { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* Risk badge */
+    .risk-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .risk-critical { background: rgba(224,92,92,0.12); color: #e05c5c; border: 1px solid rgba(224,92,92,0.25); }
+    .risk-high     { background: rgba(255,128,32,0.12); color: var(--orange); border: 1px solid rgba(255,128,32,0.25); }
+    .risk-medium   { background: rgba(255,200,60,0.10); color: #f5c842; border: 1px solid rgba(255,200,60,0.2); }
+    .risk-low      { background: rgba(51,205,182,0.10); color: var(--teal); border: 1px solid rgba(51,205,182,0.2); }
+    .risk-unknown  { background: rgba(208,212,226,0.06); color: var(--muted); border: 1px solid rgba(208,212,226,0.1); }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-active .status-dot   { background: var(--teal); box-shadow: 0 0 5px var(--teal); }
+    .status-inactive .status-dot { background: var(--muted); }
+    .status-active   { color: var(--teal); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 64px 24px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 8px;
+      opacity: 0.7;
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 320px;
+      margin: 0 auto 24px;
+    }
+
+    /* Summary chips */
+    .inv-summary {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .inv-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(9, 26, 54, 0.65);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 10px 16px;
+    }
+
+    .inv-chip-num {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--light);
+      line-height: 1;
+    }
+
+    .inv-chip-label {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* Page header row */
+    .page-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-input {
+      background: rgba(9, 26, 54, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      color: var(--light);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 7px 12px;
+      outline: none;
+      width: 220px;
+      transition: border-color 0.15s;
+    }
+
+    .filter-input::placeholder { color: var(--muted); }
+    .filter-input:focus { border-color: rgba(64, 130, 232, 0.5); }
+
+    .filter-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* ---- Approval buttons ---- */
+    .approval-group { display: flex; gap: 4px; }
+
+    .approval-btn {
+      background: transparent;
+      border: 1px solid rgba(208,212,226,0.12);
+      border-radius: 4px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 4px 8px;
+      text-transform: uppercase;
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+    .approval-btn:hover { border-color: rgba(208,212,226,0.3); color: var(--light); }
+    .appr-approved { background: rgba(51,205,182,0.12); border-color: rgba(51,205,182,0.3) !important; color: var(--teal) !important; }
+    .appr-review   { background: rgba(245,200,66,0.10); border-color: rgba(245,200,66,0.3) !important; color: #f5c842 !important; }
+    .appr-blocked  { background: rgba(224,92,92,0.12);  border-color: rgba(224,92,92,0.3)  !important; color: #e05c5c  !important; }
+
+    /* ---- Row expand ---- */
+    .expand-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 10px;
+      padding: 4px 8px;
+      transition: transform 0.15s, color 0.15s;
+    }
+    .expand-btn:hover { color: var(--light); }
+    .expand-btn.open { transform: rotate(180deg); color: var(--light); }
+
+    /* ---- Notes row ---- */
+    .detail-row td {
+      background: rgba(3,11,30,0.35);
+      border-bottom: 1px solid var(--glass-border) !important;
+      padding: 12px 20px 16px !important;
+    }
+
+    .notes-textarea {
+      width: 100%;
+      background: rgba(9,26,54,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      color: var(--light);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+      min-height: 64px;
+      outline: none;
+      padding: 10px 12px;
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+    .notes-textarea::placeholder { color: var(--muted); }
+    .notes-textarea:focus { border-color: rgba(64,130,232,0.45); }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <a class="app-header-logo" href="login.html">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <nav class="app-header-nav">
+      <a href="../index.html" class="app-nav-link">Home</a>
+      <a href="inventory.html" class="app-nav-link active">Inventory</a>
+    </nav>
+    <div class="app-header-right">
+      <div class="org-badge">
+        <span class="org-badge-dot"></span>
+        <span id="header-org-name">Organization</span>
+      </div>
+      <button class="btn-logout" onclick="sessionStorage.clear(); window.location.href='login.html';">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="page-content">
+
+    <div class="page-header-row">
+      <div>
+        <h1 class="page-title">AI Inventory</h1>
+        <div class="page-subtitle" id="inv-subtitle">AI tools identified across your organization</div>
+      </div>
+      <button class="btn btn-ghost" onclick="window.location.href='upload.html'">&#43; New Assessment</button>
+    </div>
+
+    <!-- Summary chips -->
+    <div class="inv-summary" id="inv-summary" style="display:none;"></div>
+
+    <!-- Main card -->
+    <div class="glass-card" style="padding:0;overflow:hidden;">
+
+      <!-- Filter bar -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--glass-border);">
+        <div class="filter-bar">
+          <input class="filter-input" type="text" id="filter-input" placeholder="Search tools…" oninput="applyFilter()">
+          <span class="filter-label" id="filter-count"></span>
+        </div>
+      </div>
+
+      <!-- Table or empty state -->
+      <div id="table-area"></div>
+
+    </div>
+
+    <p style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center;">
+      Inventory reflects AI tools detected in the most recent assessment session.
+      Persistent cross-session storage coming soon.
+    </p>
+
+  </main>
+
+  <script>
+    // Auth guard
+    const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
+    if (!session || !session.org_name) { window.location.href = 'login.html'; }
+
+    if (session) {
+      document.getElementById('header-org-name').textContent = session.org_name;
+      document.getElementById('inv-subtitle').textContent =
+        `AI tools identified for ${session.org_name}`;
+    }
+
+    const det   = (session && session.detection) || {};
+    const tools = det.detected_tools || [];
+
+    // Per-tool overrides: { [key]: { approval: string, notes: string } }
+    if (!session.inv_overrides) session.inv_overrides = {};
+    const overrides = session.inv_overrides;
+
+    // Track which tool keys have their notes row expanded
+    const expanded = new Set();
+
+    let filtered = [...tools];
+
+    function toolKey(t) { return t.domain || t.tool_name || t.name || ''; }
+
+    function saveOverrides() {
+      sessionStorage.setItem('compass_session', JSON.stringify(session));
+    }
+
+    function riskClass(level) {
+      if (!level) return 'risk-unknown';
+      const l = level.toLowerCase();
+      if (l === 'critical') return 'risk-critical';
+      if (l === 'high')     return 'risk-high';
+      if (l === 'medium')   return 'risk-medium';
+      if (l === 'low')      return 'risk-low';
+      return 'risk-unknown';
+    }
+
+    function initials(name) {
+      if (!name) return '?';
+      return name.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    }
+
+    // Toggle expanded state without re-rendering the whole table
+    function toggleDetail(key) {
+      if (expanded.has(key)) { expanded.delete(key); } else { expanded.add(key); }
+      const area = document.getElementById('table-area');
+      area.querySelectorAll('[data-detail-key]').forEach(r => {
+        if (r.getAttribute('data-detail-key') === key)
+          r.style.display = expanded.has(key) ? 'table-row' : 'none';
+      });
+      area.querySelectorAll('[data-expand-key]').forEach(b => {
+        if (b.getAttribute('data-expand-key') === key)
+          b.classList.toggle('open', expanded.has(key));
+      });
+    }
+
+    // Toggle approval status; clicking the active status deselects it
+    function setApproval(key, status, evt) {
+      evt.stopPropagation();
+      overrides[key] = overrides[key] || {};
+      overrides[key].approval = overrides[key].approval === status ? '' : status;
+      saveOverrides();
+      renderTable(filtered);
+    }
+
+    function saveNote(key, value) {
+      overrides[key] = overrides[key] || {};
+      overrides[key].notes = value;
+      saveOverrides();
+    }
+
+    function renderTable(items) {
+      const area = document.getElementById('table-area');
+      document.getElementById('filter-count').textContent =
+        items.length === tools.length
+          ? `${tools.length} tool${tools.length !== 1 ? 's' : ''}`
+          : `${items.length} of ${tools.length}`;
+
+      if (items.length === 0 && tools.length > 0) {
+        area.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">&#128269;</div>
+            <div class="empty-title">No matches</div>
+            <div class="empty-sub">Try a different search term.</div>
+          </div>`;
+        return;
+      }
+
+      if (items.length === 0) {
+        area.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">&#128202;</div>
+            <div class="empty-title">No inventory yet</div>
+            <div class="empty-sub">
+              Run an assessment to detect AI tools in your organization's network logs.
+              Detected tools will appear here automatically.
+            </div>
+            <button class="btn btn-teal" onclick="window.location.href='upload.html'">
+              Start Assessment &#8594;
+            </button>
+          </div>`;
+        return;
+      }
+
+      const rows = items.map(t => {
+        const risk     = t.risk_level || t.riskLevel || t.risk || '';
+        const vendor   = t.vendor   || t.company || '';
+        const cat      = t.category || t.type    || '—';
+        const first    = t.first_seen || t.firstSeen || '';
+        const key      = toolKey(t);
+        const ov       = overrides[key] || {};
+        const approval = ov.approval || '';
+        const notes    = (ov.notes || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const isOpen   = expanded.has(key);
+        const kj       = JSON.stringify(key);   // safely quoted for inline handlers
+
+        const mainRow = `
+          <tr style="cursor:pointer;" onclick="toggleDetail(${kj})">
+            <td>
+              <div class="tool-name-cell">
+                <div class="tool-icon">${initials(t.name || t.tool_name)}</div>
+                <div>
+                  <div class="tool-name">${t.name || t.tool_name || '—'}</div>
+                  ${vendor ? `<div class="tool-vendor">${vendor}</div>` : ''}
+                </div>
+              </div>
+            </td>
+            <td>${cat}</td>
+            <td><span class="risk-badge ${riskClass(risk)}">${risk || 'Unknown'}</span></td>
+            <td>
+              <div class="approval-group">
+                <button class="approval-btn ${approval==='approved'?'appr-approved':''}"
+                  onclick="setApproval(${kj},'approved',event)">Approved</button>
+                <button class="approval-btn ${approval==='review'?'appr-review':''}"
+                  onclick="setApproval(${kj},'review',event)">Review</button>
+                <button class="approval-btn ${approval==='blocked'?'appr-blocked':''}"
+                  onclick="setApproval(${kj},'blocked',event)">Blocked</button>
+              </div>
+            </td>
+            <td style="font-size:12px;color:var(--muted);">${first || '—'}</td>
+            <td>
+              <button class="expand-btn ${isOpen?'open':''}" data-expand-key="${key}"
+                onclick="toggleDetail(${kj});event.stopPropagation();">&#9660;</button>
+            </td>
+          </tr>`;
+
+        const detailRow = `
+          <tr class="detail-row" data-detail-key="${key}" style="display:${isOpen?'table-row':'none'};">
+            <td colspan="6">
+              <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Notes</label>
+              <textarea class="notes-textarea"
+                placeholder="Add analyst notes — approval rationale, review findings, remediation steps…"
+                oninput="saveNote(${kj},this.value)">${notes}</textarea>
+            </td>
+          </tr>`;
+
+        return mainRow + detailRow;
+      }).join('');
+
+      area.innerHTML = `
+        <div class="inv-table-wrap">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th>Category</th>
+                <th>Risk Level</th>
+                <th>Approval</th>
+                <th>First Seen</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    function applyFilter() {
+      const q = document.getElementById('filter-input').value.toLowerCase().trim();
+      filtered = q
+        ? tools.filter(t =>
+            (t.name       || t.tool_name || '').toLowerCase().includes(q) ||
+            (t.vendor     || t.company   || '').toLowerCase().includes(q) ||
+            (t.category   || t.type      || '').toLowerCase().includes(q) ||
+            (t.risk_level || t.riskLevel || '').toLowerCase().includes(q)
+          )
+        : [...tools];
+      renderTable(filtered);
+    }
+
+    // Summary chips
+    if (tools.length > 0) {
+      const summaryEl = document.getElementById('inv-summary');
+      summaryEl.style.display = 'flex';
+      const critical = tools.filter(t => (t.risk_level||t.riskLevel||'').toLowerCase() === 'critical').length;
+      const high     = tools.filter(t => (t.risk_level||t.riskLevel||'').toLowerCase() === 'high').length;
+      summaryEl.innerHTML = `
+        <div class="inv-chip">
+          <div>
+            <div class="inv-chip-num">${tools.length}</div>
+            <div class="inv-chip-label">Total Tools<br>Detected</div>
+          </div>
+        </div>
+        ${critical > 0 ? `<div class="inv-chip" style="border-color:rgba(224,92,92,0.25);">
+          <div><div class="inv-chip-num" style="color:#e05c5c;">${critical}</div>
+          <div class="inv-chip-label">Critical<br>Risk</div></div></div>` : ''}
+        ${high > 0 ? `<div class="inv-chip" style="border-color:rgba(255,128,32,0.25);">
+          <div><div class="inv-chip-num" style="color:var(--orange);">${high}</div>
+          <div class="inv-chip-label">High<br>Risk</div></div></div>` : ''}`;
+    }
+
+    renderTable(tools);
+  </script>
+</body>
+</html>

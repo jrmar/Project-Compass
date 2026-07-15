@@ -226,7 +226,7 @@
   </div>
 
   <script>
-    const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
+    const session = JSON.parse(sessionStorage.getItem('compass_session') || '{}');
     const det   = session.detection || {};
     const quest = session.questionnaire || {};
     const orgName = session.org_name || 'Your Organization';

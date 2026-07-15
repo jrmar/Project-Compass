@@ -484,7 +484,112 @@
     ::-webkit-scrollbar-thumb:hover { background: rgba(64,130,232,0.65); }
 
     /* ── Section z-index ── */
-    section, footer, nav { position: relative; z-index: 2; }
+    section, footer { position: relative; z-index: 2; }
+    nav { position: relative; z-index: 200; }
+
+    /* ── Profile Dropdown ── */
+    .profile-wrapper { position: relative; }
+
+    .profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(9,26,54,0.65);
+      border: 1px solid rgba(64,130,232,0.22);
+      border-radius: 40px;
+      cursor: pointer;
+      padding: 5px 13px 5px 5px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .profile-btn:hover,
+    .profile-btn.open {
+      background: rgba(64,130,232,0.12);
+      border-color: rgba(64,130,232,0.4);
+    }
+
+    .profile-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4082E8 0%, #33CDB6 100%);
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      letter-spacing: 0.03em;
+    }
+
+    .profile-display-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #D0D4E2;
+      letter-spacing: 0.01em;
+    }
+
+    .profile-chevron {
+      color: rgba(208,212,226,0.45);
+      font-size: 9px;
+      transition: transform 0.18s;
+    }
+    .profile-btn.open .profile-chevron { transform: rotate(180deg); }
+
+    .profile-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 228px;
+      background: #07163a;
+      border: 1px solid rgba(64,130,232,0.18);
+      border-radius: 12px;
+      box-shadow: 0 20px 56px rgba(0,0,0,0.55);
+      overflow: hidden;
+      z-index: 500;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.16s, transform 0.16s;
+    }
+    .profile-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .profile-menu-header {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid rgba(64,130,232,0.1);
+    }
+    .pmh-name  { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; color:#D0D4E2; margin-bottom:2px; }
+    .pmh-role  { font-size:11px; color:rgba(208,212,226,0.45); }
+    .pmh-org   { font-size:11px; color:#33CDB6; font-weight:600; margin-top:5px; }
+
+    .profile-menu-section { padding: 5px 0; }
+    .profile-menu-section + .profile-menu-section { border-top: 1px solid rgba(64,130,232,0.08); }
+
+    .pmi {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(208,212,226,0.7);
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.12s, color 0.12s;
+    }
+    .pmi:hover { background: rgba(64,130,232,0.08); color: #D0D4E2; }
+    .pmi-danger { color: rgba(224,92,92,0.65); }
+    .pmi-danger:hover { background: rgba(224,92,92,0.07); color: #e05c5c; }
   </style>
 </head>
 <body>
@@ -513,9 +618,51 @@
     </ul>
 
     <div class="nav-right">
-      <button class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.75rem;" onclick="window.location.href='app/login.html'">
+      <!-- Shown when NOT logged in -->
+      <button class="btn btn-primary" id="nav-run-btn" style="padding:0.5rem 1.25rem;font-size:0.75rem;" onclick="window.location.href='app/login.html'">
         Run Assessment
       </button>
+
+      <!-- Shown when logged in -->
+      <div class="profile-wrapper" id="nav-profile" style="display:none;">
+        <button class="profile-btn" id="profile-toggle" onclick="toggleProfile(event)">
+          <div class="profile-avatar" id="nav-avatar">?</div>
+          <span class="profile-display-name" id="nav-displayname"></span>
+          <span class="profile-chevron">&#9660;</span>
+        </button>
+        <div class="profile-menu" id="profile-menu">
+          <div class="profile-menu-header">
+            <div class="pmh-name" id="pmh-name"></div>
+            <div class="pmh-role" id="pmh-role"></div>
+            <div class="pmh-org"  id="pmh-org"></div>
+          </div>
+          <div class="profile-menu-section">
+            <a class="pmi" href="app/inventory.html">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="12" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
+                <rect x="1" y="5.75" width="12" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
+                <rect x="1" y="10.5" width="7" height="2.5" rx="1" fill="currentColor" opacity=".85"/>
+              </svg>
+              My Inventory
+            </a>
+            <a class="pmi" href="app/upload.html">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <polygon points="2,1.5 12,7 2,12.5" fill="currentColor" opacity=".85"/>
+              </svg>
+              Continue Assessment
+            </a>
+          </div>
+          <div class="profile-menu-section">
+            <button class="pmi pmi-danger" onclick="profileSignOut()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M5 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
@@ -1121,6 +1268,52 @@
   }, { threshold: 0.12 });
 
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+
+
+// ══════════════════════════════════════════
+//  PROFILE DROPDOWN
+// ══════════════════════════════════════════
+(function () {
+  const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
+  if (!session || !session.org_name) return; // not logged in — show default nav
+
+  // Swap nav button for profile chip
+  document.getElementById('nav-run-btn').style.display  = 'none';
+  document.getElementById('nav-profile').style.display  = 'block';
+
+  // Populate fields
+  const user      = session.user || {};
+  const fullName  = user.name || session.user_name || 'User';
+  const firstName = fullName.split(' ')[0];
+  const initials  = fullName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+
+  document.getElementById('nav-avatar').textContent      = initials;
+  document.getElementById('nav-displayname').textContent = firstName;
+  document.getElementById('pmh-name').textContent        = fullName;
+  document.getElementById('pmh-role').textContent        = session.user_role || '';
+  document.getElementById('pmh-org').textContent         = session.org_name  || '';
+
+  // Toggle open/close
+  window.toggleProfile = function (evt) {
+    evt.stopPropagation();
+    const btn  = document.getElementById('profile-toggle');
+    const menu = document.getElementById('profile-menu');
+    const open = menu.classList.toggle('open');
+    btn.classList.toggle('open', open);
+  };
+
+  // Close on outside click
+  document.addEventListener('click', function () {
+    document.getElementById('profile-toggle').classList.remove('open');
+    document.getElementById('profile-menu').classList.remove('open');
+  });
+
+  // Sign out: wipe session and reload (shows Run Assessment button again)
+  window.profileSignOut = function () {
+    sessionStorage.clear();
+    window.location.reload();
+  };
 })();
 </script>
 

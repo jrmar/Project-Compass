@@ -173,7 +173,7 @@
     const AZURE_FN_URL = 'https://compass-dns-fn.azurewebsites.net/api/parse';
 
     // ---- Session guard ----
-    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
+    const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) {
       window.location.href = 'login.html';
     }
@@ -339,14 +339,14 @@
         .then(data => {
           session.detection = data;
           session.detection._fallback = true;
-          localStorage.setItem('compass_session', JSON.stringify(session));
+          sessionStorage.setItem('compass_session', JSON.stringify(session));
           setProgress(100);
           addLog('OK', 'Demo data loaded. Redirecting...');
           setTimeout(() => { window.location.href = 'detect.html'; }, 800);
         })
         .catch(() => {
           session.detection = { _fallback: true };
-          localStorage.setItem('compass_session', JSON.stringify(session));
+          sessionStorage.setItem('compass_session', JSON.stringify(session));
           setProgress(100);
           setTimeout(() => { window.location.href = 'detect.html'; }, 800);
         });
@@ -468,7 +468,7 @@
 
         // Save real results to session
         session.detection = detection;
-        localStorage.setItem('compass_session', JSON.stringify(session));
+        sessionStorage.setItem('compass_session', JSON.stringify(session));
 
         // Clear the file signal
         sessionStorage.removeItem('compass_has_files');

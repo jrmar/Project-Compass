@@ -127,9 +127,187 @@
     .resume-btn:hover { background: rgba(51, 205, 182, 0.22); }
 
     .hidden { display: none !important; }
+
+    /* ---- Tabs ---- */
+    .login-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 24px;
+      gap: 0;
+    }
+
+    .login-tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      padding: 0 0 12px;
+      text-transform: uppercase;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -1px;
+    }
+    .login-tab:hover { color: var(--light); }
+    .login-tab.active { color: var(--light); border-bottom-color: var(--blue); }
+
+    /* ---- Remembered org chip ---- */
+    .remembered-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(51,205,182,0.07);
+      border: 1px solid rgba(51,205,182,0.2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+
+    .remembered-chip-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .remembered-chip-org {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--teal);
+    }
+
+    .remembered-change {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+      margin-left: auto;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      white-space: nowrap;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .remembered-change:hover { color: var(--light); }
+
+    /* ---- Onboarding tour overlay ---- */
+    .tour-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3,11,30,0.82);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .tour-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--navy-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px 28px;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    .tour-step-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .tour-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(208,212,226,0.2);
+      transition: background 0.2s;
+    }
+    .tour-dot.active { background: var(--teal); }
+
+    .tour-icon {
+      font-size: 32px;
+      margin-bottom: 14px;
+    }
+
+    .tour-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--light);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .tour-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .tour-body strong { color: var(--light); font-weight: 600; }
+
+    .tour-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tour-skip {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: color 0.15s;
+    }
+    .tour-skip:hover { color: var(--light); }
+
+    .tour-next {
+      background: linear-gradient(135deg, var(--blue) 0%, #2d6dd4 100%);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 10px 22px;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .tour-next:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(64,130,232,0.4); }
   </style>
 </head>
 <body>
+
+  <!-- Onboarding Tour Overlay (shown once to first-time visitors) -->
+  <div class="tour-overlay" id="tour-overlay" style="display:none;">
+    <div class="tour-card">
+      <div class="tour-step-dots" id="tour-dots"></div>
+      <div class="tour-icon" id="tour-icon"></div>
+      <div class="tour-title" id="tour-title"></div>
+      <div class="tour-body" id="tour-body"></div>
+      <div class="tour-footer">
+        <button class="tour-skip" onclick="closeTour()">Skip tour</button>
+        <button class="tour-next" id="tour-next-btn" onclick="tourNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+
   <div class="login-wrapper">
 
     <!-- Brand -->
@@ -140,49 +318,65 @@
 
     <!-- Card -->
     <div class="login-card glass-card">
-      <h1 class="login-card-title">Assessment Setup</h1>
-      <p class="login-card-sub">Tell us about your organization before we begin.</p>
 
-      <!-- Resume session banner (shown if session exists) -->
-      <div class="resume-banner hidden" id="resume-banner">
-        <div>
-          <div class="resume-banner-text" id="resume-org-name">Previous session found</div>
-          <div class="resume-banner-sub">Continue where you left off?</div>
-        </div>
-        <button class="resume-btn" onclick="resumeSession()">Resume →</button>
+      <!-- Tabs -->
+      <div class="login-tabs">
+        <button class="login-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+        <button class="login-tab" id="tab-create" onclick="switchTab('create')">Create Account</button>
       </div>
 
-      <!-- Setup Form -->
-      <form id="setup-form" onsubmit="handleSetup(event)" novalidate>
+      <!-- ── Sign In Panel ── -->
+      <div id="panel-signin">
+        <h1 class="login-card-title">Welcome back</h1>
+        <p class="login-card-sub">Sign in to continue your AI governance work.</p>
+
+        <!-- Remembered org chip (shown after first sign-in) -->
+        <div class="remembered-chip" id="remembered-chip" style="display:none;">
+          <div>
+            <div class="remembered-chip-label">Continuing as</div>
+            <div class="remembered-chip-org" id="remembered-org"></div>
+          </div>
+          <button class="remembered-change" onclick="clearRemembered()">Change org</button>
+        </div>
+
+        <!-- Org name field (shown only when no remembered profile) -->
+        <div class="form-group" id="signin-org-group" style="display:none;">
+          <label class="form-label" for="signin-org-name">
+            Organization Name <span class="required">*</span>
+          </label>
+          <input class="form-input" type="text" id="signin-org-name"
+            placeholder="e.g. Acme Corporation" autocomplete="organization">
+        </div>
+
+        <div id="error-msg-signin" class="hidden" style="color:var(--danger);font-size:12px;margin-bottom:12px;font-weight:600;"></div>
+
+        <button type="button" class="btn btn-primary btn-full btn-lg" id="signin-btn" onclick="doSignIn()">
+          Sign In →
+        </button>
+      </div>
+
+      <!-- ── Create Account Panel ── -->
+      <div id="panel-create" style="display:none;">
+        <h1 class="login-card-title">Assessment Setup</h1>
+        <p class="login-card-sub">Tell us about your organization before we begin.</p>
 
         <div class="form-group">
           <label class="form-label" for="org-name">
             Organization Name <span class="required">*</span>
           </label>
-          <input
-            class="form-input"
-            type="text"
-            id="org-name"
-            placeholder="e.g. Acme Corporation"
-            autocomplete="organization"
-            required
-          >
+          <input class="form-input" type="text" id="org-name"
+            placeholder="e.g. Acme Corporation" autocomplete="organization" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="user-name">
             Your Name <span class="optional">(optional)</span>
           </label>
-          <input
-            class="form-input"
-            type="text"
-            id="user-name"
-            placeholder="e.g. Jane Smith"
-            autocomplete="name"
-          >
+          <input class="form-input" type="text" id="user-name"
+            placeholder="e.g. Jane Smith" autocomplete="name">
         </div>
 
-        <div class="form-group" style="margin-bottom: 24px;">
+        <div class="form-group" style="margin-bottom:24px;">
           <label class="form-label" for="user-role">Your Role</label>
           <div class="select-wrapper">
             <select class="form-select" id="user-role">
@@ -196,16 +390,20 @@
           <span class="form-hint">Used to tailor report language for your audience.</span>
         </div>
 
-        <div id="error-msg" class="hidden" style="color: var(--danger); font-size: 12px; margin-bottom: 12px; font-weight: 600;"></div>
+        <div id="error-msg-create" class="hidden" style="color:var(--danger);font-size:12px;margin-bottom:12px;font-weight:600;"></div>
 
-        <button type="submit" class="btn btn-primary btn-full btn-lg">
-          Begin Assessment →
+        <button type="button" class="btn btn-primary btn-full btn-lg" id="create-btn" onclick="doCreateAccount()">
+          Create Account
         </button>
-      </form>
+      </div>
 
       <hr class="login-divider">
 
-      <p class="login-disclaimer">
+      <button type="button" class="btn-demo" id="demo-btn" onclick="startDemo()">
+        Try with sample data — no account needed
+      </button>
+
+      <p class="login-disclaimer" style="margin-top:14px;">
         By proceeding, you confirm that you have authorization to analyze your
         organization's network logs for AI governance purposes. No data leaves
         your browser.
@@ -214,43 +412,160 @@
 
   </div><!-- /.login-wrapper -->
 
+  <script src="/node_modules/@azure/msal-browser/lib/msal-browser.min.js"></script>
+  <script src="auth.js"></script>
   <script>
-    // ---- Restore existing session to form fields ----
-    const stored = localStorage.getItem('compass_session');
-    if (stored) {
-      try {
-        const session = JSON.parse(stored);
-        if (session.org_name) {
-          // Pre-fill form
-          document.getElementById('org-name').value = session.org_name;
-          if (session.user_name) document.getElementById('user-name').value = session.user_name;
-          if (session.user_role) document.getElementById('user-role').value = session.user_role;
+    // Reset all button states when page is restored via back/forward navigation (bfcache).
+    // Without this, buttons stay disabled and show "Loading…" / "Redirecting…" indefinitely.
+    window.addEventListener('pageshow', function (e) {
+      if (!e.persisted) return;
+      const resets = [
+        ['demo-btn',   'Try with sample data — no account needed'],
+        ['signin-btn', 'Sign In →'],
+        ['create-btn', 'Create Account'],
+      ];
+      resets.forEach(([id, label]) => {
+        const el = document.getElementById(id);
+        if (el) { el.disabled = false; el.textContent = label; }
+      });
+    });
 
-          // Show resume banner
-          const banner = document.getElementById('resume-banner');
-          banner.classList.remove('hidden');
-          document.getElementById('resume-org-name').textContent = session.org_name;
-        }
-      } catch (_) {}
+    // If already fully authenticated, skip straight to upload
+    const existing = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
+    if (existing && existing.org_name && existing.user) {
+      window.location.href = 'upload.html';
     }
 
-    // ---- Resume session: go to the furthest completed step ----
-    function resumeSession() {
-      const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
-      if (session.detection) {
-        window.location.href = 'detect.html';
+    // ── Tab switching ──
+    function switchTab(tab) {
+      const isSignIn = tab === 'signin';
+      document.getElementById('tab-signin').classList.toggle('active', isSignIn);
+      document.getElementById('tab-create').classList.toggle('active', !isSignIn);
+      document.getElementById('panel-signin').style.display = isSignIn ? '' : 'none';
+      document.getElementById('panel-create').style.display = isSignIn ? 'none' : '';
+      document.getElementById('error-msg-signin').classList.add('hidden');
+      document.getElementById('error-msg-create').classList.add('hidden');
+    }
+
+    // ── Remembered profile (localStorage — survives closing the browser) ──
+    const PROFILE_KEY = 'compass_profile';
+    let remembered = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+
+    function initSignInPanel() {
+      if (remembered && remembered.org_name) {
+        document.getElementById('remembered-chip').style.display = 'flex';
+        document.getElementById('remembered-org').textContent   = remembered.org_name;
+        document.getElementById('signin-org-group').style.display = 'none';
       } else {
-        window.location.href = 'upload.html';
+        document.getElementById('remembered-chip').style.display  = 'none';
+        document.getElementById('signin-org-group').style.display = '';
+      }
+    }
+    initSignInPanel();
+
+    function clearRemembered() {
+      localStorage.removeItem(PROFILE_KEY);
+      remembered = null;
+      initSignInPanel();
+      document.getElementById('signin-org-name').focus();
+    }
+
+    // Pre-fill if returning from an interrupted MSAL redirect
+    const pending = JSON.parse(sessionStorage.getItem('compass_pending') || 'null');
+    if (pending) {
+      if (pending.flow === 'create') {
+        switchTab('create');
+        if (pending.org_name)  document.getElementById('org-name').value  = pending.org_name;
+        if (pending.user_name) document.getElementById('user-name').value = pending.user_name;
+        if (pending.user_role) document.getElementById('user-role').value = pending.user_role;
+      } else if (pending.org_name && !remembered) {
+        document.getElementById('signin-org-name').value = pending.org_name;
       }
     }
 
-    // ---- Handle form submit ----
-    function handleSetup(e) {
-      e.preventDefault();
-      const orgName = document.getElementById('org-name').value.trim();
+    // ── MSAL init ──
+    let msalInstance;
+    (async () => {
+      try {
+        msalInstance = await initMsal();
+        await msalInstance.handleRedirectPromise();
+      } catch (err) {
+        console.error('MSAL init error:', err);
+      }
+    })();
+
+    // ── Shared: persist profile to localStorage and build session ──
+    function saveProfileAndSession({ orgName, userName, userRole, acct }) {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify({
+        org_name: orgName, user_name: userName, user_role: userRole,
+      }));
+      const session = {
+        org_name:   orgName,
+        user_name:  userName,
+        user_role:  userRole,
+        user:       acct
+          ? { name: acct.name || acct.username, email: acct.username, oid: acct.localAccountId }
+          : null,
+        started_at: new Date().toISOString(),
+      };
+      sessionStorage.setItem('compass_session', JSON.stringify(session));
+      window.location.href = 'upload.html';
+    }
+
+    // ── Sign In ──
+    async function doSignIn() {
+      const orgName  = remembered
+        ? remembered.org_name
+        : document.getElementById('signin-org-name').value.trim();
+      const userName = remembered ? (remembered.user_name || '') : '';
+      const userRole = remembered ? (remembered.user_role || 'IT Security') : 'IT Security';
+      const errEl    = document.getElementById('error-msg-signin');
+      const btn      = document.getElementById('signin-btn');
+
+      if (!orgName) {
+        errEl.textContent = 'Organization name is required.';
+        errEl.classList.remove('hidden');
+        document.getElementById('signin-org-name').focus();
+        return;
+      }
+      errEl.classList.add('hidden');
+
+      if (!msalInstance) {
+        errEl.textContent = 'Authentication service not ready. Please refresh.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Redirecting…';
+
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        const acct = accounts[0];
+        saveProfileAndSession({ orgName, userName: userName || acct.name || acct.username, userRole, acct });
+        return;
+      }
+
+      sessionStorage.setItem('compass_pending', JSON.stringify({
+        org_name: orgName, user_name: userName, user_role: userRole, flow: 'signin',
+      }));
+      try {
+        await msalInstance.loginRedirect({ scopes: COMPASS_AUTH.scopes, prompt: 'login' });
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Sign In →';
+        errEl.textContent = err.message || 'Sign-in failed. Please try again.';
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    // ── Create Account ──
+    async function doCreateAccount() {
+      const orgName  = document.getElementById('org-name').value.trim();
       const userName = document.getElementById('user-name').value.trim();
       const userRole = document.getElementById('user-role').value;
-      const errEl = document.getElementById('error-msg');
+      const errEl    = document.getElementById('error-msg-create');
+      const btn      = document.getElementById('create-btn');
 
       if (!orgName) {
         errEl.textContent = 'Organization name is required.';
@@ -258,22 +573,119 @@
         document.getElementById('org-name').focus();
         return;
       }
-
       errEl.classList.add('hidden');
 
-      const session = {
-        org_name:   orgName,
-        user_name:  userName,
-        user_role:  userRole,
-        started_at: new Date().toISOString(),
-        upload:     null,
-        detection:  null,
-        inventory:  null,
-        assessment: null
-      };
+      if (!msalInstance) {
+        errEl.textContent = 'Authentication service not ready. Please refresh.';
+        errEl.classList.remove('hidden');
+        return;
+      }
 
-      localStorage.setItem('compass_session', JSON.stringify(session));
-      window.location.href = 'upload.html';
+      btn.disabled = true;
+      btn.textContent = 'Redirecting…';
+
+      sessionStorage.setItem('compass_pending', JSON.stringify({
+        org_name: orgName, user_name: userName, user_role: userRole, flow: 'create',
+      }));
+      try {
+        await msalInstance.loginRedirect({ scopes: COMPASS_AUTH.scopes, prompt: 'create' });
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+        errEl.textContent = err.message || 'Account creation failed. Please try again.';
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    // ── Onboarding Tour ──
+    const TOUR_KEY = 'compass_tour_seen';
+    const TOUR_STEPS = [
+      {
+        icon: '&#127759;',
+        title: 'Welcome to Project Compass',
+        body: 'Project Compass helps you <strong>discover, assess, and govern AI tools</strong> in your organization — in minutes, not months. This quick tour shows you how it works.',
+      },
+      {
+        icon: '&#128196;',
+        title: 'Step 1 — Upload Your Logs',
+        body: 'Drop in your <strong>DNS, proxy, or firewall logs</strong>. Compass parses them automatically and identifies every AI tool your team is using — known or shadow.',
+      },
+      {
+        icon: '&#128202;',
+        title: 'Step 2 — Detect & Assess',
+        body: 'See every detected AI tool with its <strong>risk level and category</strong>. Answer a short questionnaire to surface governance gaps against NIST AI RMF controls.',
+      },
+      {
+        icon: '&#128203;',
+        title: 'Step 3 — Get Your Report',
+        body: 'Receive a tailored risk report for <strong>executives, security teams, and auditors</strong> — complete with remediation steps and an AI inventory you can act on.',
+      },
+    ];
+
+    let tourStep = 0;
+
+    function renderTourStep() {
+      const step = TOUR_STEPS[tourStep];
+      document.getElementById('tour-icon').innerHTML    = step.icon;
+      document.getElementById('tour-title').textContent = step.title;
+      document.getElementById('tour-body').innerHTML    = step.body;
+      document.getElementById('tour-next-btn').textContent =
+        tourStep === TOUR_STEPS.length - 1 ? 'Get Started' : 'Next →';
+      const dots = document.getElementById('tour-dots');
+      dots.innerHTML = TOUR_STEPS.map((_, i) =>
+        `<div class="tour-dot ${i === tourStep ? 'active' : ''}"></div>`
+      ).join('');
+    }
+
+    function tourNext() {
+      if (tourStep < TOUR_STEPS.length - 1) { tourStep++; renderTourStep(); }
+      else { closeTour(); }
+    }
+
+    function closeTour() {
+      localStorage.setItem(TOUR_KEY, '1');
+      document.getElementById('tour-overlay').style.display = 'none';
+    }
+
+    if (!localStorage.getItem(TOUR_KEY)) {
+      renderTourStep();
+      document.getElementById('tour-overlay').style.display = 'flex';
+    }
+
+    // ── Demo mode ──
+    async function startDemo() {
+      const orgName  = (remembered && remembered.org_name)  || 'Demo Organization';
+      const userName = (remembered && remembered.user_name) || 'Demo User';
+      const userRole = (remembered && remembered.user_role) || 'IT Security';
+      const errEl    = document.getElementById('error-msg-signin');
+      const demoBtn  = document.getElementById('demo-btn');
+
+      errEl.classList.add('hidden');
+      demoBtn.disabled    = true;
+      demoBtn.textContent = 'Loading demo data…';
+
+      try {
+        const res = await fetch('../project_compass_seeded_detection_results_frontend.json');
+        if (!res.ok) throw new Error('fetch failed');
+        const detectionData = await res.json();
+
+        const session = {
+          org_name:   orgName,
+          user_name:  userName,
+          user_role:  userRole,
+          user:       { name: userName, email: 'demo@projectcompass.io', oid: 'demo' },
+          demo:       true,
+          started_at: new Date().toISOString(),
+          detection:  detectionData,
+        };
+        sessionStorage.setItem('compass_session', JSON.stringify(session));
+        window.location.href = 'detect.html';
+      } catch (err) {
+        demoBtn.disabled    = false;
+        demoBtn.textContent = 'Try with sample data — no account needed';
+        errEl.textContent   = 'Could not load demo data. Please try again.';
+        errEl.classList.remove('hidden');
+      }
     }
   </script>
 </body>

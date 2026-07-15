@@ -389,11 +389,16 @@
       <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
       <span class="app-header-logo-text">Project Compass</span>
     </a>
+    <nav class="app-header-nav">
+      <a href="../index.html" class="app-nav-link">Home</a>
+      <a href="inventory.html" class="app-nav-link">Inventory</a>
+    </nav>
     <div class="app-header-right">
       <div class="org-badge">
         <span class="org-badge-dot"></span>
         <span id="header-org-name">Organization</span>
       </div>
+      <button class="btn-logout" onclick="sessionStorage.clear(); window.location.href='login.html';">Sign Out</button>
     </div>
   </header>
 
@@ -482,7 +487,7 @@
 
   <script>
     // ── Session Guard ──
-    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
+    const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) { window.location.href = 'login.html'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 

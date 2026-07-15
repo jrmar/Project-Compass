@@ -123,6 +123,82 @@ code, .mono {
 }
 
 /* ============================================================
+   APP HEADER NAV LINKS
+   ============================================================ */
+.app-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 8px;
+}
+
+.app-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.app-nav-link:hover {
+  color: var(--light);
+  background: rgba(64, 130, 232, 0.1);
+}
+
+.app-nav-link.active {
+  color: var(--teal);
+  background: rgba(51, 205, 182, 0.08);
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid rgba(224, 92, 92, 0.25);
+  border-radius: var(--radius-sm);
+  color: rgba(224, 92, 92, 0.7);
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 13px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background: rgba(224, 92, 92, 0.08);
+  border-color: rgba(224, 92, 92, 0.5);
+  color: #e05c5c;
+}
+
+.btn-demo {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 0;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.btn-demo:hover { color: var(--light); }
+
+/* ============================================================
    STEP PROGRESS BAR
    ============================================================ */
 .step-bar-wrapper {

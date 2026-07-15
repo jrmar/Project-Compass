@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass - Signing In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 90% 70% at 50% 0%, rgba(64,130,232,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(51,205,182,0.06) 0%, transparent 60%);
+    }
+    .cb-card {
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      padding: 48px 36px;
+    }
+    .cb-logo {
+      height: 56px;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      margin-bottom: 28px;
+    }
+    .cb-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(64,130,232,0.15);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .cb-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px; font-weight: 800;
+      color: var(--light);
+      margin-bottom: 8px;
+    }
+    .cb-sub {
+      font-size: 13px; color: var(--muted);
+      line-height: 1.5;
+    }
+    .cb-error {
+      background: rgba(224,92,92,0.08);
+      border: 1px solid rgba(224,92,92,0.25);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--danger);
+      line-height: 1.5;
+      display: none;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="cb-card glass-card">
+    <img class="cb-logo" src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+    <div class="cb-spinner" id="spinner"></div>
+    <div class="cb-title" id="cb-title">Completing sign-in…</div>
+    <div class="cb-sub" id="cb-sub">Setting up your session. You'll be redirected in a moment.</div>
+    <div class="cb-error" id="cb-error"></div>
+  </div>
+
+  <script src="/node_modules/@azure/msal-browser/lib/msal-browser.min.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    (async () => {
+      const titleEl = document.getElementById('cb-title');
+      const subEl   = document.getElementById('cb-sub');
+      const errEl   = document.getElementById('cb-error');
+      const spinner = document.getElementById('spinner');
+
+      try {
+        const pca = await initMsal();
+        const result = await pca.handleRedirectPromise();
+
+        if (result && result.account) {
+          const acct = result.account;
+          const pending = JSON.parse(sessionStorage.getItem('compass_pending') || '{}');
+
+          const session = {
+            org_name:   pending.org_name  || 'Your Organization',
+            user_name:  pending.user_name || acct.name || acct.username,
+            user_role:  pending.user_role || 'IT Security',
+            user: {
+              name:  acct.name     || acct.username,
+              email: acct.username,
+              oid:   acct.localAccountId,
+            },
+            started_at: new Date().toISOString(),
+          };
+
+          sessionStorage.setItem('compass_session', JSON.stringify(session));
+          sessionStorage.removeItem('compass_pending');
+
+          // Persist org/role to localStorage so returning users skip the form
+          localStorage.setItem('compass_profile', JSON.stringify({
+            org_name:  session.org_name,
+            user_name: session.user_name,
+            user_role: session.user_role,
+          }));
+
+          titleEl.textContent = 'Signed in!';
+          subEl.textContent   = `Welcome, ${session.user.name}. Redirecting…`;
+          setTimeout(() => { window.location.href = 'upload.html'; }, 800);
+
+        } else {
+          // No redirect result — someone landed here directly
+          window.location.href = 'login.html';
+        }
+
+      } catch (err) {
+        console.error('Auth callback error:', err);
+        spinner.style.display = 'none';
+        titleEl.textContent   = 'Sign-in failed';
+        subEl.textContent     = 'Redirecting to sign-in page…';
+        errEl.textContent     = err.message || 'Authentication error. Please try again.';
+        errEl.style.display   = 'block';
+        setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+      }
+    })();
+  </script>
+</body>
+</html>
