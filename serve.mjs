@@ -129,8 +129,25 @@ const server = createServer(async (req, res) => {
     return res.end();
   }
 
+  // ── Clean URL rewrites (mirrors vercel.json) ───────────────────────────────
+  const CLEAN_URLS = {
+    '/login':         '/app/login.html',
+    '/dashboard':     '/app/dashboard.html',
+    '/compliance':    '/app/compliance.html',
+    '/governance':    '/app/compass-governance.html',
+    '/inventory':     '/app/inventory.html',
+    '/report':        '/app/report.html',
+    '/about':         '/app/info.html',
+    '/assess':        '/app/assess.html',
+    '/detect':        '/app/detect.html',
+    '/upload':        '/app/upload.html',
+    '/scanning':      '/app/scanning.html',
+    '/sample-report': '/app/sample-report.html',
+  };
+  const rewritten = CLEAN_URLS[url];
+
   // ── Static files ───────────────────────────────────────────────────────────
-  let filePath = url === '/' ? '/index.html' : url;
+  let filePath = rewritten || (url === '/' ? '/index.html' : url);
   filePath = join(__dirname, filePath);
 
   try {
