@@ -52,6 +52,29 @@
       color: var(--muted);
     }
 
+    .login-home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(208,212,226,0.1);
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+      margin-top: -8px;
+    }
+    .login-home-link:hover {
+      color: var(--light);
+      background: rgba(64,130,232,0.08);
+      border-color: rgba(64,130,232,0.2);
+    }
+
     /* ---- Card ---- */
     .login-card {
       width: 100%;
@@ -315,6 +338,8 @@
       <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass Logo">
       <span class="login-brand-name">Project Compass</span>
     </div>
+
+    <a href="../index.html" class="login-home-link">← Back to Home</a>
 
     <!-- Card -->
     <div class="login-card glass-card">

@@ -258,17 +258,26 @@
     <img src="../brand_assets/compass_logo.png" alt="Compass" onerror="this.style.display='none'">
     <span class="app-header-logo-text">Project Compass</span>
   </a>
-  <nav class="app-header-right">
-    <a href="dashboard.html" class="nav-link">Dashboard</a>
-    <a href="compliance.html" class="nav-link">Compliance</a>
-    <a href="compass-governance.html" class="nav-link active">AI Governance</a>
-    <a href="inventory.html" class="nav-link">Inventory</a>
-    <a href="report.html" class="nav-link">Reports</a>
+  <nav class="app-header-nav">
+    <a href="dashboard.html" class="app-nav-link">Dashboard</a>
+    <div class="nav-dropdown" id="gov-dropdown">
+      <button class="nav-dropdown-btn active" onclick="toggleDropdown('gov-dropdown')">
+        Governance <span class="nav-dropdown-caret">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="compliance.html" class="nav-dropdown-item">Compliance Reference</a>
+        <a href="compass-governance.html" class="nav-dropdown-item active">AI Governance Policy</a>
+      </div>
+    </div>
+    <a href="inventory.html" class="app-nav-link">Inventory</a>
+    <a href="report.html" class="app-nav-link">Reports</a>
+  </nav>
+  <div class="app-header-right">
     <div class="user-pill" id="user-pill">
       <span class="user-pill-icon">◈</span>
       <span id="user-name-display">Loading…</span>
     </div>
-  </nav>
+  </div>
 </header>
 
 <!-- ══ MAIN ════════════════════════════════════════════════════════════ -->
@@ -663,6 +672,18 @@
     },{threshold:0.1});
     document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   })();
+
+  // ── Governance dropdown ──
+  function toggleDropdown(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    document.querySelectorAll('.nav-dropdown.open').forEach(function(d) {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
+  });
 
   // ── User pill ──
   (function(){

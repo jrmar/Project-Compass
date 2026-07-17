@@ -426,10 +426,17 @@
       <span class="app-header-logo-text">Project Compass</span>
     </a>
     <nav class="app-header-nav">
-      <a href="../index.html"        class="app-nav-link">Home</a>
-      <a href="info.html"            class="app-nav-link">About</a>
-      <a href="compliance.html"      class="app-nav-link active">Compliance</a>
-      <a href="compass-governance.html" class="app-nav-link">AI Governance</a>
+      <a href="../index.html" class="app-nav-link">Home</a>
+      <a href="info.html"    class="app-nav-link">About</a>
+      <div class="nav-dropdown" id="gov-dropdown">
+        <button class="nav-dropdown-btn active" onclick="toggleDropdown('gov-dropdown')">
+          Governance <span class="nav-dropdown-caret">▾</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="compliance.html"      class="nav-dropdown-item active">Compliance Reference</a>
+          <a href="compass-governance.html" class="nav-dropdown-item">AI Governance Policy</a>
+        </div>
+      </div>
     </nav>
     <div class="app-header-right">
       <a href="login.html" style="background:linear-gradient(135deg,var(--blue),#2d64c4);color:#fff;border-radius:6px;padding:7px 16px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;text-decoration:none;">Run Assessment</a>
@@ -832,6 +839,17 @@
   }
   requestAnimationFrame(draw);
 })();
+
+// ── Governance dropdown ──
+function toggleDropdown(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  document.querySelectorAll('.nav-dropdown.open').forEach(function(d) {
+    if (!d.contains(e.target)) d.classList.remove('open');
+  });
+});
 
 // ── Scroll-reveal ──
 (function () {

@@ -157,6 +157,84 @@ code, .mono {
   background: rgba(51, 205, 182, 0.08);
 }
 
+/* ============================================================
+   DROPDOWN NAV
+   ============================================================ */
+.nav-dropdown { position: relative; }
+
+.nav-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.nav-dropdown-btn:hover,
+.nav-dropdown.open .nav-dropdown-btn {
+  color: var(--light);
+  background: rgba(64, 130, 232, 0.1);
+}
+
+.nav-dropdown-btn.active {
+  color: var(--teal);
+  background: rgba(51, 205, 182, 0.08);
+}
+
+.nav-dropdown-caret {
+  font-size: 10px;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.nav-dropdown.open .nav-dropdown-caret { transform: rotate(180deg); }
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 190px;
+  background: rgba(7, 21, 48, 0.97);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  display: none;
+  z-index: 500;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.45);
+}
+
+.nav-dropdown.open .nav-dropdown-menu { display: block; }
+
+.nav-dropdown-item {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-dropdown-item:hover { color: var(--light); background: rgba(64,130,232,0.1); }
+.nav-dropdown-item.active { color: var(--teal); background: rgba(51,205,182,0.08); }
+
 .btn-logout {
   background: transparent;
   border: 1px solid rgba(224, 92, 92, 0.25);
