@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/app/">
   <title>Project Compass - Reports</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -116,20 +117,20 @@
 <body>
 
   <header class="app-header">
-    <a class="app-header-logo" href="login.html">
+    <a class="app-header-logo" href="/login">
       <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
       <span class="app-header-logo-text">Project Compass</span>
     </a>
     <nav class="app-header-nav">
-      <a href="../index.html" class="app-nav-link">Home</a>
-      <a href="inventory.html" class="app-nav-link">Inventory</a>
+      <a href="/" class="app-nav-link">Home</a>
+      <a href="/inventory" class="app-nav-link">Inventory</a>
     </nav>
     <div class="app-header-right">
       <div class="org-badge">
         <span class="org-badge-dot"></span>
         <span id="header-org-name">Organization</span>
       </div>
-      <button class="btn-logout" onclick="sessionStorage.clear(); window.location.href='login.html';">Sign Out</button>
+      <button class="btn-logout" onclick="sessionStorage.clear(); window.location.href='/login';">Sign Out</button>
     </div>
   </header>
 
@@ -233,10 +234,10 @@
 
     <!-- Navigation -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--glass-border);">
-      <button class="btn btn-ghost" onclick="window.location.href='dashboard.html'">&#8592; Back to Dashboard</button>
+      <button class="btn btn-ghost" onclick="window.location.href='/dashboard'">&#8592; Back to Dashboard</button>
       <div style="display:flex;gap:10px;">
-        <button class="btn btn-ghost" onclick="window.location.href='../index.html'">&#8962; Home</button>
-        <button class="btn btn-teal" onclick="window.location.href='login.html'">Start New Assessment &#8635;</button>
+        <button class="btn btn-ghost" onclick="window.location.href='/'">&#8962; Home</button>
+        <button class="btn btn-teal" onclick="window.location.href='/login'">Start New Assessment &#8635;</button>
       </div>
     </div>
 

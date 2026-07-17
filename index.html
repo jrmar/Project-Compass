@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -722,21 +722,21 @@
       <li><a href="#how-it-works">How It Works</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#for-teams">For Teams</a></li>
-      <li><a href="app/info.html">About</a></li>
+      <li><a href="/about">About</a></li>
       <li class="nav-dropdown" id="landing-gov-dd">
         <button class="nav-dropdown-btn" onclick="toggleLandingDD()">
           Governance <span class="nav-dropdown-caret">▾</span>
         </button>
         <div class="nav-dropdown-menu">
-          <a href="app/compliance.html" class="nav-dropdown-item">Compliance Reference</a>
-          <a href="app/compass-governance.html" class="nav-dropdown-item">AI Governance Policy</a>
+          <a href="/compliance" class="nav-dropdown-item">Compliance Reference</a>
+          <a href="/governance" class="nav-dropdown-item">AI Governance Policy</a>
         </div>
       </li>
     </ul>
 
     <div class="nav-right">
       <!-- Shown when NOT logged in -->
-      <button class="btn btn-primary" id="nav-run-btn" style="padding:0.5rem 1.25rem;font-size:0.75rem;" onclick="window.location.href='app/login.html'">
+      <button class="btn btn-primary" id="nav-run-btn" style="padding:0.5rem 1.25rem;font-size:0.75rem;" onclick="window.location.href='/login'">
         Run Assessment
       </button>
 
@@ -820,11 +820,11 @@
       </p>
 
       <div style="display:flex;gap:0.875rem;flex-wrap:wrap;margin-bottom:1.125rem;" class="anim-fadeup d3">
-        <button class="btn btn-primary btn-lg" onclick="window.location.href='app/login.html'">
+        <button class="btn btn-primary btn-lg" onclick="window.location.href='/login'">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5L9.5 5.5H13.5L10.5 8L11.5 12.5L7.5 10.5L3.5 12.5L4.5 8L1.5 5.5H5.5L7.5 1.5Z" fill="currentColor"/></svg>
           Run Assessment
         </button>
-        <button class="btn btn-outline btn-lg" onclick="window.location.href='app/login.html?demo=true'">Try Live Demo</button>
+        <button class="btn btn-outline btn-lg" onclick="window.location.href='/login?demo=true'">Try Live Demo</button>
       </div>
 
       <!-- Trust strip -->
@@ -849,7 +849,7 @@
 
       <!-- Sample report link -->
       <div style="margin-bottom:2.5rem;" class="anim-fadeup d3">
-        <a href="app/sample-report.html" style="font-size:0.78rem;color:rgba(208,212,226,0.48);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;transition:color 0.2s;" onmouseover="this.style.color='rgba(51,205,182,0.8)'" onmouseout="this.style.color='rgba(208,212,226,0.48)'">
+        <a href="/sample-report" style="font-size:0.78rem;color:rgba(208,212,226,0.48);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;transition:color 0.2s;" onmouseover="this.style.color='rgba(51,205,182,0.8)'" onmouseout="this.style.color='rgba(208,212,226,0.48)'">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M4 4h4M4 6h4M4 8h2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
           View a sample completed report
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 5h5M5.5 3l2 2-2 2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1089,7 +1089,7 @@
     </div>
 
     <div style="text-align:center;margin-top:2.5rem;" class="reveal">
-      <a href="app/info.html" style="font-family:'Montserrat',sans-serif;font-size:0.8125rem;font-weight:700;letter-spacing:0.04em;color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(51,205,182,0.35);padding-bottom:2px;transition:border-color 0.15s;">Full workflow details and technical overview →</a>
+      <a href="/about" style="font-family:'Montserrat',sans-serif;font-size:0.8125rem;font-weight:700;letter-spacing:0.04em;color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(51,205,182,0.35);padding-bottom:2px;transition:border-color 0.15s;">Full workflow details and technical overview →</a>
     </div>
   </div>
 </section>
@@ -1281,7 +1281,7 @@
     </div>
 
     <div style="text-align:center;margin-top:2.25rem;" class="reveal">
-      <a href="app/sample-report.html" style="font-size:0.8125rem;color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(51,205,182,0.3);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(51,205,182,0.7)'" onmouseout="this.style.borderColor='rgba(51,205,182,0.3)'">See a sample completed report →</a>
+      <a href="/sample-report" style="font-size:0.8125rem;color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(51,205,182,0.3);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(51,205,182,0.7)'" onmouseout="this.style.borderColor='rgba(51,205,182,0.3)'">See a sample completed report →</a>
     </div>
 
   </div>
@@ -1410,7 +1410,7 @@
           <svg class="faq-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </summary>
         <div class="faq-a">
-          Risk findings are mapped to the <strong>NIST AI Risk Management Framework</strong> (GOVERN, MAP, MEASURE, MANAGE), <strong>NIST SP 800-218A</strong> secure software development practices, and the <strong>OWASP LLM Top 10 2025</strong>. See the <a href="app/compliance.html">Compliance reference page</a> for the full mapping and how Compass addresses each control.
+          Risk findings are mapped to the <strong>NIST AI Risk Management Framework</strong> (GOVERN, MAP, MEASURE, MANAGE), <strong>NIST SP 800-218A</strong> secure software development practices, and the <strong>OWASP LLM Top 10 2025</strong>. See the <a href="/compliance">Compliance reference page</a> for the full mapping and how Compass addresses each control.
         </div>
       </details>
 
@@ -1451,8 +1451,8 @@
     </p>
 
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;">
-      <button class="btn btn-primary btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;" onclick="window.location.href='app/login.html'">Run Assessment</button>
-      <button class="btn btn-outline btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;" onclick="window.location.href='app/login.html?demo=true'">Try Live Demo</button>
+      <button class="btn btn-primary btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;" onclick="window.location.href='/login'">Run Assessment</button>
+      <button class="btn btn-outline btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;" onclick="window.location.href='/login?demo=true'">Try Live Demo</button>
     </div>
 
     <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;">
@@ -1492,9 +1492,9 @@
     <div>
       <div class="font-heading" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(208,212,226,0.38);margin-bottom:1.25rem;">Product</div>
       <nav style="display:flex;flex-direction:column;gap:0.75rem;">
-        <a href="app/login.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Run Assessment</a>
-        <a href="app/login.html?demo=true" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Try Live Demo</a>
-        <a href="app/login.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Sign In</a>
+        <a href="/login" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Run Assessment</a>
+        <a href="/login?demo=true" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Try Live Demo</a>
+        <a href="/login" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Sign In</a>
         <a href="app/login.html#create" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Create Account</a>
       </nav>
     </div>
@@ -1503,9 +1503,9 @@
     <div>
       <div class="font-heading" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(208,212,226,0.38);margin-bottom:1.25rem;">Resources</div>
       <nav style="display:flex;flex-direction:column;gap:0.75rem;">
-        <a href="app/info.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">About the Project</a>
-        <a href="app/compliance.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Compliance Reference</a>
-        <a href="app/sample-report.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Sample Report</a>
+        <a href="/about" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">About the Project</a>
+        <a href="/compliance" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Compliance Reference</a>
+        <a href="/sample-report" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Sample Report</a>
         <a href="#how-it-works" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">How It Works</a>
         <a href="#faq" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">FAQ</a>
       </nav>

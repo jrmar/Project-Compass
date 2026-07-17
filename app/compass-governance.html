@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/app/">
   <title>Project Compass — AI Governance Policy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -254,23 +255,23 @@
 
 <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
 <header class="app-header">
-  <a href="dashboard.html" class="app-header-logo">
+  <a href="/dashboard" class="app-header-logo">
     <img src="../brand_assets/compass_logo.png" alt="Compass" onerror="this.style.display='none'">
     <span class="app-header-logo-text">Project Compass</span>
   </a>
   <nav class="app-header-nav">
-    <a href="dashboard.html" class="app-nav-link">Dashboard</a>
+    <a href="/dashboard" class="app-nav-link">Dashboard</a>
     <div class="nav-dropdown" id="gov-dropdown">
       <button class="nav-dropdown-btn active" onclick="toggleDropdown('gov-dropdown')">
         Governance <span class="nav-dropdown-caret">▾</span>
       </button>
       <div class="nav-dropdown-menu">
-        <a href="compliance.html" class="nav-dropdown-item">Compliance Reference</a>
-        <a href="compass-governance.html" class="nav-dropdown-item active">AI Governance Policy</a>
+        <a href="/compliance" class="nav-dropdown-item">Compliance Reference</a>
+        <a href="/governance" class="nav-dropdown-item active">AI Governance Policy</a>
       </div>
     </div>
-    <a href="inventory.html" class="app-nav-link">Inventory</a>
-    <a href="report.html" class="app-nav-link">Reports</a>
+    <a href="/inventory" class="app-nav-link">Inventory</a>
+    <a href="/report" class="app-nav-link">Reports</a>
   </nav>
   <div class="app-header-right">
     <div class="user-pill" id="user-pill">
@@ -625,11 +626,11 @@
 
     <!-- Footer nav -->
     <div class="gov-footnav reveal">
-      <a href="compliance.html">← Compliance Reference</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="inventory.html">Inventory</a>
-      <a href="report.html">Reports</a>
-      <a href="../index.html">Public Site</a>
+      <a href="/compliance">← Compliance Reference</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/inventory">Inventory</a>
+      <a href="/report">Reports</a>
+      <a href="/">Public Site</a>
     </div>
 
   </div><!-- /container -->

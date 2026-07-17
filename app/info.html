@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/app/">
   <title>Project Compass — About</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -340,25 +341,25 @@
 
   <!-- Header -->
   <header class="app-header">
-    <a class="app-header-logo" href="../index.html">
+    <a class="app-header-logo" href="/">
       <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
       <span class="app-header-logo-text">Project Compass</span>
     </a>
     <nav class="app-header-nav">
-      <a href="../index.html" class="app-nav-link">Home</a>
-      <a href="info.html"     class="app-nav-link active">About</a>
+      <a href="/" class="app-nav-link">Home</a>
+      <a href="/about"     class="app-nav-link active">About</a>
       <div class="nav-dropdown" id="gov-dropdown">
         <button class="nav-dropdown-btn" onclick="toggleDropdown('gov-dropdown')">
           Governance <span class="nav-dropdown-caret">▾</span>
         </button>
         <div class="nav-dropdown-menu">
-          <a href="compliance.html"         class="nav-dropdown-item">Compliance Reference</a>
-          <a href="compass-governance.html" class="nav-dropdown-item">AI Governance Policy</a>
+          <a href="/compliance"         class="nav-dropdown-item">Compliance Reference</a>
+          <a href="/governance" class="nav-dropdown-item">AI Governance Policy</a>
         </div>
       </div>
     </nav>
     <div class="app-header-right">
-      <a href="login.html" class="cta-btn-primary">Run Assessment</a>
+      <a href="/login" class="cta-btn-primary">Run Assessment</a>
     </div>
   </header>
 
@@ -567,8 +568,8 @@
 
     <!-- ── CTA ── -->
     <div class="cta-row reveal">
-      <a href="login.html"      class="cta-btn-primary">Run Your Assessment</a>
-      <a href="compliance.html" class="cta-btn-outline">View Compliance Reference →</a>
+      <a href="/login"      class="cta-btn-primary">Run Your Assessment</a>
+      <a href="/compliance" class="cta-btn-outline">View Compliance Reference →</a>
     </div>
 
   </main>

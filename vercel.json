@@ -1,0 +1,17 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/login",         "destination": "/app/login.html" },
+    { "source": "/dashboard",     "destination": "/app/dashboard.html" },
+    { "source": "/compliance",    "destination": "/app/compliance.html" },
+    { "source": "/governance",    "destination": "/app/compass-governance.html" },
+    { "source": "/inventory",     "destination": "/app/inventory.html" },
+    { "source": "/report",        "destination": "/app/report.html" },
+    { "source": "/about",         "destination": "/app/info.html" },
+    { "source": "/assess",        "destination": "/app/assess.html" },
+    { "source": "/detect",        "destination": "/app/detect.html" },
+    { "source": "/upload",        "destination": "/app/upload.html" },
+    { "source": "/scanning",      "destination": "/app/scanning.html" },
+    { "source": "/sample-report", "destination": "/app/sample-report.html" }
+  ]
+}
