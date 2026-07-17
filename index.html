@@ -67,6 +67,66 @@
       margin: 0 2rem;
     }
 
+    /* ── FAQ Accordion ── */
+    .faq-list { display: flex; flex-direction: column; gap: 0; }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(64,130,232,0.12);
+    }
+    .faq-item:first-child { border-top: 1px solid rgba(64,130,232,0.12); }
+
+    .faq-q {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.375rem 0;
+      cursor: pointer;
+      list-style: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: rgba(246,247,247,0.88);
+      letter-spacing: -0.01em;
+      transition: color 0.2s;
+      user-select: none;
+    }
+    .faq-q::-webkit-details-marker { display: none; }
+    .faq-q::marker { display: none; }
+    .faq-q:hover { color: var(--white); }
+
+    .faq-icon {
+      flex-shrink: 0;
+      color: rgba(64,130,232,0.65);
+      transition: transform 0.25s ease;
+    }
+    .faq-item[open] .faq-icon { transform: rotate(180deg); }
+    .faq-item[open] .faq-q { color: var(--teal); }
+    .faq-item[open] .faq-icon { color: var(--teal); }
+
+    .faq-a {
+      padding: 0 0 1.375rem;
+      font-size: 0.875rem;
+      color: rgba(208,212,226,0.68);
+      line-height: 1.75;
+      max-width: 680px;
+    }
+    .faq-a a { color: var(--teal); text-decoration: none; }
+    .faq-a a:hover { text-decoration: underline; }
+    .faq-a code { font-family: 'JetBrains Mono', monospace; font-size: 0.8em; color: rgba(208,212,226,0.85); background: rgba(64,130,232,0.08); padding: 0.1em 0.35em; border-radius: 3px; }
+
+    /* ── Footer responsive ── */
+    @media (max-width: 900px) {
+      footer .container[style*="grid-template-columns"] {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+    @media (max-width: 580px) {
+      footer .container[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
     /* ────────────────────────────────────────
        NAV
     ──────────────────────────────────────── */
@@ -704,12 +764,32 @@
         Compass discovers AI tools running in your environment, maps governance gaps to the NIST AI Risk Management Framework, and produces clear dashboards for security, compliance, and leadership teams.
       </p>
 
-      <div style="display:flex;gap:0.875rem;flex-wrap:wrap;margin-bottom:3rem;" class="anim-fadeup d3">
+      <div style="display:flex;gap:0.875rem;flex-wrap:wrap;margin-bottom:1.125rem;" class="anim-fadeup d3">
         <button class="btn btn-primary btn-lg" onclick="window.location.href='app/login.html'">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5L9.5 5.5H13.5L10.5 8L11.5 12.5L7.5 10.5L3.5 12.5L4.5 8L1.5 5.5H5.5L7.5 1.5Z" fill="currentColor"/></svg>
           Run Assessment
         </button>
-        <button class="btn btn-outline btn-lg" onclick="window.location.href='app/info.html'">About the Project</button>
+        <button class="btn btn-outline btn-lg" onclick="window.location.href='app/login.html?demo=true'">Try Live Demo</button>
+      </div>
+
+      <!-- Trust strip -->
+      <div style="display:flex;flex-wrap:wrap;gap:1.25rem;align-items:center;margin-bottom:2.75rem;" class="anim-fadeup d3">
+        <span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.7rem;color:rgba(208,212,226,0.52);letter-spacing:0.02em;">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#33CDB6" stroke-width="1.1"/><path d="M3.5 5.5l1.4 1.4L7.5 4" stroke="#33CDB6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Client-side only
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.7rem;color:rgba(208,212,226,0.52);letter-spacing:0.02em;">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#33CDB6" stroke-width="1.1"/><path d="M3.5 5.5l1.4 1.4L7.5 4" stroke="#33CDB6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          No data uploaded
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.7rem;color:rgba(208,212,226,0.52);letter-spacing:0.02em;">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#33CDB6" stroke-width="1.1"/><path d="M3.5 5.5l1.4 1.4L7.5 4" stroke="#33CDB6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          NIST AI RMF aligned
+        </span>
+        <span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.7rem;color:rgba(208,212,226,0.52);letter-spacing:0.02em;">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#33CDB6" stroke-width="1.1"/><path d="M3.5 5.5l1.4 1.4L7.5 4" stroke="#33CDB6" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          OWASP LLM Top 10
+        </span>
       </div>
 
       <!-- Stats strip -->
@@ -1121,6 +1201,78 @@
 
 
 <!-- ══════════════════════════════════════════
+     FAQ
+══════════════════════════════════════════ -->
+<section id="faq" style="padding:7rem 2rem;">
+  <div class="container" style="max-width:820px;">
+    <div style="text-align:center;margin-bottom:3.5rem;" class="reveal">
+      <div class="section-label">FAQ</div>
+      <h2 class="font-heading" style="font-weight:800;font-size:clamp(1.875rem,3vw,2.5rem);letter-spacing:-0.025em;color:var(--white);line-height:1.18;">
+        Common questions
+      </h2>
+    </div>
+
+    <div class="faq-list reveal">
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>What log formats does Compass accept?</span>
+          <svg class="faq-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq-a">
+          Compass parses DNS query logs, HTTP proxy logs, and firewall exports in <code>.log</code>, <code>.txt</code>, <code>.csv</code>, and <code>.json</code> formats. The parser extracts domains, timestamps, categories, and risk tiers automatically — no custom mapping required. See the <a href="app/info.html#parser">Log Parser section</a> on the About page for the full field reference.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Does my data ever leave my browser?</span>
+          <svg class="faq-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq-a">
+          No. Every log file you upload is processed entirely inside your browser — nothing is transmitted to a server or stored in the cloud. Once you close the tab, the data is gone. Compass is designed for environments where log data is sensitive and must stay on-premise.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Do I need an IT team to use it?</span>
+          <svg class="faq-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq-a">
+          No installation, infrastructure, or IT support is required. Compass runs in any modern browser. Upload a log file, answer a few guided questions about your org context, and you have a full risk report in minutes. It is designed for security leads, compliance officers, and auditors — not just engineers.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Which governance frameworks does Compass map to?</span>
+          <svg class="faq-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq-a">
+          Risk findings are mapped to the <strong>NIST AI Risk Management Framework</strong> (GOVERN, MAP, MEASURE, MANAGE), <strong>NIST SP 800-218A</strong> secure software development practices, and the <strong>OWASP LLM Top 10 2025</strong>. See the <a href="app/compliance.html">Compliance reference page</a> for the full mapping and how Compass addresses each control.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span>Can I try it without creating an account?</span>
+          <svg class="faq-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq-a">
+          Yes. Click <strong>Try Live Demo</strong> on this page to run a complete assessment using built-in sample log data — no account, no sign-up, no data upload. You will see real detection results, risk scoring, and a sample report in the same interface used for live assessments.
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════════
      CTA
 ══════════════════════════════════════════ -->
 <section style="padding:8rem 2rem;position:relative;overflow:hidden;">
@@ -1140,7 +1292,7 @@
 
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;">
       <button class="btn btn-primary btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;" onclick="window.location.href='app/login.html'">Run Assessment</button>
-      <button class="btn btn-outline btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;">Export Sample Report</button>
+      <button class="btn btn-outline btn-lg" style="font-size:0.9375rem;padding:1.0625rem 2.5rem;" onclick="window.location.href='app/login.html?demo=true'">Try Live Demo</button>
     </div>
 
     <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;">
@@ -1155,24 +1307,70 @@
 <!-- ══════════════════════════════════════════
      FOOTER
 ══════════════════════════════════════════ -->
-<footer style="background:rgba(2,6,16,0.97);border-top:1px solid rgba(64,130,232,0.09);padding:2.5rem 2rem;">
-  <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
+<footer style="background:rgba(2,6,16,0.98);border-top:1px solid rgba(64,130,232,0.09);">
 
-    <div style="display:flex;align-items:center;gap:0.75rem;">
-      <img src="brand_assets/New Main Logo Project Compass Image 1.png" alt="Compass" style="height:2rem;width:auto;opacity:0.8;border-radius:5px;">
-      <div>
-        <div class="font-heading" style="font-weight:700;font-size:0.875rem;color:var(--white);">Compass</div>
-        <div style="font-size:0.6875rem;color:var(--gray-light);opacity:0.5;">AI Governance. Risk Clarity.</div>
+  <!-- Main footer grid -->
+  <div class="container" style="padding:4rem 2rem 3rem;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:3rem;align-items:start;">
+
+    <!-- Brand column -->
+    <div>
+      <div style="display:flex;align-items:center;gap:0.625rem;margin-bottom:1rem;">
+        <img src="brand_assets/New Main Logo Project Compass Image 1.png" alt="Compass" style="height:2.25rem;width:auto;opacity:0.88;border-radius:6px;">
+        <div class="font-heading" style="font-weight:800;font-size:1rem;color:var(--white);letter-spacing:-0.01em;">Compass</div>
+      </div>
+      <p style="font-size:0.8125rem;color:rgba(208,212,226,0.45);line-height:1.7;max-width:260px;margin-bottom:1.5rem;">
+        AI governance and risk assessment for security teams, compliance officers, and auditors — no infrastructure required.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        <span style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);font-family:'Montserrat',sans-serif;">NIST AI RMF</span>
+        <span style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(64,130,232,0.7);font-family:'Montserrat',sans-serif;">OWASP LLM Top 10</span>
+        <span style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(155,151,212,0.65);font-family:'Montserrat',sans-serif;">SP 800-218A</span>
       </div>
     </div>
 
-    <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
-      <span class="font-heading" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal);">NIST AI RMF</span>
-      <span class="font-heading" style="font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-light);opacity:0.4;">Log Discovery - Risk Dashboards - Reporting</span>
+    <!-- Product links -->
+    <div>
+      <div class="font-heading" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(208,212,226,0.38);margin-bottom:1.25rem;">Product</div>
+      <nav style="display:flex;flex-direction:column;gap:0.75rem;">
+        <a href="app/login.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Run Assessment</a>
+        <a href="app/login.html?demo=true" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Try Live Demo</a>
+        <a href="app/login.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Sign In</a>
+        <a href="app/login.html#create" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Create Account</a>
+      </nav>
     </div>
 
-    <div style="font-size:0.75rem;color:var(--gray-light);opacity:0.35;">Capstone Project - MICS 2026</div>
+    <!-- Resources links -->
+    <div>
+      <div class="font-heading" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(208,212,226,0.38);margin-bottom:1.25rem;">Resources</div>
+      <nav style="display:flex;flex-direction:column;gap:0.75rem;">
+        <a href="app/info.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">About the Project</a>
+        <a href="app/compliance.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Compliance Reference</a>
+        <a href="#how-it-works" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">How It Works</a>
+        <a href="#faq" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">FAQ</a>
+      </nav>
+    </div>
+
+    <!-- Frameworks -->
+    <div>
+      <div class="font-heading" style="font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(208,212,226,0.38);margin-bottom:1.25rem;">Frameworks</div>
+      <nav style="display:flex;flex-direction:column;gap:0.75rem;">
+        <a href="app/compliance.html#nist-rmf" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">NIST AI RMF</a>
+        <a href="app/compliance.html#sp800" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">NIST SP 800-218A</a>
+        <a href="app/compliance.html#owasp" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">OWASP LLM Top 10</a>
+        <a href="app/compliance.html#risk" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Risk Classification</a>
+      </nav>
+    </div>
+
   </div>
+
+  <!-- Footer bottom bar -->
+  <div style="border-top:1px solid rgba(64,130,232,0.07);padding:1.375rem 2rem;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+      <div style="font-size:0.72rem;color:rgba(208,212,226,0.28);">Capstone Project · MICS 2026 · Client-side only — no data leaves your browser</div>
+      <div style="font-size:0.72rem;color:rgba(208,212,226,0.22);">Built with NIST AI RMF &amp; OWASP LLM Top 10</div>
+    </div>
+  </div>
+
 </footer>
 
 

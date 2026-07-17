@@ -436,6 +436,11 @@
       window.location.href = 'upload.html';
     }
 
+    // Auto-start demo when arriving via ?demo=true (e.g. from landing page "Try Live Demo")
+    if (new URLSearchParams(location.search).get('demo') === 'true') {
+      startDemo();
+    }
+
     // ── Tab switching ──
     function switchTab(tab) {
       const isSignIn = tab === 'signin';
