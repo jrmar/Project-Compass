@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass — AI Governance Policy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    /* ── Starfield ── */
+    #star-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 1000; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    header, main { position: relative; z-index: 2; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: rgba(64,130,232,0.35); border-radius: 3px; }
+
+    /* ── Scroll-reveal ── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22,1,0.36,1); }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-d1 { transition-delay: 0.07s; }
+    .reveal-d2 { transition-delay: 0.15s; }
+    .reveal-d3 { transition-delay: 0.23s; }
+    .reveal-d4 { transition-delay: 0.31s; }
+
+    @keyframes fade-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+    /* ── Page layout ── */
+    .gov-hero {
+      text-align: center;
+      padding: 56px 0 44px;
+      animation: fade-up 0.75s ease both;
+    }
+    .gov-hero-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,128,32,0.09);
+      border: 1px solid rgba(255,128,32,0.25);
+      border-radius: 20px; padding: 4px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--orange);
+      margin-bottom: 20px;
+    }
+    .gov-hero h1 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800; margin-bottom: 14px;
+      background: linear-gradient(135deg, #fff 0%, #8ab0f0 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gov-hero p {
+      color: var(--muted); font-size: 15px; max-width: 580px; margin: 0 auto 28px;
+      line-height: 1.7;
+    }
+    .gov-meta-badges {
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    }
+    .gov-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: 6px; padding: 5px 12px;
+      font-size: 11px; font-weight: 600; font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.04em; color: var(--light);
+    }
+    .gov-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal);
+    }
+    .gov-badge .dot.orange { background: var(--orange); }
+    .gov-badge .dot.blue   { background: var(--blue); }
+
+    /* ── Section ── */
+    .gov-section { margin-bottom: 48px; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 18px;
+    }
+    .section-label::before {
+      content: ''; display: block; width: 20px; height: 2px;
+      background: var(--blue); border-radius: 1px;
+    }
+    .section-heading {
+      font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--light);
+    }
+
+    /* ── Glass card ── */
+    .glass-card {
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg); padding: 24px; backdrop-filter: blur(10px);
+    }
+    .glass-card + .glass-card { margin-top: 16px; }
+
+    /* ── Data flow diagram ── */
+    .flow-row {
+      display: flex; align-items: center; gap: 0;
+      flex-wrap: wrap; margin: 24px 0;
+    }
+    .flow-node {
+      background: rgba(64,130,232,0.08);
+      border: 1px solid rgba(64,130,232,0.25);
+      border-radius: 8px; padding: 10px 16px;
+      text-align: center; flex: 1; min-width: 120px;
+    }
+    .flow-node.red {
+      background: rgba(224,92,92,0.07);
+      border-color: rgba(224,92,92,0.25);
+    }
+    .flow-node.green {
+      background: rgba(51,205,182,0.07);
+      border-color: rgba(51,205,182,0.25);
+    }
+    .flow-node-icon { font-size: 20px; margin-bottom: 4px; }
+    .flow-node-title { font-size: 11px; font-weight: 700; font-family: 'Montserrat', sans-serif; color: var(--light); letter-spacing: 0.03em; }
+    .flow-node-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .flow-arrow {
+      padding: 0 10px; color: var(--muted); font-size: 16px; flex-shrink: 0;
+    }
+
+    /* ── Data table ── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th {
+      text-align: left; font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 0 12px 10px; border-bottom: 1px solid var(--glass-border);
+    }
+    .data-table td {
+      padding: 11px 12px; border-bottom: 1px solid rgba(64,130,232,0.07);
+      vertical-align: top; color: var(--light);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table code { color: var(--teal); font-size: 11px; }
+    .sent-yes { color: var(--teal); font-weight: 600; font-size: 11px; font-family: 'Montserrat', sans-serif; letter-spacing: 0.04em; }
+    .sent-no  { color: var(--muted); font-size: 11px; font-family: 'Montserrat', sans-serif; letter-spacing: 0.04em; }
+
+    /* ── NIST control grid ── */
+    .nist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .nist-card {
+      background: rgba(9,26,54,0.6); border: 1px solid rgba(64,130,232,0.14);
+      border-radius: var(--radius-md); padding: 16px;
+    }
+    .nist-card-id {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      font-weight: 500; color: var(--blue); margin-bottom: 6px;
+    }
+    .nist-card-title { font-weight: 600; font-size: 13px; color: var(--light); margin-bottom: 6px; }
+    .nist-card-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .nist-status {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 10px; font-weight: 700; font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.06em; text-transform: uppercase; margin-top: 8px;
+    }
+    .status-met   { background: rgba(51,205,182,0.12); color: var(--teal); border: 1px solid rgba(51,205,182,0.25); }
+    .status-partial { background: rgba(255,128,32,0.1); color: var(--orange); border: 1px solid rgba(255,128,32,0.25); }
+
+    /* ── OWASP table ── */
+    .owasp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .owasp-table th {
+      text-align: left; font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); padding: 0 12px 10px; border-bottom: 1px solid var(--glass-border);
+    }
+    .owasp-table td {
+      padding: 10px 12px; border-bottom: 1px solid rgba(64,130,232,0.07);
+      vertical-align: top; color: var(--light); line-height: 1.55;
+    }
+    .owasp-table tr:last-child td { border-bottom: none; }
+    .owasp-id { font-family: 'JetBrains Mono', monospace; color: var(--orange); font-size: 11px; white-space: nowrap; }
+    .control-chip {
+      display: inline-block; padding: 2px 7px; border-radius: 4px;
+      font-size: 10px; font-weight: 600; font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .chip-applied { background: rgba(51,205,182,0.1); color: var(--teal); border: 1px solid rgba(51,205,182,0.2); }
+    .chip-na      { background: rgba(208,212,226,0.06); color: var(--muted); border: 1px solid rgba(208,212,226,0.1); }
+    .chip-partial { background: rgba(255,128,32,0.1); color: var(--orange); border: 1px solid rgba(255,128,32,0.2); }
+
+    /* ── Vendor card ── */
+    .vendor-card {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 600px) { .vendor-card { grid-template-columns: 1fr; } }
+    .vendor-field label {
+      display: block; font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+    }
+    .vendor-field span { font-size: 13px; color: var(--light); }
+    .risk-pill {
+      display: inline-block; padding: 3px 10px; border-radius: 4px;
+      font-size: 11px; font-weight: 700; font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,128,32,0.1); color: var(--orange);
+      border: 1px solid rgba(255,128,32,0.25);
+    }
+    .risk-pill.low {
+      background: rgba(51,205,182,0.1); color: var(--teal);
+      border-color: rgba(51,205,182,0.25);
+    }
+    .risk-pill.medium {
+      background: rgba(255,128,32,0.1); color: var(--orange);
+      border-color: rgba(255,128,32,0.25);
+    }
+
+    /* ── Statement card ── */
+    .statement-card {
+      border-left: 3px solid var(--blue);
+      background: rgba(64,130,232,0.05);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 20px 24px;
+    }
+    .statement-card p { font-size: 14px; line-height: 1.75; color: var(--light); margin-bottom: 12px; }
+    .statement-card p:last-child { margin-bottom: 0; }
+
+    /* ── Effective date bar ── */
+    .effective-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 14px 20px;
+      margin-bottom: 32px; font-size: 12px; color: var(--muted);
+    }
+    .effective-bar strong { color: var(--light); }
+
+    /* ── Footer nav ── */
+    .gov-footnav {
+      display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;
+      padding: 32px 0 16px; border-top: 1px solid var(--glass-border);
+      font-size: 12px;
+    }
+    .gov-footnav a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .gov-footnav a:hover { color: var(--blue); }
+
+    /* ── Container ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Orbs ── */
+    .orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+  </style>
+</head>
+<body>
+<canvas id="star-canvas"></canvas>
+<div class="orb" style="width:520px;height:520px;background:radial-gradient(circle,rgba(64,130,232,0.06) 0%,transparent 70%);top:-140px;left:-120px;"></div>
+<div class="orb" style="width:380px;height:380px;background:radial-gradient(circle,rgba(255,128,32,0.05) 0%,transparent 70%);bottom:-100px;right:-80px;"></div>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
+<header class="app-header">
+  <a href="dashboard.html" class="app-header-logo">
+    <img src="../brand_assets/compass_logo.png" alt="Compass" onerror="this.style.display='none'">
+    <span class="app-header-logo-text">Project Compass</span>
+  </a>
+  <nav class="app-header-right">
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="compliance.html" class="nav-link">Compliance</a>
+    <a href="compass-governance.html" class="nav-link active">AI Governance</a>
+    <a href="inventory.html" class="nav-link">Inventory</a>
+    <a href="report.html" class="nav-link">Reports</a>
+    <div class="user-pill" id="user-pill">
+      <span class="user-pill-icon">◈</span>
+      <span id="user-name-display">Loading…</span>
+    </div>
+  </nav>
+</header>
+
+<!-- ══ MAIN ════════════════════════════════════════════════════════════ -->
+<main>
+  <div class="container">
+
+    <!-- Hero -->
+    <div class="gov-hero">
+      <div class="gov-hero-label">◈ Meta-Governance</div>
+      <h1>Project Compass AI Governance Policy</h1>
+      <p>How Compass governs its own use of artificial intelligence — including the Claude-powered "Explain this Finding" feature — in accordance with NIST AI RMF and OWASP LLM Top 10 2025.</p>
+      <div class="gov-meta-badges">
+        <span class="gov-badge"><span class="dot"></span>NIST AI RMF 1.0</span>
+        <span class="gov-badge"><span class="dot orange"></span>OWASP LLM Top 10 2025</span>
+        <span class="gov-badge"><span class="dot blue"></span>Anthropic Vendor</span>
+      </div>
+    </div>
+
+    <!-- Effective date bar -->
+    <div class="effective-bar reveal">
+      <div>
+        <strong>Document:</strong> AI Governance Policy — Project Compass Platform &nbsp;·&nbsp;
+        <strong>Version:</strong> 1.0 &nbsp;·&nbsp;
+        <strong>Effective:</strong> July 2026
+      </div>
+      <div>
+        <strong>Owner:</strong> Compass Security &amp; Compliance Team &nbsp;·&nbsp;
+        <strong>Review Cycle:</strong> Quarterly
+      </div>
+    </div>
+
+    <!-- ── Section 1: Feature Overview ── -->
+    <div class="gov-section">
+      <div class="section-label reveal">Feature Overview</div>
+      <div class="section-heading reveal reveal-d1">What the AI Feature Does</div>
+
+      <div class="glass-card reveal reveal-d2">
+        <p style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:20px;">
+          The <strong style="color:var(--light)">"Explain this Finding"</strong> button appears on flagged NIST AI RMF controls in the Dashboard. When clicked, it sends a minimal, structured payload to the Anthropic API (Claude Haiku) and returns a 2–3 sentence plain-language explanation of the gap plus three numbered remediation steps. This feature is local-only; it is not available in the static Vercel deployment unless a Vercel environment variable is configured.
+        </p>
+
+        <!-- Data flow diagram -->
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-icon">🖥</div>
+            <div class="flow-node-title">Browser</div>
+            <div class="flow-node-sub">dashboard.html</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-node-icon">⚙</div>
+            <div class="flow-node-title">Proxy API</div>
+            <div class="flow-node-sub">POST /api/explain<br>(serve.mjs)</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node green">
+            <div class="flow-node-icon">✦</div>
+            <div class="flow-node-title">Anthropic API</div>
+            <div class="flow-node-sub">claude-haiku-4-5</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">
+            <div class="flow-node-icon">📋</div>
+            <div class="flow-node-title">Explanation</div>
+            <div class="flow-node-sub">Rendered inline</div>
+          </div>
+        </div>
+
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;">
+          The proxy server (<code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:11px;">serve.mjs</code>) acts as a gatekeeper — the browser never has direct access to the API key, and the proxy enforces what fields are forwarded.  No session data, log contents, organization name, or user identity ever leaves the local server.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Section 2: Data Handling ── -->
+    <div class="gov-section">
+      <div class="section-label reveal">Data Classification</div>
+      <div class="section-heading reveal reveal-d1">What Is and Is Not Sent to Anthropic</div>
+
+      <div class="glass-card reveal reveal-d2" style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data Field</th>
+              <th>Sent to Claude?</th>
+              <th>Classification</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>control_id</code> (e.g. <code>GV.PO-1</code>)</td>
+              <td><span class="sent-yes">✓ YES</span></td>
+              <td>Public standard</td>
+              <td>NIST AI RMF control identifier — not org-specific</td>
+            </tr>
+            <tr>
+              <td><code>control_name</code> (e.g. "AI Risk Policy")</td>
+              <td><span class="sent-yes">✓ YES</span></td>
+              <td>Public standard</td>
+              <td>Human-readable label from public NIST framework</td>
+            </tr>
+            <tr>
+              <td><code>status</code> (GAP / PARTIAL / MET)</td>
+              <td><span class="sent-yes">✓ YES</span></td>
+              <td>Non-identifying</td>
+              <td>Structural enum value, not org-specific</td>
+            </tr>
+            <tr>
+              <td><code>finding_text</code></td>
+              <td><span class="sent-yes">✓ YES</span></td>
+              <td>Non-identifying</td>
+              <td>Template string: "Control X — 'Name' is unmet…" — no org name, log content, or user data</td>
+            </tr>
+            <tr>
+              <td>Organization name (<code>org_name</code>)</td>
+              <td><span class="sent-no">✗ NO</span></td>
+              <td>Sensitive — PII</td>
+              <td>Stays in <code>compass_session</code> in browser only</td>
+            </tr>
+            <tr>
+              <td>Log file contents</td>
+              <td><span class="sent-no">✗ NO</span></td>
+              <td>Sensitive — operational</td>
+              <td>Never leaves the browser; processed client-side</td>
+            </tr>
+            <tr>
+              <td>User name or email</td>
+              <td><span class="sent-no">✗ NO</span></td>
+              <td>Sensitive — PII</td>
+              <td>Stays in MSAL session; never in API payload</td>
+            </tr>
+            <tr>
+              <td>AI tool inventory (<code>inv_overrides</code>)</td>
+              <td><span class="sent-no">✗ NO</span></td>
+              <td>Sensitive — operational</td>
+              <td>Session-only; not included in any server call</td>
+            </tr>
+            <tr>
+              <td>NIST gap scores / counts</td>
+              <td><span class="sent-no">✗ NO</span></td>
+              <td>Sensitive — operational</td>
+              <td>Dashboard computed client-side; not forwarded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Section 3: NIST AI RMF Mapping ── -->
+    <div class="gov-section">
+      <div class="section-label reveal">Framework Mapping</div>
+      <div class="section-heading reveal reveal-d1">NIST AI RMF Controls — Compass's Own AI System</div>
+      <p class="reveal reveal-d2" style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px;">Compass applies the same NIST AI RMF lens to itself that it uses to audit client AI tools. The table below shows how each core function applies to the "Explain this Finding" Claude integration.</p>
+
+      <div class="nist-grid">
+        <div class="nist-card reveal">
+          <div class="nist-card-id">GV.PO-1 — GOVERN</div>
+          <div class="nist-card-title">AI Risk Policy</div>
+          <div class="nist-card-body">This document constitutes Compass's AI usage policy for the platform. It defines scope, data classification, vendor accountability, and review cadence for the Claude integration.</div>
+          <div class="nist-status status-met">Met</div>
+        </div>
+
+        <div class="nist-card reveal reveal-d1">
+          <div class="nist-card-id">GV.OV-1 — GOVERN</div>
+          <div class="nist-card-title">Organizational Oversight</div>
+          <div class="nist-card-body">The Compass Security &amp; Compliance Team owns this policy. Review occurs quarterly or upon any change to the Claude integration payload, model, or vendor terms.</div>
+          <div class="nist-status status-met">Met</div>
+        </div>
+
+        <div class="nist-card reveal reveal-d2">
+          <div class="nist-card-id">GV.AT-1 — GOVERN</div>
+          <div class="nist-card-title">AI Literacy and Awareness</div>
+          <div class="nist-card-body">Every AI-generated explanation carries an inline disclosure note: "Generated by Claude (Anthropic) · Only control ID and description were sent — no org data or log content." Users are never left unaware they are reading AI output.</div>
+          <div class="nist-status status-met">Met</div>
+        </div>
+
+        <div class="nist-card reveal reveal-d3">
+          <div class="nist-card-id">MP.AC-1 — MAP</div>
+          <div class="nist-card-title">AI Context Established</div>
+          <div class="nist-card-body">The system prompt instructs Claude to act as a "concise NIST AI RMF compliance advisor," constraining outputs to the compliance domain. Off-domain responses are not solicited or expected.</div>
+          <div class="nist-status status-met">Met</div>
+        </div>
+
+        <div class="nist-card reveal">
+          <div class="nist-card-id">MS.MC-1 — MEASURE</div>
+          <div class="nist-card-title">Trustworthiness Evaluation</div>
+          <div class="nist-card-body">Explanations are advisory only. The disclosure note reinforces that users should verify AI guidance against official NIST documentation. No automated decisions are made from Claude outputs.</div>
+          <div class="nist-status status-partial">Partial — advisory use</div>
+        </div>
+
+        <div class="nist-card reveal reveal-d1">
+          <div class="nist-card-id">MG.AN-1 — MANAGE</div>
+          <div class="nist-card-title">AI Incident Monitoring</div>
+          <div class="nist-card-body">Server-side errors from the Anthropic API are logged to the local console with prefix <code>[/api/explain]</code>. Production deployments should route these to a log aggregator. Hallucination incidents should be reported to the Compass team.</div>
+          <div class="nist-status status-partial">Partial — prod logging TBD</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Section 4: OWASP LLM Top 10 ── -->
+    <div class="gov-section">
+      <div class="section-label reveal">Security Controls</div>
+      <div class="section-heading reveal reveal-d1">OWASP LLM Top 10 2025 — Applied Controls</div>
+
+      <div class="glass-card reveal reveal-d2" style="overflow-x:auto;">
+        <table class="owasp-table">
+          <thead>
+            <tr>
+              <th style="width:90px;">OWASP ID</th>
+              <th style="width:180px;">Risk</th>
+              <th>Control Applied</th>
+              <th style="width:90px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="owasp-id">LLM01:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Prompt Injection</td>
+              <td style="font-size:12px;color:var(--muted);">User has no free-text input field that reaches the LLM. The payload is a fixed template constructed server-side from whitelisted fields (<code style="color:var(--teal)">control_id</code>, <code style="color:var(--teal)">control_name</code>, <code style="color:var(--teal)">status</code>, <code style="color:var(--teal)">finding_text</code>). Template strings contain no user-supplied text.</td>
+              <td><span class="control-chip chip-applied">Applied</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM02:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Sensitive Information Disclosure</td>
+              <td style="font-size:12px;color:var(--muted);">Data classification table above confirms no PII, org name, log content, or inventory data is sent. Proxy enforces the allowlist at the server layer, not the client layer.</td>
+              <td><span class="control-chip chip-applied">Applied</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM03:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Supply Chain</td>
+              <td style="font-size:12px;color:var(--muted);">Anthropic is a named, contracted vendor. Model version (<code style="color:var(--teal)">claude-haiku-4-5-20251001</code>) is pinned in code. Vendor risk assessment (Section 5) is reviewed quarterly.</td>
+              <td><span class="control-chip chip-applied">Applied</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM04:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Data and Model Poisoning</td>
+              <td style="font-size:12px;color:var(--muted);">Compass does not fine-tune or provide training feedback to Claude. Read-only inference only. Not applicable to this integration.</td>
+              <td><span class="control-chip chip-na">N/A</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM05:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Improper Output Handling</td>
+              <td style="font-size:12px;color:var(--muted);">Claude output is HTML-escaped via <code style="color:var(--teal)">escHtml()</code> before injection into the DOM. Only <code style="color:var(--teal)">&lt;strong&gt;</code> tags are allowed (from <code>**bold**</code> markdown conversion). No raw HTML from Claude is ever rendered.</td>
+              <td><span class="control-chip chip-applied">Applied</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM06:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Excessive Agency</td>
+              <td style="font-size:12px;color:var(--muted);">Claude has no tools, no memory, no ability to take actions. It returns text only. The system prompt explicitly scopes it to "concise NIST AI RMF advisor." Outputs are advisory and never trigger automated decisions.</td>
+              <td><span class="control-chip chip-applied">Applied</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM07:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">System Prompt Leakage</td>
+              <td style="font-size:12px;color:var(--muted);">The system prompt contains no secrets, keys, or confidential instructions. It is a behavior directive only. Leaking it would not create a security risk.</td>
+              <td><span class="control-chip chip-applied">Applied</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM08:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Vector and Embedding Weaknesses</td>
+              <td style="font-size:12px;color:var(--muted);">No vector database, RAG pipeline, or embeddings are used. Not applicable to this integration.</td>
+              <td><span class="control-chip chip-na">N/A</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM09:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Misinformation</td>
+              <td style="font-size:12px;color:var(--muted);">Every explanation is labeled "Generated by Claude · advisory only." Users are directed to verify guidance against official NIST documentation. The feature description uses "advisory" language throughout, not "authoritative."</td>
+              <td><span class="control-chip chip-partial">Residual risk</span></td>
+            </tr>
+            <tr>
+              <td><span class="owasp-id">LLM10:2025</span></td>
+              <td style="color:var(--light);font-size:12px;">Unbounded Consumption</td>
+              <td style="font-size:12px;color:var(--muted);">Token limit is capped at 400 per call (<code style="color:var(--teal)">max_tokens: 400</code>). The API key is gated server-side; the browser cannot call Anthropic directly or in a loop. Rate limiting and cost monitoring are the operator's responsibility via Anthropic console.</td>
+              <td><span class="control-chip chip-applied">Applied</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Section 5: Vendor Risk ── -->
+    <div class="gov-section">
+      <div class="section-label reveal">Vendor Risk</div>
+      <div class="section-heading reveal reveal-d1">Anthropic — Third-Party AI Vendor Assessment</div>
+
+      <div class="glass-card reveal reveal-d2">
+        <div class="vendor-card">
+          <div class="vendor-field">
+            <label>Vendor Name</label>
+            <span>Anthropic, PBC</span>
+          </div>
+          <div class="vendor-field">
+            <label>Service Used</label>
+            <span>Anthropic Messages API (Claude Haiku)</span>
+          </div>
+          <div class="vendor-field">
+            <label>Model Pinned</label>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);">claude-haiku-4-5-20251001</span>
+          </div>
+          <div class="vendor-field">
+            <label>Data Sent</label>
+            <span>NIST control IDs and descriptions only — no PII, no org data</span>
+          </div>
+          <div class="vendor-field">
+            <label>Inherent Risk</label>
+            <span><span class="risk-pill medium">Medium</span></span>
+          </div>
+          <div class="vendor-field">
+            <label>Residual Risk</label>
+            <span><span class="risk-pill low">Low</span></span>
+          </div>
+          <div class="vendor-field">
+            <label>Data Retention by Vendor</label>
+            <span>Anthropic's API usage policy may log prompts for safety monitoring. See <em>Anthropic Privacy Policy</em> (api.anthropic.com/privacy).</span>
+          </div>
+          <div class="vendor-field">
+            <label>Mitigation</label>
+            <span>Sending only public-standard identifiers (not org-specific data) limits the sensitivity of any retained logs.</span>
+          </div>
+          <div class="vendor-field">
+            <label>Authentication</label>
+            <span>API key stored in <code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:11px;">.env</code> (gitignored) locally; Vercel environment variable in production. Never committed to source control.</span>
+          </div>
+          <div class="vendor-field">
+            <label>Next Review</label>
+            <span>October 2026 (quarterly cadence)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Section 6: Responsible Use Statement ── -->
+    <div class="gov-section">
+      <div class="section-label reveal">Responsible Use</div>
+      <div class="section-heading reveal reveal-d1">Responsible AI Use Statement</div>
+
+      <div class="statement-card reveal reveal-d2">
+        <p>Project Compass uses AI to augment, not replace, human compliance judgment. The "Explain this Finding" feature is designed to help compliance professionals understand NIST AI RMF control gaps more quickly — it is not a substitute for qualified professional review, legal counsel, or official NIST guidance.</p>
+        <p>Compass limits AI system scope to the minimum necessary: one feature, advisory outputs only, no automated decisions, no sensitive data transmitted. This reflects our commitment to the same responsible-AI principles we help our users assess in their own tools.</p>
+        <p>Users who observe unexpected, harmful, or inaccurate AI outputs should report them to the Compass team so they can be investigated and, where appropriate, used to improve the system prompt or disable the feature.</p>
+        <p style="color:var(--muted);font-size:12px;">This policy is reviewed quarterly. Changes to the AI integration that alter data flow, model, or vendor require an updated review before deployment.</p>
+      </div>
+    </div>
+
+    <!-- Footer nav -->
+    <div class="gov-footnav reveal">
+      <a href="compliance.html">← Compliance Reference</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="report.html">Reports</a>
+      <a href="../index.html">Public Site</a>
+    </div>
+
+  </div><!-- /container -->
+</main>
+
+<script>
+  // ── Starfield ──
+  (function(){
+    const canvas = document.getElementById('star-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, stars = [];
+    function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    function init(){
+      resize();
+      stars = Array.from({length:220}, () => ({
+        x: Math.random()*W, y: Math.random()*H,
+        r: Math.random()*1.1+0.2,
+        a: Math.random(), da: (Math.random()-0.5)*0.003
+      }));
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      stars.forEach(s=>{
+        s.a = Math.max(0.05, Math.min(1, s.a + s.da));
+        if (s.a<=0.05||s.a>=1) s.da=-s.da;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${s.a*0.45})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', resize);
+    init(); draw();
+  })();
+
+  // ── Scroll-reveal ──
+  (function(){
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+    },{threshold:0.1});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  })();
+
+  // ── User pill ──
+  (function(){
+    try {
+      const s = JSON.parse(sessionStorage.getItem('compass_session') || '{}');
+      const el = document.getElementById('user-name-display');
+      if (el) el.textContent = s.user_name || s.user?.name?.split(' ')[0] || 'User';
+    } catch(e){}
+  })();
+</script>
+</body>
+</html>
