@@ -200,6 +200,52 @@
     .nav-links a:hover { color: var(--blue); border-bottom-color: var(--blue); }
     .nav-right { display: flex; align-items: center; gap: 2.5rem; }
 
+    /* ── Nav dropdown ── */
+    .nav-links .nav-dropdown { position: relative; }
+    .nav-dropdown-btn {
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500; font-size: 0.8125rem;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--gray-light);
+      background: transparent; border: none; cursor: pointer;
+      padding-bottom: 2px; border-bottom: 2px solid transparent;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .nav-dropdown-btn:hover,
+    .nav-dropdown.open .nav-dropdown-btn {
+      color: var(--blue); border-bottom-color: var(--blue);
+    }
+    .nav-dropdown-caret {
+      font-size: 10px; display: inline-block;
+      transition: transform 0.2s;
+    }
+    .nav-dropdown.open .nav-dropdown-caret { transform: rotate(180deg); }
+    .nav-dropdown-menu {
+      position: absolute; top: calc(100% + 14px); left: 50%;
+      transform: translateX(-50%);
+      min-width: 200px;
+      background: rgba(7, 21, 48, 0.97);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(64,130,232,0.18);
+      border-radius: 10px; padding: 6px;
+      display: none; z-index: 500;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .nav-dropdown.open .nav-dropdown-menu { display: block; }
+    .nav-dropdown-item {
+      display: block; padding: 9px 14px; border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      color: rgba(208,212,226,0.7); text-decoration: none;
+      border-bottom: none;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-dropdown-item:hover {
+      color: var(--blue); background: rgba(64,130,232,0.1);
+    }
+
     /* ────────────────────────────────────────
        BUTTONS
     ──────────────────────────────────────── */
@@ -676,7 +722,15 @@
       <li><a href="#features">Features</a></li>
       <li><a href="#for-teams">For Teams</a></li>
       <li><a href="app/info.html">About</a></li>
-      <li><a href="app/compliance.html">Compliance</a></li>
+      <li class="nav-dropdown" id="landing-gov-dd">
+        <button class="nav-dropdown-btn" onclick="toggleLandingDD()">
+          Governance <span class="nav-dropdown-caret">▾</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="app/compliance.html" class="nav-dropdown-item">Compliance Reference</a>
+          <a href="app/compass-governance.html" class="nav-dropdown-item">AI Governance Policy</a>
+        </div>
+      </li>
     </ul>
 
     <div class="nav-right">
@@ -1603,6 +1657,15 @@
     window.location.reload();
   };
 })();
+
+// ── Nav governance dropdown ──
+function toggleLandingDD() {
+  document.getElementById('landing-gov-dd').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('landing-gov-dd');
+  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+});
 </script>
 
 </body>
