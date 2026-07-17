@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    .info-hero {
+      text-align: center;
+      padding: 52px 0 44px;
+    }
+    .info-hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(51,205,182,0.08);
+      border: 1px solid rgba(51,205,182,0.2);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 22px;
+    }
+    .info-hero h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .info-hero p {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.75;
+    }
+
+    .section-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+    .section-heading {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+    .section-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 680px;
+    }
+
+    .info-section { margin-bottom: 52px; }
+
+    .divider-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glass-border) 25%, var(--glass-border) 75%, transparent);
+      margin: 44px 0;
+    }
+
+    /* ---- Flow steps ---- */
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .flow-step {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 22px 22px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .flow-step-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .bar-blue   { background: var(--blue); }
+    .bar-teal   { background: var(--teal); }
+    .bar-orange { background: var(--orange); }
+    .bar-grad   { background: linear-gradient(90deg, var(--blue), var(--teal)); }
+
+    .flow-step-num {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .flow-step-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--light);
+      margin-bottom: 8px;
+    }
+    .flow-step-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ---- Feature cards ---- */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .feature-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 20px 22px 22px;
+    }
+    .feature-card-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--light);
+      margin-bottom: 7px;
+    }
+    .feature-card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ---- Format tags ---- */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .tag {
+      background: rgba(9,26,54,0.7);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+    .tag-teal   { color: var(--teal); }
+    .tag-blue   { color: var(--blue); }
+    .tag-orange { color: var(--orange); }
+    .tag-red    { color: var(--danger); }
+    .tag-yellow { color: #f5c842; }
+
+    /* ---- Privacy grid ---- */
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .privacy-card {
+      background: rgba(51,205,182,0.04);
+      border: 1px solid rgba(51,205,182,0.14);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+    .privacy-card-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+    .privacy-card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ---- Capstone note ---- */
+    .capstone-banner {
+      background: rgba(64,130,232,0.05);
+      border: 1px solid rgba(64,130,232,0.15);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-top: 28px;
+    }
+    .capstone-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 2px;
+    }
+    .capstone-text {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .capstone-text strong {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--blue);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ---- CTA ---- */
+    .cta-row {
+      text-align: center;
+      padding: 40px 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .cta-btn-primary {
+      background: linear-gradient(135deg,var(--blue),#2d64c4);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .cta-btn-outline {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      padding: 10px 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .cta-btn-outline:hover { border-color: rgba(64,130,232,0.4); color: var(--light); }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <a class="app-header-logo" href="../index.html">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <nav class="app-header-nav">
+      <a href="../index.html" class="app-nav-link">Home</a>
+      <a href="info.html"       class="app-nav-link active">About</a>
+      <a href="compliance.html" class="app-nav-link">Compliance</a>
+    </nav>
+    <div class="app-header-right">
+      <a href="login.html" class="cta-btn-primary">Run Assessment</a>
+    </div>
+  </header>
+
+  <main class="page-content-wide">
+
+    <!-- ── Hero ── -->
+    <div class="info-hero">
+      <div class="info-hero-label">
+        <span class="org-badge-dot"></span>
+        About the Project
+      </div>
+      <h1>Understanding Project Compass</h1>
+      <p>A capstone AI governance tool that helps organizations discover, assess, and manage AI tool risk — entirely in the browser, with no data leaving your device.</p>
+    </div>
+
+    <!-- ── How It Works ── -->
+    <div class="info-section">
+      <div class="section-eyebrow">Workflow</div>
+      <div class="section-heading">How Project Compass Works</div>
+      <p class="section-body">Compass follows a four-step pipeline that takes raw network logs and produces a structured AI risk report aligned to the NIST AI Risk Management Framework.</p>
+
+      <div class="flow-grid">
+        <div class="flow-step">
+          <div class="flow-step-bar bar-blue"></div>
+          <div class="flow-step-num">Step 01</div>
+          <div class="flow-step-title">Upload Logs</div>
+          <div class="flow-step-desc">Provide network or proxy logs (DNS, HTTP, firewall exports) from your organization. Files are read locally in your browser — nothing is uploaded to any server.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-bar bar-teal"></div>
+          <div class="flow-step-num">Step 02</div>
+          <div class="flow-step-title">Detect AI Tools</div>
+          <div class="flow-step-desc">The log parser matches hostnames against a registry of known AI service domains — OpenAI, Anthropic, Copilot, Hugging Face, and hundreds more — and assigns each a risk tier.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-bar bar-orange"></div>
+          <div class="flow-step-num">Step 03</div>
+          <div class="flow-step-title">Assess Controls</div>
+          <div class="flow-step-desc">A structured questionnaire maps your existing policies against NIST AI RMF control domains. Responses generate a maturity score and gap analysis across Govern, Map, Measure, and Manage.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-bar bar-grad"></div>
+          <div class="flow-step-num">Step 04</div>
+          <div class="flow-step-title">Generate Report</div>
+          <div class="flow-step-desc">Three audience-specific views — IT Security, Executive, and Auditor — summarize posture, risk score, maturity rating, and prioritized remediation recommendations.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ── Log Parser ── -->
+    <div class="info-section">
+      <div class="section-eyebrow">Log Parser</div>
+      <div class="section-heading">What the Parser Analyzes</div>
+      <p class="section-body">The log parser is the detection engine at the core of Compass. It reads structured log files and matches hostnames and endpoints against a curated registry of known AI service domains, returning enriched tool metadata for each match.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-title">Supported File Formats</div>
+          <div class="feature-card-desc">Accepts common network log formats exported from proxy servers, next-gen firewalls, and DNS resolvers.</div>
+          <div class="tag-row">
+            <span class="tag tag-teal">.log</span>
+            <span class="tag tag-teal">.txt</span>
+            <span class="tag tag-teal">.csv</span>
+            <span class="tag tag-teal">.json</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-title">Extracted Fields</div>
+          <div class="feature-card-desc">For each detected AI tool, the parser surfaces the following attributes from the registry lookup.</div>
+          <div class="tag-row">
+            <span class="tag tag-blue">Tool Name</span>
+            <span class="tag tag-blue">Vendor</span>
+            <span class="tag tag-blue">Category</span>
+            <span class="tag tag-blue">Risk Level</span>
+            <span class="tag tag-blue">Data Class</span>
+            <span class="tag tag-blue">Frequency</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-title">Risk Tier Assignment</div>
+          <div class="feature-card-desc">Each tool is automatically tiered based on data exposure potential, external connectivity, and model type.</div>
+          <div class="tag-row">
+            <span class="tag tag-red">Critical</span>
+            <span class="tag tag-orange">High</span>
+            <span class="tag tag-yellow">Medium</span>
+            <span class="tag tag-teal">Low</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-title">Tool Categories Detected</div>
+          <div class="feature-card-desc">The registry covers major categories of AI tools in enterprise environments.</div>
+          <div class="tag-row">
+            <span class="tag tag-blue">LLM / Chat</span>
+            <span class="tag tag-blue">Code Assistant</span>
+            <span class="tag tag-blue">Image Gen</span>
+            <span class="tag tag-blue">Data Pipeline</span>
+            <span class="tag tag-blue">Voice / Speech</span>
+            <span class="tag tag-blue">Search / RAG</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ── AI Registry / Inventory ── -->
+    <div class="info-section">
+      <div class="section-eyebrow">AI Registry</div>
+      <div class="section-heading">The AI Tool Inventory</div>
+      <p class="section-body">After detection, every identified tool is added to an AI Inventory — a structured registry your team can review, annotate, and act on. This gives you a living record of AI usage across your organization and the foundation for a governance decision log.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-title">Per-Tool Metadata</div>
+          <div class="feature-card-desc">Tool name, vendor, category, risk level, data classification, and relative access frequency derived from log volume.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">Approval Workflow</div>
+          <div class="feature-card-desc">Each tool is individually marked <span style="color:var(--teal);">Approved</span>, <span style="color:#f5c842;">Under Review</span>, or <span style="color:#e05c5c;">Blocked</span> — tracking governance decisions at the tool level.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">Analyst Notes</div>
+          <div class="feature-card-desc">Expand any inventory row to add free-text notes — document exceptions, risk acceptance rationale, or remediation steps per tool.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-title">Session Storage</div>
+          <div class="feature-card-desc">Inventory and notes persist within your active browser session. Persistent cross-session storage backed by a database is planned for a future release.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ── Reports ── -->
+    <div class="info-section">
+      <div class="section-eyebrow">Reporting</div>
+      <div class="section-heading">Three Audience-Tuned Report Views</div>
+      <p class="section-body">The same assessment data is presented three ways so each stakeholder gets exactly the signal they need — without wading through sections written for a different audience.</p>
+
+      <div class="flow-grid">
+        <div class="flow-step" style="border-color:rgba(64,130,232,0.2);">
+          <div class="flow-step-bar bar-blue"></div>
+          <div class="flow-step-title">IT Security View</div>
+          <div class="flow-step-desc">Full tool list with risk tiers, per-control gap analysis, OWASP LLM mapping, and technical remediation actions sorted by severity.</div>
+        </div>
+        <div class="flow-step" style="border-color:rgba(51,205,182,0.2);">
+          <div class="flow-step-bar bar-teal"></div>
+          <div class="flow-step-title">Executive View</div>
+          <div class="flow-step-desc">One-page posture summary with a risk score, maturity rating, and three strategic recommendations — designed for a 5-minute briefing.</div>
+        </div>
+        <div class="flow-step" style="border-color:rgba(255,128,32,0.2);">
+          <div class="flow-step-bar bar-orange"></div>
+          <div class="flow-step-title">Auditor View</div>
+          <div class="flow-step-desc">NIST AI RMF control-by-control coverage table, evidence notes, and a compliance posture declaration formatted for audit documentation.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ── Privacy ── -->
+    <div class="info-section">
+      <div class="section-eyebrow">Data &amp; Privacy</div>
+      <div class="section-heading">No Data Leaves Your Browser</div>
+      <p class="section-body">Project Compass is a client-side application. Your log files, questionnaire answers, and generated reports are processed entirely within your browser tab and are never transmitted to any external server.</p>
+
+      <div class="privacy-grid">
+        <div class="privacy-card">
+          <div class="privacy-card-label">Log Files</div>
+          <div class="privacy-card-desc">Parsed in-browser using the File API. The raw file content is never uploaded to any server.</div>
+        </div>
+        <div class="privacy-card">
+          <div class="privacy-card-label">Session Data</div>
+          <div class="privacy-card-desc">Detection results, assessment answers, and inventory state are held in <code>sessionStorage</code> and cleared automatically when you close the tab.</div>
+        </div>
+        <div class="privacy-card">
+          <div class="privacy-card-label">Profile</div>
+          <div class="privacy-card-desc">Org name, your name, and role are saved to <code>localStorage</code> for returning-user convenience. Cleared on Sign Out.</div>
+        </div>
+        <div class="privacy-card">
+          <div class="privacy-card-label">Authentication</div>
+          <div class="privacy-card-desc">Identity via Microsoft Entra External ID using PKCE flow. Tokens stay browser-side; no Compass server holds your credentials.</div>
+        </div>
+      </div>
+
+      <div class="capstone-banner">
+        <div class="capstone-icon">🎓</div>
+        <div class="capstone-text">
+          <strong>Academic Context</strong>
+          Project Compass is a capstone project developed for the Master of Information and Cybersecurity (MICS) program. It is intended as a demonstration of AI governance concepts and tooling, not a production security product. Use of sample or synthetic log data is recommended for demo purposes.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CTA ── -->
+    <div class="cta-row">
+      <a href="login.html" class="cta-btn-primary">Run Your Assessment</a>
+      <a href="compliance.html" class="cta-btn-outline">View Compliance Reference →</a>
+    </div>
+
+  </main>
+</body>
+</html>

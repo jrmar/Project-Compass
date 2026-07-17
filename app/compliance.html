@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Compass — Compliance Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    .comp-hero {
+      text-align: center;
+      padding: 48px 0 40px;
+    }
+    .comp-hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(64,130,232,0.08);
+      border: 1px solid rgba(64,130,232,0.2);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 20px;
+    }
+    .comp-hero h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .comp-hero p {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 20px;
+      line-height: 1.75;
+    }
+    .updated-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(9,26,54,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .updated-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      flex-shrink: 0;
+    }
+
+    .comp-section { margin-bottom: 52px; }
+    .section-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+    .section-heading {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .section-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 680px;
+      margin-bottom: 24px;
+    }
+
+    .divider-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glass-border) 25%, var(--glass-border) 75%, transparent);
+      margin: 44px 0;
+    }
+
+    /* ── NIST Function Cards ── */
+    .nist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .nist-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 22px 22px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .nist-card-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .nist-fn-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .nist-fn-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .nist-fn-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .nist-compass-row {
+      background: rgba(64,130,232,0.05);
+      border: 1px solid rgba(64,130,232,0.12);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .nist-compass-row strong {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--blue);
+      display: block;
+      margin-bottom: 3px;
+    }
+    .nist-key-activities {
+      margin: 10px 0 14px;
+      padding-left: 0;
+      list-style: none;
+    }
+    .nist-key-activities li {
+      font-size: 11px;
+      color: var(--muted);
+      padding: 3px 0 3px 14px;
+      position: relative;
+      line-height: 1.5;
+    }
+    .nist-key-activities li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--glass-border);
+    }
+
+    /* ── OWASP table ── */
+    .owasp-table-wrap { overflow-x: auto; }
+    .owasp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .owasp-table th {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      white-space: nowrap;
+    }
+    .owasp-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(64,130,232,0.07);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    .owasp-table tr:last-child td { border-bottom: none; }
+    .owasp-table tr:hover td { background: rgba(64,130,232,0.03); }
+
+    .owasp-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue);
+      white-space: nowrap;
+    }
+    .owasp-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 3px;
+    }
+    .owasp-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Detection badge */
+    .detect-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .detect-yes     { background: rgba(51,205,182,0.1);  border: 1px solid rgba(51,205,182,0.25); color: var(--teal); }
+    .detect-partial { background: rgba(245,200,66,0.1);  border: 1px solid rgba(245,200,66,0.25); color: #f5c842; }
+    .detect-no      { background: rgba(208,212,226,0.06); border: 1px solid rgba(208,212,226,0.12); color: var(--muted); }
+
+    /* ── Risk reference ── */
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .risk-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .risk-card-bar {
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+    }
+    .risk-card { padding-left: 22px; }
+    .risk-level {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .risk-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .risk-examples {
+      font-size: 10px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .bar-critical { background: #e05c5c; }
+    .bar-high     { background: var(--orange); }
+    .bar-medium   { background: #f5c842; }
+    .bar-low      { background: var(--teal); }
+
+    .color-critical { color: #e05c5c; }
+    .color-high     { color: var(--orange); }
+    .color-medium   { color: #f5c842; }
+    .color-low      { color: var(--teal); }
+
+    /* ── Framework version badges ── */
+    .framework-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .fw-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(9,26,54,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* ── update note ── */
+    .update-note {
+      background: rgba(64,130,232,0.04);
+      border: 1px solid rgba(64,130,232,0.14);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .update-note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .update-note a { color: var(--blue); text-underline-offset: 2px; }
+
+    .cta-row {
+      text-align: center;
+      padding: 40px 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .cta-btn-primary {
+      background: linear-gradient(135deg,var(--blue),#2d64c4);
+      color: #fff; border: none; border-radius: 6px;
+      padding: 10px 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; display: inline-block;
+    }
+    .cta-btn-outline {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--glass-border); border-radius: 6px;
+      padding: 10px 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; display: inline-block;
+    }
+    .cta-btn-outline:hover { border-color: rgba(64,130,232,0.4); color: var(--light); }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <a class="app-header-logo" href="../index.html">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <nav class="app-header-nav">
+      <a href="../index.html"   class="app-nav-link">Home</a>
+      <a href="info.html"       class="app-nav-link">About</a>
+      <a href="compliance.html" class="app-nav-link active">Compliance</a>
+    </nav>
+    <div class="app-header-right">
+      <a href="login.html" style="background:linear-gradient(135deg,var(--blue),#2d64c4);color:#fff;border-radius:6px;padding:7px 16px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;text-decoration:none;">Run Assessment</a>
+    </div>
+  </header>
+
+  <main class="page-content-wide">
+
+    <!-- ── Hero ── -->
+    <div class="comp-hero">
+      <div class="comp-hero-label">
+        <span class="org-badge-dot" style="background:var(--blue);box-shadow:0 0 6px var(--blue);"></span>
+        Compliance Reference
+      </div>
+      <h1>Frameworks &amp; Standards</h1>
+      <p>How Project Compass aligns to NIST AI RMF, NIST SP 800-218A, and the OWASP Top 10 for LLM Applications — and how to interpret risk across these frameworks.</p>
+      <div class="updated-badge">
+        <div class="updated-dot"></div>
+        Content last reviewed: July 2025
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         NIST AI RMF
+    ══════════════════════════════════════════ -->
+    <div class="comp-section">
+      <div class="section-eyebrow">NIST AI 100-1</div>
+      <div class="section-heading">NIST AI Risk Management Framework</div>
+      <p class="section-body">The NIST AI RMF (January 2023) provides a voluntary, flexible framework for managing risks associated with AI systems throughout their lifecycle. It is organized into four core functions.</p>
+
+      <div class="framework-meta">
+        <span class="fw-badge">NIST AI 100-1</span>
+        <span class="fw-badge">Published: January 2023</span>
+        <span class="fw-badge">Voluntary</span>
+        <span class="fw-badge">Lifecycle-spanning</span>
+      </div>
+
+      <div class="nist-grid">
+
+        <!-- GOVERN -->
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:var(--blue);"></div>
+          <div class="nist-fn-label" style="color:var(--blue);">Function 1</div>
+          <div class="nist-fn-name">GOVERN</div>
+          <div class="nist-fn-desc">Establishes the organizational culture, policies, and accountability structures needed for responsible AI risk management across the enterprise.</div>
+          <ul class="nist-key-activities">
+            <li>Define AI risk tolerance and appetite</li>
+            <li>Establish roles, responsibilities, accountability</li>
+            <li>Build AI risk governance policies</li>
+            <li>Train staff on AI risk concepts</li>
+          </ul>
+          <div class="nist-compass-row">
+            <strong>Compass Support</strong>
+            Org profile setup and role-based report views reflect GOVERN by capturing who uses AI and in what capacity, establishing accountability context for each assessment.
+          </div>
+        </div>
+
+        <!-- MAP -->
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:var(--teal);"></div>
+          <div class="nist-fn-label" style="color:var(--teal);">Function 2</div>
+          <div class="nist-fn-name">MAP</div>
+          <div class="nist-fn-desc">Establishes the context in which AI systems operate and identifies the risks, impacts, and harms associated with each system and use case.</div>
+          <ul class="nist-key-activities">
+            <li>Categorize AI tools and use cases</li>
+            <li>Identify stakeholders and impacted groups</li>
+            <li>Document data sources and provenance</li>
+            <li>Assess organizational exposure</li>
+          </ul>
+          <div class="nist-compass-row">
+            <strong>Compass Support</strong>
+            The log-based AI tool discovery phase (Detect) directly fulfills MAP — surfacing what AI systems exist, their categories, vendors, and risk tiers.
+          </div>
+        </div>
+
+        <!-- MEASURE -->
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:var(--orange);"></div>
+          <div class="nist-fn-label" style="color:var(--orange);">Function 3</div>
+          <div class="nist-fn-name">MEASURE</div>
+          <div class="nist-fn-desc">Analyzes and assesses identified AI risks, impacts, and uncertainties — including bias, explainability, robustness, and privacy concerns.</div>
+          <ul class="nist-key-activities">
+            <li>Evaluate risks against defined criteria</li>
+            <li>Test for bias and fairness</li>
+            <li>Assess explainability and transparency</li>
+            <li>Track residual risks over time</li>
+          </ul>
+          <div class="nist-compass-row">
+            <strong>Compass Support</strong>
+            The NIST control questionnaire (Assess phase) measures your organization's maturity across each RMF domain, producing a gap score that quantifies current vs. target posture.
+          </div>
+        </div>
+
+        <!-- MANAGE -->
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:linear-gradient(180deg,var(--blue),var(--teal));"></div>
+          <div class="nist-fn-label" style="color:var(--light);">Function 4</div>
+          <div class="nist-fn-name">MANAGE</div>
+          <div class="nist-fn-desc">Prioritizes and addresses identified risks through treatment plans, monitoring protocols, incident response, and ongoing documentation.</div>
+          <ul class="nist-key-activities">
+            <li>Develop risk treatment plans</li>
+            <li>Implement monitoring and response</li>
+            <li>Document decisions and residual risks</li>
+            <li>Continuously improve controls</li>
+          </ul>
+          <div class="nist-compass-row">
+            <strong>Compass Support</strong>
+            Report phase delivers prioritized remediation recommendations. The inventory approval workflow (Approved / Review / Blocked) creates a traceable management decision log.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="update-note">
+        <div class="update-note-icon">ℹ️</div>
+        <div>NIST released the AI RMF Playbook alongside AI 100-1, providing actionable guidance for each subcategory. A companion document, <strong>NIST AI 600-1</strong> (Generative AI), was published in July 2024 and addresses specific risks from large language models. Check <a href="https://airc.nist.gov" target="_blank" rel="noopener">airc.nist.gov</a> for the latest publications.</div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ══════════════════════════════════════════
+         NIST SP 800-218A
+    ══════════════════════════════════════════ -->
+    <div class="comp-section">
+      <div class="section-eyebrow">NIST SP 800-218A</div>
+      <div class="section-heading">Secure Software Development for AI</div>
+      <p class="section-body">NIST SP 800-218A extends the Secure Software Development Framework (SSDF) to address unique challenges in AI and machine learning system development, including model training, data pipelines, and generative AI integrations.</p>
+
+      <div class="framework-meta">
+        <span class="fw-badge">NIST SP 800-218A</span>
+        <span class="fw-badge">Initial Draft: August 2024</span>
+        <span class="fw-badge">Extends SSDF (SP 800-218)</span>
+      </div>
+
+      <div class="nist-grid">
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:var(--blue);"></div>
+          <div class="nist-fn-label" style="color:var(--blue);">PO</div>
+          <div class="nist-fn-name">Prepare the Org</div>
+          <div class="nist-fn-desc">Define security requirements for AI systems before development begins. Establish roles, tools, and policies specific to AI/ML workflows.</div>
+          <div class="nist-compass-row">
+            <strong>Compass Relevance</strong>
+            Org profile + role collection during login captures who is accountable for AI governance decisions.
+          </div>
+        </div>
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:var(--teal);"></div>
+          <div class="nist-fn-label" style="color:var(--teal);">PW</div>
+          <div class="nist-fn-name">Produce Well-Secured Software</div>
+          <div class="nist-fn-desc">Design and implement AI systems with security controls, including data validation, model integrity checks, and output filtering.</div>
+          <div class="nist-compass-row">
+            <strong>Compass Relevance</strong>
+            Detection phase flags tools with missing data controls; questionnaire covers model security practices.
+          </div>
+        </div>
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:var(--orange);"></div>
+          <div class="nist-fn-label" style="color:var(--orange);">PS</div>
+          <div class="nist-fn-name">Protect the Software</div>
+          <div class="nist-fn-desc">Protect AI artifacts (models, datasets, pipelines) from unauthorized access, tampering, and supply chain compromise throughout their lifecycle.</div>
+          <div class="nist-compass-row">
+            <strong>Compass Relevance</strong>
+            Supply chain risk is surfaced in inventory via third-party tool flagging and vendor risk tiers.
+          </div>
+        </div>
+        <div class="nist-card">
+          <div class="nist-card-bar" style="background:#e05c5c;"></div>
+          <div class="nist-fn-label" style="color:#e05c5c;">RV</div>
+          <div class="nist-fn-name">Respond to Vulnerabilities</div>
+          <div class="nist-fn-desc">Identify, triage, and remediate vulnerabilities in AI systems, models, and dependencies — including those introduced post-deployment.</div>
+          <div class="nist-compass-row">
+            <strong>Compass Relevance</strong>
+            Report remediation recommendations are severity-ordered to support triage and incident response planning.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ══════════════════════════════════════════
+         OWASP LLM TOP 10
+    ══════════════════════════════════════════ -->
+    <div class="comp-section">
+      <div class="section-eyebrow">OWASP LLM Top 10 · 2025</div>
+      <div class="section-heading">Top Security Risks for LLM Applications</div>
+      <p class="section-body">The OWASP Top 10 for LLM Applications (2025, v2.0) identifies the most critical security vulnerabilities specific to systems built with large language models. The table below notes which risks Compass can surface through log analysis.</p>
+
+      <div class="framework-meta">
+        <span class="fw-badge">OWASP LLM Top 10</span>
+        <span class="fw-badge">v2.0 — 2025</span>
+        <span class="fw-badge">owasp.org/www-project-top-10-for-large-language-model-applications</span>
+      </div>
+
+      <div class="glass-card" style="padding:0;overflow:hidden;">
+        <div class="owasp-table-wrap">
+          <table class="owasp-table">
+            <thead>
+              <tr>
+                <th style="width:110px;">ID</th>
+                <th>Risk</th>
+                <th style="width:160px;">Detected by Compass</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="owasp-id">LLM01:2025</td>
+                <td>
+                  <div class="owasp-name">Prompt Injection</div>
+                  <div class="owasp-desc">Adversarial inputs manipulate LLM behavior — including indirect injection via untrusted external content retrieved by the model.</div>
+                </td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Log volume anomalies from LLM API calls can indicate injection campaigns; payload content is not inspected.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM02:2025</td>
+                <td>
+                  <div class="owasp-name">Sensitive Information Disclosure</div>
+                  <div class="owasp-desc">LLM outputs inadvertently reveal PII, credentials, proprietary data, or confidential system information.</div>
+                </td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Tools with a "Confidential" data classification flag are surfaced; content of API responses is not inspected.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM03:2025</td>
+                <td>
+                  <div class="owasp-name">Supply Chain</div>
+                  <div class="owasp-desc">Vulnerabilities in third-party models, datasets, plugins, or pre-trained weights used within the AI stack.</div>
+                </td>
+                <td><span class="detect-badge detect-yes">Yes</span><div class="owasp-desc" style="margin-top:5px;">The AI Inventory enumerates third-party vendors and tools, giving visibility into supply chain dependencies.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM04:2025</td>
+                <td>
+                  <div class="owasp-name">Data and Model Poisoning</div>
+                  <div class="owasp-desc">Training data or fine-tuning datasets are corrupted to introduce backdoors, biases, or malicious behavior into the model.</div>
+                </td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires inspection of training pipelines — outside the scope of network log analysis.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM05:2025</td>
+                <td>
+                  <div class="owasp-name">Improper Output Handling</div>
+                  <div class="owasp-desc">Downstream systems consume LLM output without sufficient validation, enabling injection attacks (XSS, SSRF, code execution).</div>
+                </td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires application-level output inspection; not observable in network logs.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM06:2025</td>
+                <td>
+                  <div class="owasp-name">Excessive Agency</div>
+                  <div class="owasp-desc">LLM-based agents are granted too many permissions, actions, or autonomy — enabling unintended or harmful automated actions.</div>
+                </td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Agentic AI tools (e.g., autonomous code execution platforms) are flagged as Critical risk in the inventory.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM07:2025</td>
+                <td>
+                  <div class="owasp-name">System Prompt Leakage</div>
+                  <div class="owasp-desc">Confidential system prompt contents — including instructions, personas, or business logic — are exposed to end users.</div>
+                </td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires application-layer inspection of request/response payloads.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM08:2025</td>
+                <td>
+                  <div class="owasp-name">Vector and Embedding Weaknesses</div>
+                  <div class="owasp-desc">Attacks against retrieval-augmented generation (RAG) pipelines — including poisoned vector stores, embedding inversion, or cross-tenant data leakage.</div>
+                </td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">RAG/vector DB tools (Pinecone, Weaviate, Chroma) are detected and inventoried; attack patterns are not.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM09:2025</td>
+                <td>
+                  <div class="owasp-name">Misinformation</div>
+                  <div class="owasp-desc">LLMs generate plausible but false information (hallucinations) that is then acted upon by users or downstream systems.</div>
+                </td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Output accuracy requires semantic evaluation — outside the scope of network log analysis.</div></td>
+              </tr>
+              <tr>
+                <td class="owasp-id">LLM10:2025</td>
+                <td>
+                  <div class="owasp-name">Unbounded Consumption</div>
+                  <div class="owasp-desc">Unrestricted resource consumption by LLM workloads — leading to denial of service, excessive cost, or degraded availability.</div>
+                </td>
+                <td><span class="detect-badge detect-yes">Yes</span><div class="owasp-desc" style="margin-top:5px;">High-frequency call patterns to LLM APIs are surfaced via log volume analysis; anomalous usage is flagged.</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="update-note">
+        <div class="update-note-icon">ℹ️</div>
+        <div>The OWASP LLM Top 10 is a living document updated by the community. Check the official project page for the latest version and changelog. New entries and re-rankings are released periodically as the threat landscape evolves.</div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ══════════════════════════════════════════
+         RISK CLASSIFICATION
+    ══════════════════════════════════════════ -->
+    <div class="comp-section">
+      <div class="section-eyebrow">Risk Reference</div>
+      <div class="section-heading">Compass Risk Classification</div>
+      <p class="section-body">Each AI tool detected in the log analysis is assigned a risk tier based on three factors: data exposure potential, external connectivity, and the type of AI capability the tool provides.</p>
+
+      <div class="risk-grid">
+        <div class="risk-card">
+          <div class="risk-card-bar bar-critical"></div>
+          <div class="risk-level color-critical">Critical</div>
+          <div class="risk-desc">Direct data exfiltration risk or autonomous action capability. These tools send or process sensitive organizational data with minimal controls or oversight.</div>
+          <div class="risk-examples">Examples: LLM APIs with file upload, agentic platforms, unsanctioned AI data pipelines</div>
+        </div>
+        <div class="risk-card">
+          <div class="risk-card-bar bar-high"></div>
+          <div class="risk-level color-high">High</div>
+          <div class="risk-desc">Significant data sharing with external AI providers, or tools likely to be used with confidential business content without explicit policy coverage.</div>
+          <div class="risk-examples">Examples: AI writing assistants, code completion tools, document summarizers</div>
+        </div>
+        <div class="risk-card">
+          <div class="risk-card-bar bar-medium"></div>
+          <div class="risk-level color-medium">Medium</div>
+          <div class="risk-desc">Moderate risk — AI-assisted features that process user input externally but have limited data persistence or established vendor data handling agreements.</div>
+          <div class="risk-examples">Examples: AI search enhancement, sentiment analysis tools, grammar assistants</div>
+        </div>
+        <div class="risk-card">
+          <div class="risk-card-bar bar-low"></div>
+          <div class="risk-level color-low">Low</div>
+          <div class="risk-desc">Minimal risk — AI features operating locally, with anonymous inputs, or with established enterprise data processing agreements and access controls.</div>
+          <div class="risk-examples">Examples: On-device spell check, approved enterprise AI add-ins with DPA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CTA ── -->
+    <div class="cta-row">
+      <a href="login.html" class="cta-btn-primary">Run Your Assessment</a>
+      <a href="info.html"  class="cta-btn-outline">← About the Project</a>
+    </div>
+
+  </main>
+</body>
+</html>
