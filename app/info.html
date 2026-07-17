@@ -8,9 +8,74 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
   <style>
+    /* ── Starfield canvas ── */
+    #star-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Noise grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── Layer content above canvas ── */
+    header, main { position: relative; z-index: 2; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: rgba(64,130,232,0.35); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(64,130,232,0.65); }
+
+    /* ── Scroll-reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.08s; }
+    .reveal-d2 { transition-delay: 0.18s; }
+    .reveal-d3 { transition-delay: 0.28s; }
+    .reveal-d4 { transition-delay: 0.38s; }
+
+    /* ── Keyframes ── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float-y {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-14px); }
+    }
+
+    /* ── Brighter body text ── */
+    .body-text {
+      color: rgba(208, 212, 226, 0.78);
+    }
+
+    /* ── Orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Hero ── */
     .info-hero {
       text-align: center;
-      padding: 52px 0 44px;
+      padding: 56px 0 48px;
+      animation: fade-up 0.75s ease both;
     }
     .info-hero-label {
       display: inline-flex;
@@ -29,19 +94,20 @@
       margin-bottom: 22px;
     }
     .info-hero h1 {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 800;
       letter-spacing: -0.02em;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .info-hero p {
       font-size: 14px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.78);
       max-width: 520px;
       margin: 0 auto;
-      line-height: 1.75;
+      line-height: 1.78;
     }
 
+    /* ── Section labels ── */
     .section-eyebrow {
       font-family: 'Montserrat', sans-serif;
       font-size: 10px;
@@ -59,12 +125,12 @@
     }
     .section-body {
       font-size: 13px;
-      color: var(--muted);
-      line-height: 1.75;
+      color: rgba(208, 212, 226, 0.78);
+      line-height: 1.78;
       max-width: 680px;
     }
 
-    .info-section { margin-bottom: 52px; }
+    .info-section { margin-bottom: 56px; }
 
     .divider-line {
       height: 1px;
@@ -72,7 +138,7 @@
       margin: 44px 0;
     }
 
-    /* ---- Flow steps ---- */
+    /* ── Flow steps ── */
     .flow-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -86,6 +152,12 @@
       padding: 22px 22px 24px;
       position: relative;
       overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .flow-step:hover {
+      border-color: rgba(64,130,232,0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
     }
     .flow-step-bar {
       position: absolute;
@@ -103,7 +175,7 @@
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.5);
       margin-bottom: 10px;
     }
     .flow-step-title {
@@ -115,11 +187,11 @@
     }
     .flow-step-desc {
       font-size: 12px;
-      color: var(--muted);
-      line-height: 1.65;
+      color: rgba(208, 212, 226, 0.72);
+      line-height: 1.68;
     }
 
-    /* ---- Feature cards ---- */
+    /* ── Feature cards ── */
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -131,6 +203,12 @@
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-md);
       padding: 20px 22px 22px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      border-color: rgba(64,130,232,0.28);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     }
     .feature-card-title {
       font-family: 'Montserrat', sans-serif;
@@ -141,17 +219,12 @@
     }
     .feature-card-desc {
       font-size: 12px;
-      color: var(--muted);
-      line-height: 1.65;
+      color: rgba(208, 212, 226, 0.72);
+      line-height: 1.68;
     }
 
-    /* ---- Format tags ---- */
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 12px;
-    }
+    /* ── Tags ── */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .tag {
       background: rgba(9,26,54,0.7);
       border: 1px solid var(--glass-border);
@@ -166,7 +239,7 @@
     .tag-red    { color: var(--danger); }
     .tag-yellow { color: #f5c842; }
 
-    /* ---- Privacy grid ---- */
+    /* ── Privacy grid ── */
     .privacy-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -178,6 +251,11 @@
       border: 1px solid rgba(51,205,182,0.14);
       border-radius: var(--radius-md);
       padding: 18px 20px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .privacy-card:hover {
+      border-color: rgba(51,205,182,0.28);
+      transform: translateY(-2px);
     }
     .privacy-card-label {
       font-family: 'Montserrat', sans-serif;
@@ -190,11 +268,11 @@
     }
     .privacy-card-desc {
       font-size: 12px;
-      color: var(--muted);
-      line-height: 1.65;
+      color: rgba(208, 212, 226, 0.72);
+      line-height: 1.68;
     }
 
-    /* ---- Capstone note ---- */
+    /* ── Capstone note ── */
     .capstone-banner {
       background: rgba(64,130,232,0.05);
       border: 1px solid rgba(64,130,232,0.15);
@@ -205,17 +283,8 @@
       align-items: flex-start;
       margin-top: 28px;
     }
-    .capstone-icon {
-      font-size: 22px;
-      flex-shrink: 0;
-      line-height: 1;
-      margin-top: 2px;
-    }
-    .capstone-text {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
+    .capstone-icon { font-size: 22px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+    .capstone-text { font-size: 12px; color: rgba(208, 212, 226, 0.72); line-height: 1.72; }
     .capstone-text strong {
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
@@ -227,10 +296,10 @@
       margin-bottom: 4px;
     }
 
-    /* ---- CTA ---- */
+    /* ── CTA ── */
     .cta-row {
       text-align: center;
-      padding: 40px 0 20px;
+      padding: 40px 0 24px;
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
@@ -238,38 +307,36 @@
     }
     .cta-btn-primary {
       background: linear-gradient(135deg,var(--blue),#2d64c4);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
+      color: #fff; border: none; border-radius: 6px;
       padding: 10px 22px;
       font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; display: inline-block;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
+    .cta-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(64,130,232,0.45); }
     .cta-btn-outline {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--glass-border);
-      border-radius: 6px;
+      background: transparent; color: rgba(208,212,226,0.65);
+      border: 1px solid var(--glass-border); border-radius: 6px;
       padding: 10px 22px;
       font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; display: inline-block;
+      transition: border-color 0.2s, color 0.2s;
     }
     .cta-btn-outline:hover { border-color: rgba(64,130,232,0.4); color: var(--light); }
   </style>
 </head>
 <body>
+
+<!-- Starfield canvas (behind everything) -->
+<canvas id="star-canvas"></canvas>
+
+<!-- Decorative orbs -->
+<div class="orb" style="width:700px;height:700px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(64,130,232,0.07) 0%,transparent 68%);"></div>
+<div class="orb" style="width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(51,205,182,0.05) 0%,transparent 68%);"></div>
 
   <!-- Header -->
   <header class="app-header">
@@ -278,7 +345,7 @@
       <span class="app-header-logo-text">Project Compass</span>
     </a>
     <nav class="app-header-nav">
-      <a href="../index.html" class="app-nav-link">Home</a>
+      <a href="../index.html"   class="app-nav-link">Home</a>
       <a href="info.html"       class="app-nav-link active">About</a>
       <a href="compliance.html" class="app-nav-link">Compliance</a>
     </nav>
@@ -301,30 +368,32 @@
 
     <!-- ── How It Works ── -->
     <div class="info-section">
-      <div class="section-eyebrow">Workflow</div>
-      <div class="section-heading">How Project Compass Works</div>
-      <p class="section-body">Compass follows a four-step pipeline that takes raw network logs and produces a structured AI risk report aligned to the NIST AI Risk Management Framework.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">Workflow</div>
+        <div class="section-heading">How Project Compass Works</div>
+        <p class="section-body">Compass follows a four-step pipeline that takes raw network logs and produces a structured AI risk report aligned to the NIST AI Risk Management Framework.</p>
+      </div>
 
       <div class="flow-grid">
-        <div class="flow-step">
+        <div class="flow-step reveal reveal-d1">
           <div class="flow-step-bar bar-blue"></div>
           <div class="flow-step-num">Step 01</div>
           <div class="flow-step-title">Upload Logs</div>
           <div class="flow-step-desc">Provide network or proxy logs (DNS, HTTP, firewall exports) from your organization. Files are read locally in your browser — nothing is uploaded to any server.</div>
         </div>
-        <div class="flow-step">
+        <div class="flow-step reveal reveal-d2">
           <div class="flow-step-bar bar-teal"></div>
           <div class="flow-step-num">Step 02</div>
           <div class="flow-step-title">Detect AI Tools</div>
           <div class="flow-step-desc">The log parser matches hostnames against a registry of known AI service domains — OpenAI, Anthropic, Copilot, Hugging Face, and hundreds more — and assigns each a risk tier.</div>
         </div>
-        <div class="flow-step">
+        <div class="flow-step reveal reveal-d3">
           <div class="flow-step-bar bar-orange"></div>
           <div class="flow-step-num">Step 03</div>
           <div class="flow-step-title">Assess Controls</div>
           <div class="flow-step-desc">A structured questionnaire maps your existing policies against NIST AI RMF control domains. Responses generate a maturity score and gap analysis across Govern, Map, Measure, and Manage.</div>
         </div>
-        <div class="flow-step">
+        <div class="flow-step reveal reveal-d4">
           <div class="flow-step-bar bar-grad"></div>
           <div class="flow-step-num">Step 04</div>
           <div class="flow-step-title">Generate Report</div>
@@ -337,12 +406,14 @@
 
     <!-- ── Log Parser ── -->
     <div class="info-section">
-      <div class="section-eyebrow">Log Parser</div>
-      <div class="section-heading">What the Parser Analyzes</div>
-      <p class="section-body">The log parser is the detection engine at the core of Compass. It reads structured log files and matches hostnames and endpoints against a curated registry of known AI service domains, returning enriched tool metadata for each match.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">Log Parser</div>
+        <div class="section-heading">What the Parser Analyzes</div>
+        <p class="section-body">The log parser is the detection engine at the core of Compass. It reads structured log files and matches hostnames and endpoints against a curated registry of known AI service domains, returning enriched tool metadata for each match.</p>
+      </div>
 
       <div class="feature-grid">
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d1">
           <div class="feature-card-title">Supported File Formats</div>
           <div class="feature-card-desc">Accepts common network log formats exported from proxy servers, next-gen firewalls, and DNS resolvers.</div>
           <div class="tag-row">
@@ -352,8 +423,7 @@
             <span class="tag tag-teal">.json</span>
           </div>
         </div>
-
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d2">
           <div class="feature-card-title">Extracted Fields</div>
           <div class="feature-card-desc">For each detected AI tool, the parser surfaces the following attributes from the registry lookup.</div>
           <div class="tag-row">
@@ -365,8 +435,7 @@
             <span class="tag tag-blue">Frequency</span>
           </div>
         </div>
-
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d3">
           <div class="feature-card-title">Risk Tier Assignment</div>
           <div class="feature-card-desc">Each tool is automatically tiered based on data exposure potential, external connectivity, and model type.</div>
           <div class="tag-row">
@@ -376,8 +445,7 @@
             <span class="tag tag-teal">Low</span>
           </div>
         </div>
-
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d4">
           <div class="feature-card-title">Tool Categories Detected</div>
           <div class="feature-card-desc">The registry covers major categories of AI tools in enterprise environments.</div>
           <div class="tag-row">
@@ -394,26 +462,28 @@
 
     <div class="divider-line"></div>
 
-    <!-- ── AI Registry / Inventory ── -->
+    <!-- ── AI Registry ── -->
     <div class="info-section">
-      <div class="section-eyebrow">AI Registry</div>
-      <div class="section-heading">The AI Tool Inventory</div>
-      <p class="section-body">After detection, every identified tool is added to an AI Inventory — a structured registry your team can review, annotate, and act on. This gives you a living record of AI usage across your organization and the foundation for a governance decision log.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">AI Registry</div>
+        <div class="section-heading">The AI Tool Inventory</div>
+        <p class="section-body">After detection, every identified tool is added to an AI Inventory — a structured registry your team can review, annotate, and act on. This gives you a living record of AI usage across your organization and the foundation for a governance decision log.</p>
+      </div>
 
       <div class="feature-grid">
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d1">
           <div class="feature-card-title">Per-Tool Metadata</div>
           <div class="feature-card-desc">Tool name, vendor, category, risk level, data classification, and relative access frequency derived from log volume.</div>
         </div>
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d2">
           <div class="feature-card-title">Approval Workflow</div>
           <div class="feature-card-desc">Each tool is individually marked <span style="color:var(--teal);">Approved</span>, <span style="color:#f5c842;">Under Review</span>, or <span style="color:#e05c5c;">Blocked</span> — tracking governance decisions at the tool level.</div>
         </div>
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d3">
           <div class="feature-card-title">Analyst Notes</div>
           <div class="feature-card-desc">Expand any inventory row to add free-text notes — document exceptions, risk acceptance rationale, or remediation steps per tool.</div>
         </div>
-        <div class="feature-card">
+        <div class="feature-card reveal reveal-d4">
           <div class="feature-card-title">Session Storage</div>
           <div class="feature-card-desc">Inventory and notes persist within your active browser session. Persistent cross-session storage backed by a database is planned for a future release.</div>
         </div>
@@ -424,22 +494,24 @@
 
     <!-- ── Reports ── -->
     <div class="info-section">
-      <div class="section-eyebrow">Reporting</div>
-      <div class="section-heading">Three Audience-Tuned Report Views</div>
-      <p class="section-body">The same assessment data is presented three ways so each stakeholder gets exactly the signal they need — without wading through sections written for a different audience.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">Reporting</div>
+        <div class="section-heading">Three Audience-Tuned Report Views</div>
+        <p class="section-body">The same assessment data is presented three ways so each stakeholder gets exactly the signal they need — without wading through sections written for a different audience.</p>
+      </div>
 
       <div class="flow-grid">
-        <div class="flow-step" style="border-color:rgba(64,130,232,0.2);">
+        <div class="flow-step reveal reveal-d1" style="border-color:rgba(64,130,232,0.2);">
           <div class="flow-step-bar bar-blue"></div>
           <div class="flow-step-title">IT Security View</div>
           <div class="flow-step-desc">Full tool list with risk tiers, per-control gap analysis, OWASP LLM mapping, and technical remediation actions sorted by severity.</div>
         </div>
-        <div class="flow-step" style="border-color:rgba(51,205,182,0.2);">
+        <div class="flow-step reveal reveal-d2" style="border-color:rgba(51,205,182,0.2);">
           <div class="flow-step-bar bar-teal"></div>
           <div class="flow-step-title">Executive View</div>
           <div class="flow-step-desc">One-page posture summary with a risk score, maturity rating, and three strategic recommendations — designed for a 5-minute briefing.</div>
         </div>
-        <div class="flow-step" style="border-color:rgba(255,128,32,0.2);">
+        <div class="flow-step reveal reveal-d3" style="border-color:rgba(255,128,32,0.2);">
           <div class="flow-step-bar bar-orange"></div>
           <div class="flow-step-title">Auditor View</div>
           <div class="flow-step-desc">NIST AI RMF control-by-control coverage table, evidence notes, and a compliance posture declaration formatted for audit documentation.</div>
@@ -451,30 +523,32 @@
 
     <!-- ── Privacy ── -->
     <div class="info-section">
-      <div class="section-eyebrow">Data &amp; Privacy</div>
-      <div class="section-heading">No Data Leaves Your Browser</div>
-      <p class="section-body">Project Compass is a client-side application. Your log files, questionnaire answers, and generated reports are processed entirely within your browser tab and are never transmitted to any external server.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">Data &amp; Privacy</div>
+        <div class="section-heading">No Data Leaves Your Browser</div>
+        <p class="section-body">Project Compass is a client-side application. Your log files, questionnaire answers, and generated reports are processed entirely within your browser tab and are never transmitted to any external server.</p>
+      </div>
 
       <div class="privacy-grid">
-        <div class="privacy-card">
+        <div class="privacy-card reveal reveal-d1">
           <div class="privacy-card-label">Log Files</div>
           <div class="privacy-card-desc">Parsed in-browser using the File API. The raw file content is never uploaded to any server.</div>
         </div>
-        <div class="privacy-card">
+        <div class="privacy-card reveal reveal-d2">
           <div class="privacy-card-label">Session Data</div>
           <div class="privacy-card-desc">Detection results, assessment answers, and inventory state are held in <code>sessionStorage</code> and cleared automatically when you close the tab.</div>
         </div>
-        <div class="privacy-card">
+        <div class="privacy-card reveal reveal-d3">
           <div class="privacy-card-label">Profile</div>
           <div class="privacy-card-desc">Org name, your name, and role are saved to <code>localStorage</code> for returning-user convenience. Cleared on Sign Out.</div>
         </div>
-        <div class="privacy-card">
+        <div class="privacy-card reveal reveal-d4">
           <div class="privacy-card-label">Authentication</div>
           <div class="privacy-card-desc">Identity via Microsoft Entra External ID using PKCE flow. Tokens stay browser-side; no Compass server holds your credentials.</div>
         </div>
       </div>
 
-      <div class="capstone-banner">
+      <div class="capstone-banner reveal">
         <div class="capstone-icon">🎓</div>
         <div class="capstone-text">
           <strong>Academic Context</strong>
@@ -484,11 +558,74 @@
     </div>
 
     <!-- ── CTA ── -->
-    <div class="cta-row">
-      <a href="login.html" class="cta-btn-primary">Run Your Assessment</a>
+    <div class="cta-row reveal">
+      <a href="login.html"      class="cta-btn-primary">Run Your Assessment</a>
       <a href="compliance.html" class="cta-btn-outline">View Compliance Reference →</a>
     </div>
 
   </main>
+
+<script>
+// ── Starfield canvas ──
+(function () {
+  const canvas = document.getElementById('star-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = document.body.scrollHeight;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); initStars(); });
+
+  const STAR_COUNT = 280;
+  let stars = [];
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x:         rand(0, canvas.width),
+        y:         rand(0, canvas.height * 0.85),
+        r:         rand(0.3, 1.8),
+        baseAlpha: rand(0.25, 0.9),
+        alpha:     rand(0.25, 0.9),
+        speed:     rand(0.003, 0.012),
+        phase:     rand(0, Math.PI * 2),
+        color:     Math.random() < 0.15 ? '#99ccff' : '#ffffff',
+      });
+    }
+  }
+  initStars();
+
+  function draw(ts) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.phase += s.speed;
+      s.alpha = s.baseAlpha * (0.5 + 0.5 * Math.sin(s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = s.alpha;
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ── Scroll-reveal ──
+(function () {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
 </body>
 </html>

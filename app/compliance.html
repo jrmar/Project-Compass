@@ -8,9 +8,58 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
   <style>
+    /* ── Starfield canvas ── */
+    #star-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Noise grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── Layer content above canvas ── */
+    header, main { position: relative; z-index: 2; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: rgba(64,130,232,0.35); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(64,130,232,0.65); }
+
+    /* ── Scroll-reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.08s; }
+    .reveal-d2 { transition-delay: 0.18s; }
+    .reveal-d3 { transition-delay: 0.28s; }
+    .reveal-d4 { transition-delay: 0.38s; }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Orbs ── */
+    .orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+
     .comp-hero {
       text-align: center;
-      padding: 48px 0 40px;
+      padding: 56px 0 48px;
+      animation: fade-up 0.75s ease both;
     }
     .comp-hero-label {
       display: inline-flex;
@@ -29,17 +78,17 @@
       margin-bottom: 20px;
     }
     .comp-hero h1 {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 800;
       letter-spacing: -0.02em;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .comp-hero p {
-      font-size: 13px;
-      color: var(--muted);
+      font-size: 14px;
+      color: rgba(208, 212, 226, 0.78);
       max-width: 520px;
       margin: 0 auto 20px;
-      line-height: 1.75;
+      line-height: 1.78;
     }
     .updated-badge {
       display: inline-flex;
@@ -51,7 +100,7 @@
       padding: 5px 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.6);
     }
     .updated-dot {
       width: 6px; height: 6px;
@@ -60,7 +109,7 @@
       flex-shrink: 0;
     }
 
-    .comp-section { margin-bottom: 52px; }
+    .comp-section { margin-bottom: 56px; }
     .section-eyebrow {
       font-family: 'Montserrat', sans-serif;
       font-size: 10px;
@@ -78,8 +127,8 @@
     }
     .section-body {
       font-size: 13px;
-      color: var(--muted);
-      line-height: 1.75;
+      color: rgba(208, 212, 226, 0.78);
+      line-height: 1.78;
       max-width: 680px;
       margin-bottom: 24px;
     }
@@ -103,6 +152,12 @@
       padding: 22px 22px 24px;
       position: relative;
       overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .nist-card:hover {
+      border-color: rgba(64,130,232,0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
     }
     .nist-card-bar {
       position: absolute;
@@ -125,7 +180,7 @@
     }
     .nist-fn-desc {
       font-size: 12px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.72);
       line-height: 1.65;
       margin-bottom: 14px;
     }
@@ -135,7 +190,7 @@
       border-radius: var(--radius-sm);
       padding: 8px 10px;
       font-size: 11px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.72);
       line-height: 1.55;
     }
     .nist-compass-row strong {
@@ -155,7 +210,7 @@
     }
     .nist-key-activities li {
       font-size: 11px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.72);
       padding: 3px 0 3px 14px;
       position: relative;
       line-height: 1.5;
@@ -211,7 +266,7 @@
     }
     .owasp-desc {
       font-size: 11px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.72);
       line-height: 1.55;
     }
 
@@ -262,14 +317,21 @@
     }
     .risk-desc {
       font-size: 11px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.72);
       line-height: 1.6;
       margin-bottom: 10px;
     }
     .risk-examples {
       font-size: 10px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.52);
       font-style: italic;
+    }
+    .risk-card {
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .risk-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     }
 
     .bar-critical { background: #e05c5c; }
@@ -299,7 +361,7 @@
       padding: 4px 10px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.55);
     }
 
     /* ── update note ── */
@@ -309,7 +371,7 @@
       border-radius: var(--radius-md);
       padding: 16px 20px;
       font-size: 12px;
-      color: var(--muted);
+      color: rgba(208, 212, 226, 0.72);
       line-height: 1.65;
       margin-top: 20px;
       display: flex;
@@ -350,6 +412,13 @@
 </head>
 <body>
 
+<!-- Starfield canvas -->
+<canvas id="star-canvas"></canvas>
+
+<!-- Decorative orbs -->
+<div class="orb" style="width:700px;height:700px;top:-200px;right:-150px;background:radial-gradient(circle,rgba(64,130,232,0.07) 0%,transparent 68%);"></div>
+<div class="orb" style="width:500px;height:500px;bottom:5%;left:-100px;background:radial-gradient(circle,rgba(51,205,182,0.05) 0%,transparent 68%);"></div>
+
   <!-- Header -->
   <header class="app-header">
     <a class="app-header-logo" href="../index.html">
@@ -386,11 +455,13 @@
          NIST AI RMF
     ══════════════════════════════════════════ -->
     <div class="comp-section">
-      <div class="section-eyebrow">NIST AI 100-1</div>
-      <div class="section-heading">NIST AI Risk Management Framework</div>
-      <p class="section-body">The NIST AI RMF (January 2023) provides a voluntary, flexible framework for managing risks associated with AI systems throughout their lifecycle. It is organized into four core functions.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">NIST AI 100-1</div>
+        <div class="section-heading">NIST AI Risk Management Framework</div>
+        <p class="section-body">The NIST AI RMF (January 2023) provides a voluntary, flexible framework for managing risks associated with AI systems throughout their lifecycle. It is organized into four core functions.</p>
+      </div>
 
-      <div class="framework-meta">
+      <div class="framework-meta reveal">
         <span class="fw-badge">NIST AI 100-1</span>
         <span class="fw-badge">Published: January 2023</span>
         <span class="fw-badge">Voluntary</span>
@@ -400,7 +471,7 @@
       <div class="nist-grid">
 
         <!-- GOVERN -->
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d1">
           <div class="nist-card-bar" style="background:var(--blue);"></div>
           <div class="nist-fn-label" style="color:var(--blue);">Function 1</div>
           <div class="nist-fn-name">GOVERN</div>
@@ -418,7 +489,7 @@
         </div>
 
         <!-- MAP -->
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d2">
           <div class="nist-card-bar" style="background:var(--teal);"></div>
           <div class="nist-fn-label" style="color:var(--teal);">Function 2</div>
           <div class="nist-fn-name">MAP</div>
@@ -436,7 +507,7 @@
         </div>
 
         <!-- MEASURE -->
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d3">
           <div class="nist-card-bar" style="background:var(--orange);"></div>
           <div class="nist-fn-label" style="color:var(--orange);">Function 3</div>
           <div class="nist-fn-name">MEASURE</div>
@@ -454,7 +525,7 @@
         </div>
 
         <!-- MANAGE -->
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d4">
           <div class="nist-card-bar" style="background:linear-gradient(180deg,var(--blue),var(--teal));"></div>
           <div class="nist-fn-label" style="color:var(--light);">Function 4</div>
           <div class="nist-fn-name">MANAGE</div>
@@ -485,18 +556,20 @@
          NIST SP 800-218A
     ══════════════════════════════════════════ -->
     <div class="comp-section">
-      <div class="section-eyebrow">NIST SP 800-218A</div>
-      <div class="section-heading">Secure Software Development for AI</div>
-      <p class="section-body">NIST SP 800-218A extends the Secure Software Development Framework (SSDF) to address unique challenges in AI and machine learning system development, including model training, data pipelines, and generative AI integrations.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">NIST SP 800-218A</div>
+        <div class="section-heading">Secure Software Development for AI</div>
+        <p class="section-body">NIST SP 800-218A extends the Secure Software Development Framework (SSDF) to address unique challenges in AI and machine learning system development, including model training, data pipelines, and generative AI integrations.</p>
+      </div>
 
-      <div class="framework-meta">
+      <div class="framework-meta reveal">
         <span class="fw-badge">NIST SP 800-218A</span>
         <span class="fw-badge">Initial Draft: August 2024</span>
         <span class="fw-badge">Extends SSDF (SP 800-218)</span>
       </div>
 
       <div class="nist-grid">
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d1">
           <div class="nist-card-bar" style="background:var(--blue);"></div>
           <div class="nist-fn-label" style="color:var(--blue);">PO</div>
           <div class="nist-fn-name">Prepare the Org</div>
@@ -506,7 +579,7 @@
             Org profile + role collection during login captures who is accountable for AI governance decisions.
           </div>
         </div>
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d2">
           <div class="nist-card-bar" style="background:var(--teal);"></div>
           <div class="nist-fn-label" style="color:var(--teal);">PW</div>
           <div class="nist-fn-name">Produce Well-Secured Software</div>
@@ -516,7 +589,7 @@
             Detection phase flags tools with missing data controls; questionnaire covers model security practices.
           </div>
         </div>
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d3">
           <div class="nist-card-bar" style="background:var(--orange);"></div>
           <div class="nist-fn-label" style="color:var(--orange);">PS</div>
           <div class="nist-fn-name">Protect the Software</div>
@@ -526,7 +599,7 @@
             Supply chain risk is surfaced in inventory via third-party tool flagging and vendor risk tiers.
           </div>
         </div>
-        <div class="nist-card">
+        <div class="nist-card reveal reveal-d4">
           <div class="nist-card-bar" style="background:#e05c5c;"></div>
           <div class="nist-fn-label" style="color:#e05c5c;">RV</div>
           <div class="nist-fn-name">Respond to Vulnerabilities</div>
@@ -545,17 +618,19 @@
          OWASP LLM TOP 10
     ══════════════════════════════════════════ -->
     <div class="comp-section">
+      <div class="reveal">
       <div class="section-eyebrow">OWASP LLM Top 10 · 2025</div>
       <div class="section-heading">Top Security Risks for LLM Applications</div>
       <p class="section-body">The OWASP Top 10 for LLM Applications (2025, v2.0) identifies the most critical security vulnerabilities specific to systems built with large language models. The table below notes which risks Compass can surface through log analysis.</p>
+      </div>
 
-      <div class="framework-meta">
+      <div class="framework-meta reveal">
         <span class="fw-badge">OWASP LLM Top 10</span>
         <span class="fw-badge">v2.0 — 2025</span>
         <span class="fw-badge">owasp.org/www-project-top-10-for-large-language-model-applications</span>
       </div>
 
-      <div class="glass-card" style="padding:0;overflow:hidden;">
+      <div class="glass-card reveal" style="padding:0;overflow:hidden;">
         <div class="owasp-table-wrap">
           <table class="owasp-table">
             <thead>
@@ -663,30 +738,32 @@
          RISK CLASSIFICATION
     ══════════════════════════════════════════ -->
     <div class="comp-section">
-      <div class="section-eyebrow">Risk Reference</div>
-      <div class="section-heading">Compass Risk Classification</div>
-      <p class="section-body">Each AI tool detected in the log analysis is assigned a risk tier based on three factors: data exposure potential, external connectivity, and the type of AI capability the tool provides.</p>
+      <div class="reveal">
+        <div class="section-eyebrow">Risk Reference</div>
+        <div class="section-heading">Compass Risk Classification</div>
+        <p class="section-body">Each AI tool detected in the log analysis is assigned a risk tier based on three factors: data exposure potential, external connectivity, and the type of AI capability the tool provides.</p>
+      </div>
 
       <div class="risk-grid">
-        <div class="risk-card">
+        <div class="risk-card reveal reveal-d1">
           <div class="risk-card-bar bar-critical"></div>
           <div class="risk-level color-critical">Critical</div>
           <div class="risk-desc">Direct data exfiltration risk or autonomous action capability. These tools send or process sensitive organizational data with minimal controls or oversight.</div>
           <div class="risk-examples">Examples: LLM APIs with file upload, agentic platforms, unsanctioned AI data pipelines</div>
         </div>
-        <div class="risk-card">
+        <div class="risk-card reveal reveal-d2">
           <div class="risk-card-bar bar-high"></div>
           <div class="risk-level color-high">High</div>
           <div class="risk-desc">Significant data sharing with external AI providers, or tools likely to be used with confidential business content without explicit policy coverage.</div>
           <div class="risk-examples">Examples: AI writing assistants, code completion tools, document summarizers</div>
         </div>
-        <div class="risk-card">
+        <div class="risk-card reveal reveal-d3">
           <div class="risk-card-bar bar-medium"></div>
           <div class="risk-level color-medium">Medium</div>
           <div class="risk-desc">Moderate risk — AI-assisted features that process user input externally but have limited data persistence or established vendor data handling agreements.</div>
           <div class="risk-examples">Examples: AI search enhancement, sentiment analysis tools, grammar assistants</div>
         </div>
-        <div class="risk-card">
+        <div class="risk-card reveal reveal-d4">
           <div class="risk-card-bar bar-low"></div>
           <div class="risk-level color-low">Low</div>
           <div class="risk-desc">Minimal risk — AI features operating locally, with anonymous inputs, or with established enterprise data processing agreements and access controls.</div>
@@ -696,11 +773,74 @@
     </div>
 
     <!-- ── CTA ── -->
-    <div class="cta-row">
+    <div class="cta-row reveal">
       <a href="login.html" class="cta-btn-primary">Run Your Assessment</a>
       <a href="info.html"  class="cta-btn-outline">← About the Project</a>
     </div>
 
   </main>
+
+<script>
+// ── Starfield canvas ──
+(function () {
+  const canvas = document.getElementById('star-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = document.body.scrollHeight;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); initStars(); });
+
+  const STAR_COUNT = 280;
+  let stars = [];
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x:         rand(0, canvas.width),
+        y:         rand(0, canvas.height * 0.85),
+        r:         rand(0.3, 1.8),
+        baseAlpha: rand(0.25, 0.9),
+        alpha:     rand(0.25, 0.9),
+        speed:     rand(0.003, 0.012),
+        phase:     rand(0, Math.PI * 2),
+        color:     Math.random() < 0.15 ? '#99ccff' : '#ffffff',
+      });
+    }
+  }
+  initStars();
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.phase += s.speed;
+      s.alpha = s.baseAlpha * (0.5 + 0.5 * Math.sin(s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = s.alpha;
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ── Scroll-reveal ──
+(function () {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
 </body>
 </html>
