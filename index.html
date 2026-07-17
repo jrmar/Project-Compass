@@ -677,6 +677,7 @@
       <li><a href="#for-teams">For Teams</a></li>
       <li><a href="app/info.html">About</a></li>
       <li><a href="app/compliance.html">Compliance</a></li>
+      <li><a href="app/sample-report.html">Sample Report</a></li>
     </ul>
 
     <div class="nav-right">
@@ -1131,6 +1132,102 @@
 
 
 <!-- ══════════════════════════════════════════
+     USE CASES
+══════════════════════════════════════════ -->
+<section id="use-cases" style="padding:6.5rem 2rem;">
+  <div class="container">
+
+    <div style="text-align:center;margin-bottom:3.5rem;" class="reveal">
+      <div class="section-label">Real Scenarios</div>
+      <h2 class="font-heading" style="font-weight:800;font-size:clamp(1.875rem,3vw,2.625rem);letter-spacing:-0.025em;color:var(--white);line-height:1.18;">
+        When teams reach for Compass
+      </h2>
+      <p style="font-size:0.9375rem;color:rgba(208,212,226,0.6);max-width:520px;margin:1rem auto 0;line-height:1.72;">
+        Three situations where a 15-minute assessment turns a vague concern into a concrete action plan.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.375rem;">
+
+      <!-- Card 1 -->
+      <div class="card card-shimmer reveal reveal-delay-1" style="padding:0;overflow:hidden;">
+        <div style="height:4px;background:linear-gradient(90deg,var(--blue),#6fa3f5);"></div>
+        <div style="padding:1.75rem;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.5875rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:0.875rem;">Pre-Audit</div>
+          <h3 class="font-heading" style="font-weight:800;font-size:1.0625rem;color:var(--white);line-height:1.25;margin-bottom:0.875rem;">
+            "Audit is in six weeks. What AI is actually running here?"
+          </h3>
+          <p style="font-size:0.8125rem;color:rgba(208,212,226,0.65);line-height:1.72;margin-bottom:1.25rem;">
+            A compliance officer uploads 90 days of proxy logs before a third-party audit. Compass detects 9 unsanctioned AI tools, maps each to NIST GOVERN and MAP controls, and generates a structured findings report the auditors can review directly.
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.375rem;">
+            <span style="font-size:0.6875rem;padding:0.2rem 0.625rem;border-radius:20px;background:rgba(64,130,232,0.1);border:1px solid rgba(64,130,232,0.2);color:rgba(208,212,226,0.7);">Compliance Officer</span>
+            <span style="font-size:0.6875rem;padding:0.2rem 0.625rem;border-radius:20px;background:rgba(64,130,232,0.1);border:1px solid rgba(64,130,232,0.2);color:rgba(208,212,226,0.7);">~20 min</span>
+          </div>
+          <div style="border-top:1px solid rgba(64,130,232,0.1);padding-top:1rem;">
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;">Output</div>
+            <div style="font-size:0.78rem;color:rgba(208,212,226,0.6);line-height:1.6;">AI inventory · NIST gap report · Auditor PDF</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card card-shimmer reveal reveal-delay-2" style="padding:0;overflow:hidden;border-color:rgba(224,92,92,0.15);">
+        <div style="height:4px;background:linear-gradient(90deg,#e05c5c,var(--orange));"></div>
+        <div style="padding:1.75rem;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.5875rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#e05c5c;margin-bottom:0.875rem;">Post-Incident</div>
+          <h3 class="font-heading" style="font-weight:800;font-size:1.0625rem;color:var(--white);line-height:1.25;margin-bottom:0.875rem;">
+            "We had a data incident. Was AI in the chain?"
+          </h3>
+          <p style="font-size:0.8125rem;color:rgba(208,212,226,0.65);line-height:1.72;margin-bottom:1.25rem;">
+            After a suspected data leak, the security lead uploads firewall logs from the incident window. Compass narrows the scope to 3 AI tools active during the event, surfaces OWASP LLM06 (sensitive info disclosure) findings, and timestamps each connection for the IR report.
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.375rem;">
+            <span style="font-size:0.6875rem;padding:0.2rem 0.625rem;border-radius:20px;background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.2);color:rgba(208,212,226,0.7);">Security Lead</span>
+            <span style="font-size:0.6875rem;padding:0.2rem 0.625rem;border-radius:20px;background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.2);color:rgba(208,212,226,0.7);">~15 min</span>
+          </div>
+          <div style="border-top:1px solid rgba(224,92,92,0.1);padding-top:1rem;">
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;">Output</div>
+            <div style="font-size:0.78rem;color:rgba(208,212,226,0.6);line-height:1.6;">Scoped timeline · OWASP findings · IR-ready evidence</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card card-shimmer reveal reveal-delay-3" style="padding:0;overflow:hidden;border-color:rgba(51,205,182,0.12);">
+        <div style="height:4px;background:linear-gradient(90deg,var(--teal),#5de8d4);"></div>
+        <div style="padding:1.75rem;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:0.5875rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal);margin-bottom:0.875rem;">Quarterly Governance</div>
+          <h3 class="font-heading" style="font-weight:800;font-size:1.0625rem;color:var(--white);line-height:1.25;margin-bottom:0.875rem;">
+            "What AI tools have employees adopted since last quarter?"
+          </h3>
+          <p style="font-size:0.8125rem;color:rgba(208,212,226,0.65);line-height:1.72;margin-bottom:1.25rem;">
+            A security lead runs Compass every quarter with a fresh 30-day log pull. The tool highlights 2 newly adopted AI tools that weren't in last quarter's inventory, assigns risk levels, and flags which NIST controls need updating before the next board review.
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.375rem;">
+            <span style="font-size:0.6875rem;padding:0.2rem 0.625rem;border-radius:20px;background:rgba(51,205,182,0.08);border:1px solid rgba(51,205,182,0.15);color:rgba(208,212,226,0.7);">Security Lead</span>
+            <span style="font-size:0.6875rem;padding:0.2rem 0.625rem;border-radius:20px;background:rgba(51,205,182,0.08);border:1px solid rgba(51,205,182,0.15);color:rgba(208,212,226,0.7);">~10 min</span>
+          </div>
+          <div style="border-top:1px solid rgba(51,205,182,0.1);padding-top:1rem;">
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;">Output</div>
+            <div style="font-size:0.78rem;color:rgba(208,212,226,0.6);line-height:1.6;">Delta inventory · Board-ready summary · Updated registry</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:2.25rem;" class="reveal">
+      <a href="app/sample-report.html" style="font-size:0.8125rem;color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(51,205,182,0.3);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(51,205,182,0.7)'" onmouseout="this.style.borderColor='rgba(51,205,182,0.3)'">See a sample completed report →</a>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════════
      FOR TEAMS
 ══════════════════════════════════════════ -->
 <section id="for-teams" style="padding:6.5rem 2rem;">
@@ -1345,6 +1442,7 @@
       <nav style="display:flex;flex-direction:column;gap:0.75rem;">
         <a href="app/info.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">About the Project</a>
         <a href="app/compliance.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Compliance Reference</a>
+        <a href="app/sample-report.html" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">Sample Report</a>
         <a href="#how-it-works" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">How It Works</a>
         <a href="#faq" style="font-size:0.8125rem;color:rgba(208,212,226,0.58);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(208,212,226,0.9)'" onmouseout="this.style.color='rgba(208,212,226,0.58)'">FAQ</a>
       </nav>

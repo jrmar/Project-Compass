@@ -136,37 +136,104 @@
       margin: 0 auto 24px;
     }
 
-    /* Summary chips */
-    .inv-summary {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    /* Summary card */
+    .inv-summary-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
       margin-bottom: 20px;
+      display: none;
     }
 
-    .inv-chip {
+    .inv-summary-top {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(9, 26, 54, 0.65);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      padding: 10px 16px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
-    .inv-chip-num {
+    .inv-summary-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .inv-summary-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .inv-kpi-row {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .inv-kpi {
+      flex: 1;
+      min-width: 90px;
+      padding: 12px 16px;
+      border-right: 1px solid var(--glass-border);
+    }
+    .inv-kpi:last-child { border-right: none; }
+
+    .inv-kpi-num {
       font-family: 'Montserrat', sans-serif;
       font-size: 22px;
       font-weight: 800;
-      color: var(--light);
       line-height: 1;
+      font-variant-numeric: tabular-nums;
+      color: var(--light);
     }
 
-    .inv-chip-label {
-      font-size: 11px;
+    .inv-kpi-label {
+      font-size: 10px;
       color: var(--muted);
+      margin-top: 3px;
       line-height: 1.3;
     }
+
+    .inv-summary-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .inv-framework-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .inv-fw-chip {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .inv-fw-nist  { background: rgba(64,130,232,0.1);  border: 1px solid rgba(64,130,232,0.2);  color: var(--blue); }
+    .inv-fw-owasp { background: rgba(155,151,212,0.1); border: 1px solid rgba(155,151,212,0.2); color: #9B97D4; }
+    .inv-fw-sp    { background: rgba(51,205,182,0.08); border: 1px solid rgba(51,205,182,0.15); color: var(--teal); }
+
+    /* Keep old .inv-summary for legacy compat */
+    .inv-summary { display: none !important; }
 
     /* Page header row */
     .page-header-row {
@@ -309,7 +376,27 @@
       <button class="btn btn-ghost" onclick="window.location.href='upload.html'">&#43; New Assessment</button>
     </div>
 
-    <!-- Summary chips -->
+    <!-- Summary card -->
+    <div class="inv-summary-card" id="inv-summary-card">
+      <div class="inv-summary-top">
+        <div class="inv-summary-title">Assessment Summary</div>
+        <div class="inv-summary-meta" id="inv-summary-meta"></div>
+      </div>
+      <div class="inv-kpi-row" id="inv-kpi-row"></div>
+      <div class="inv-summary-footer">
+        <div class="inv-framework-chips">
+          <span style="font-size:10px;color:var(--muted);">Mapped to:</span>
+          <span class="inv-fw-chip inv-fw-nist">NIST AI RMF</span>
+          <span class="inv-fw-chip inv-fw-owasp">OWASP LLM Top 10</span>
+          <span class="inv-fw-chip inv-fw-sp">SP 800-218A</span>
+        </div>
+        <button class="btn btn-teal" onclick="window.location.href='report.html'" style="font-size:12px;padding:7px 16px;">
+          View Full Reports &#8594;
+        </button>
+      </div>
+    </div>
+
+    <!-- Legacy summary chips (hidden) -->
     <div class="inv-summary" id="inv-summary" style="display:none;"></div>
 
     <!-- Main card -->
@@ -527,25 +614,53 @@
       renderTable(filtered);
     }
 
-    // Summary chips
+    // Summary card
     if (tools.length > 0) {
-      const summaryEl = document.getElementById('inv-summary');
-      summaryEl.style.display = 'flex';
+      const cardEl   = document.getElementById('inv-summary-card');
+      const metaEl   = document.getElementById('inv-summary-meta');
+      const kpiRowEl = document.getElementById('inv-kpi-row');
+      cardEl.style.display = 'block';
+
       const critical = tools.filter(t => (t.risk_level||t.riskLevel||'').toLowerCase() === 'critical').length;
       const high     = tools.filter(t => (t.risk_level||t.riskLevel||'').toLowerCase() === 'high').length;
-      summaryEl.innerHTML = `
-        <div class="inv-chip">
-          <div>
-            <div class="inv-chip-num">${tools.length}</div>
-            <div class="inv-chip-label">Total Tools<br>Detected</div>
-          </div>
+      const medium   = tools.filter(t => (t.risk_level||t.riskLevel||'').toLowerCase() === 'medium').length;
+      const low      = tools.filter(t => (t.risk_level||t.riskLevel||'').toLowerCase() === 'low').length;
+
+      const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+      metaEl.textContent = `${session.org_name} · ${assessDate}`;
+
+      const kpiHigh = critical + high;
+      let postureColor = 'var(--teal)';
+      let postureLabel = 'LOW';
+      if (critical >= 1 || kpiHigh >= 3) { postureColor = '#e05c5c'; postureLabel = 'CRITICAL'; }
+      else if (high >= 1)                 { postureColor = 'var(--orange)'; postureLabel = 'HIGH'; }
+      else if (medium >= 2)               { postureColor = '#f5c842'; postureLabel = 'MODERATE'; }
+
+      kpiRowEl.innerHTML = `
+        <div class="inv-kpi">
+          <div class="inv-kpi-num" style="color:var(--blue);">${tools.length}</div>
+          <div class="inv-kpi-label">AI Tools<br>Detected</div>
         </div>
-        ${critical > 0 ? `<div class="inv-chip" style="border-color:rgba(224,92,92,0.25);">
-          <div><div class="inv-chip-num" style="color:#e05c5c;">${critical}</div>
-          <div class="inv-chip-label">Critical<br>Risk</div></div></div>` : ''}
-        ${high > 0 ? `<div class="inv-chip" style="border-color:rgba(255,128,32,0.25);">
-          <div><div class="inv-chip-num" style="color:var(--orange);">${high}</div>
-          <div class="inv-chip-label">High<br>Risk</div></div></div>` : ''}`;
+        <div class="inv-kpi">
+          <div class="inv-kpi-num" style="color:#e05c5c;">${critical}</div>
+          <div class="inv-kpi-label">Critical<br>Risk</div>
+        </div>
+        <div class="inv-kpi">
+          <div class="inv-kpi-num" style="color:var(--orange);">${high}</div>
+          <div class="inv-kpi-label">High<br>Risk</div>
+        </div>
+        <div class="inv-kpi">
+          <div class="inv-kpi-num" style="color:#f5c842;">${medium}</div>
+          <div class="inv-kpi-label">Medium<br>Risk</div>
+        </div>
+        <div class="inv-kpi">
+          <div class="inv-kpi-num" style="color:var(--teal);">${low}</div>
+          <div class="inv-kpi-label">Low<br>Risk</div>
+        </div>
+        <div class="inv-kpi" style="background:rgba(9,26,54,0.4);">
+          <div class="inv-kpi-num" style="color:${postureColor};font-size:14px;letter-spacing:0.03em;padding-top:4px;">${postureLabel}</div>
+          <div class="inv-kpi-label">Risk<br>Posture</div>
+        </div>`;
     }
 
     renderTable(tools);

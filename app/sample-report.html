@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compass — Sample Assessment Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    :root {
+      --navy: #030b1e; --blue: #4082E8; --teal: #33CDB6;
+      --orange: #FF8020; --danger: #e05c5c; --gold: #e5b800;
+      --text: #0f1c38; --muted: #5a6682; --border: #d8dff0;
+      --bg-light: #f4f6fc; --bg-white: #ffffff;
+      --med: #9B97D4;
+    }
+
+    @page { size: A4 portrait; margin: 1.8cm 2cm 1.5cm; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 11pt;
+      color: var(--text);
+      background: var(--bg-light);
+      line-height: 1.5;
+    }
+
+    /* ── Public nav bar (hidden on print) ── */
+    .pub-nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(3,11,30,0.95);
+      border-bottom: 1px solid rgba(64,130,232,0.15);
+      backdrop-filter: blur(20px);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 58px;
+    }
+    .pub-nav-left { display: flex; align-items: center; gap: 1.25rem; }
+    .pub-nav-back {
+      display: flex; align-items: center; gap: 0.4rem;
+      color: rgba(208,212,226,0.55); text-decoration: none;
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.04em; transition: color 0.15s;
+    }
+    .pub-nav-back:hover { color: rgba(208,212,226,0.9); }
+    .pub-nav-divider { width: 1px; height: 18px; background: rgba(64,130,232,0.2); }
+    .pub-nav-title {
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.04em; color: rgba(208,212,226,0.38); text-transform: uppercase;
+    }
+    .pub-nav-sample-badge {
+      background: rgba(255,128,32,0.15); border: 1px solid rgba(255,128,32,0.3);
+      border-radius: 20px; padding: 2px 10px;
+      font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 800;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange);
+    }
+    .pub-nav-cta {
+      background: var(--blue); border: none; border-radius: 7px;
+      color: white; font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.04em;
+      padding: 8px 18px; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      transition: background 0.15s;
+    }
+    .pub-nav-cta:hover { background: #3070d0; }
+
+    /* ── Sample banner ── */
+    .sample-banner {
+      background: linear-gradient(90deg, rgba(255,128,32,0.08), rgba(255,128,32,0.04));
+      border-bottom: 1px solid rgba(255,128,32,0.15);
+      padding: 10px 2rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: 12px; color: rgba(208,212,226,0.65);
+    }
+    .sample-banner strong { color: var(--orange); }
+    .sample-banner a { color: var(--teal); text-decoration: none; }
+    .sample-banner a:hover { text-decoration: underline; }
+
+    /* ── Page wrapper ── */
+    .report-page {
+      max-width: 800px;
+      margin: 2rem auto 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.18);
+      overflow: hidden;
+    }
+    @media print {
+      .pub-nav, .sample-banner, .report-cta { display: none !important; }
+      .report-page { margin: 0; border-radius: 0; box-shadow: none; max-width: 100%; }
+      body { background: white; }
+    }
+
+    /* ── Cover strip ── */
+    .cover-strip {
+      background: var(--navy);
+      padding: 36px 44px 32px;
+    }
+    .cover-logo-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .cover-logo-bar {
+      width: 4px; height: 32px;
+      background: linear-gradient(180deg, var(--blue), var(--teal));
+      border-radius: 2px;
+    }
+    .cover-logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 800;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+    .cover-report-type {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 8px;
+    }
+    .cover-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px; font-weight: 800;
+      color: white; line-height: 1.15; margin-bottom: 16px;
+    }
+    .cover-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+    .cover-meta-item { font-size: 10px; color: rgba(255,255,255,0.5); }
+    .cover-meta-item strong { display: block; color: rgba(255,255,255,0.85); font-size: 11px; margin-bottom: 2px; }
+    .cover-confidential {
+      margin-top: 20px; font-size: 9px;
+      color: rgba(255,255,255,0.25); letter-spacing: 0.05em;
+      border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;
+    }
+
+    /* ── Content area ── */
+    .content-area { padding: 32px 44px; }
+
+    /* ── Section headings ── */
+    .sec-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--blue); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px; font-weight: 800;
+      color: var(--text); margin-bottom: 14px;
+    }
+
+    /* ── KPI row ── */
+    .kpi-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden; margin-bottom: 28px;
+    }
+    .kpi-cell {
+      padding: 16px 18px;
+      border-right: 1px solid var(--border);
+      background: var(--bg-light);
+    }
+    .kpi-cell:last-child { border-right: none; }
+    .kpi-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .kpi-val {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px; font-weight: 800;
+      line-height: 1; font-variant-numeric: tabular-nums;
+    }
+    .kpi-sub { font-size: 9px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Posture / gauge ── */
+    .posture-layout { display: grid; grid-template-columns: 1fr 180px; gap: 28px; align-items: start; margin-bottom: 28px; }
+    .posture-badge {
+      display: inline-block; padding: 5px 14px; border-radius: 100px;
+      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 800;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .posture-high { background: rgba(255,128,32,0.12); color: var(--orange); border: 1px solid rgba(255,128,32,0.3); }
+    .posture-p { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+    .bullet-list { display: flex; flex-direction: column; gap: 5px; }
+    .bullet-row { display: flex; align-items: flex-start; gap: 7px; font-size: 10.5px; color: var(--text); line-height: 1.45; }
+    .bullet-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; background: var(--blue); }
+
+    .gauge-wrap { text-align: center; }
+    .gauge-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+    /* ── Risk breakdown ── */
+    .risk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 28px; }
+    .risk-cell { padding: 12px 16px; border-right: 1px solid var(--border); }
+    .risk-cell:last-child { border-right: none; }
+    .risk-cell-label { font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+    .risk-cell-num { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .rc-critical .risk-cell-label { color: var(--danger); }
+    .rc-critical .risk-cell-num   { color: var(--danger); }
+    .rc-high .risk-cell-label     { color: var(--orange); }
+    .rc-high .risk-cell-num       { color: var(--orange); }
+    .rc-medium .risk-cell-label   { color: var(--gold); }
+    .rc-medium .risk-cell-num     { color: var(--gold); }
+    .rc-low .risk-cell-label      { color: #2da88f; }
+    .rc-low .risk-cell-num        { color: #2da88f; }
+
+    /* ── Tools table ── */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 10.5px; }
+    thead tr { background: var(--bg-light); border-bottom: 2px solid var(--border); }
+    th {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--muted); padding: 9px 12px; text-align: left;
+    }
+    td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(64,130,232,0.02); }
+
+    .risk-chip {
+      display: inline-block; padding: 2px 8px; border-radius: 100px;
+      font-family: 'Montserrat', sans-serif; font-size: 8px; font-weight: 800;
+      letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+    }
+    .rchip-critical { background: rgba(224,92,92,0.1); color: var(--danger); border: 1px solid rgba(224,92,92,0.2); }
+    .rchip-high     { background: rgba(255,128,32,0.1); color: var(--orange); border: 1px solid rgba(255,128,32,0.2); }
+    .rchip-medium   { background: rgba(229,184,0,0.1);  color: var(--gold);   border: 1px solid rgba(229,184,0,0.2); }
+    .rchip-low      { background: rgba(45,168,143,0.1); color: #2da88f;       border: 1px solid rgba(45,168,143,0.2); }
+
+    .tool-name-main { font-weight: 600; color: var(--text); }
+    .tool-vendor { font-size: 9.5px; color: var(--muted); }
+
+    .owasp-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px; color: var(--med);
+      background: rgba(155,151,212,0.08); border-radius: 3px; padding: 1px 5px;
+    }
+
+    /* ── NIST gap table ── */
+    .gap-table { margin-bottom: 28px; }
+    .gap-row {
+      display: grid; grid-template-columns: 90px 1fr 56px;
+      gap: 12px; align-items: start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 10.5px;
+    }
+    .gap-row:first-child { border-top: 1px solid var(--border); }
+    .gap-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; font-weight: 600; color: var(--blue);
+    }
+    .gap-name { font-weight: 600; color: var(--text); margin-bottom: 2px; font-size: 10px; }
+    .gap-finding { color: var(--muted); font-size: 9.5px; line-height: 1.5; }
+    .gap-status {
+      display: inline-block; padding: 2px 8px; border-radius: 100px;
+      font-family: 'Montserrat', sans-serif; font-size: 7.5px; font-weight: 800;
+      letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+    }
+    .gap-gap     { background: rgba(224,92,92,0.1); color: var(--danger); border: 1px solid rgba(224,92,92,0.2); }
+    .gap-partial { background: rgba(229,184,0,0.1);  color: var(--gold);   border: 1px solid rgba(229,184,0,0.2); }
+
+    /* ── Recommendations ── */
+    .rec-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .rec-row { display: flex; align-items: flex-start; gap: 12px; }
+    .rec-num {
+      flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+      background: var(--blue); display: flex; align-items: center; justify-content: center;
+      font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 800; color: white;
+    }
+    .rec-text { font-size: 10.5px; color: var(--text); line-height: 1.55; padding-top: 2px; }
+
+    /* ── Section divider ── */
+    .sec-gap { height: 28px; }
+
+    /* ── Footer of report ── */
+    .report-footer {
+      padding: 16px 44px;
+      background: var(--bg-light);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 8.5px; color: var(--muted);
+    }
+
+    /* ── CTA section (hidden on print) ── */
+    .report-cta {
+      max-width: 800px;
+      margin: 0 auto 3rem;
+      background: var(--navy);
+      border-radius: 0 0 12px 12px;
+      padding: 2.25rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .report-cta-text { }
+    .report-cta-title {
+      font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 800;
+      color: white; margin-bottom: 4px;
+    }
+    .report-cta-sub { font-size: 12px; color: rgba(208,212,226,0.55); }
+    .report-cta-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--blue); border: none; border-radius: 8px;
+      color: white; font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 800; letter-spacing: 0.03em;
+      padding: 10px 22px; cursor: pointer; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #3070d0; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(64,130,232,0.35); border-radius: 8px;
+      color: rgba(208,212,226,0.7); font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.03em;
+      padding: 10px 22px; cursor: pointer; text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-outline:hover { border-color: rgba(64,130,232,0.7); color: rgba(208,212,226,0.95); }
+
+    @media (max-width: 640px) {
+      .pub-nav { padding: 0 1rem; }
+      .content-area { padding: 24px 20px; }
+      .cover-strip { padding: 28px 20px; }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .posture-layout { grid-template-columns: 1fr; }
+      .report-cta { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Public nav -->
+  <nav class="pub-nav">
+    <div class="pub-nav-left">
+      <a class="pub-nav-back" href="../index.html">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Project Compass
+      </a>
+      <div class="pub-nav-divider"></div>
+      <span class="pub-nav-title">Sample Report</span>
+      <span class="pub-nav-sample-badge">Sample Data</span>
+    </div>
+    <a class="pub-nav-cta" href="login.html">
+      Run Your Own Assessment
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </nav>
+
+  <!-- Sample data banner -->
+  <div class="sample-banner">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#FF8020" stroke-width="1.2"/><path d="M7 5v3M7 9.5v.5" stroke="#FF8020" stroke-width="1.2" stroke-linecap="round"/></svg>
+    <span><strong>This is a sample assessment</strong> using fictional organization data. All company names, tool counts, and findings are illustrative. <a href="login.html">Run your own assessment →</a></span>
+  </div>
+
+  <!-- Report document -->
+  <div class="report-page">
+
+    <!-- Cover -->
+    <div class="cover-strip">
+      <div class="cover-logo-row">
+        <div class="cover-logo-bar"></div>
+        <div class="cover-logo-text">Project Compass — AI Governance Platform</div>
+      </div>
+      <div class="cover-report-type">Executive Summary Report</div>
+      <div class="cover-title">AI Governance Assessment<br>Meridian Financial Services</div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><strong>Assessment Date</strong>July 14, 2025</div>
+        <div class="cover-meta-item"><strong>Analyst</strong>Compass Platform</div>
+        <div class="cover-meta-item"><strong>Log Source</strong>DNS + HTTP Proxy (180 days)</div>
+        <div class="cover-meta-item"><strong>Framework</strong>NIST AI RMF · OWASP LLM Top 10</div>
+      </div>
+      <div class="cover-confidential">SAMPLE DATA — FOR DEMONSTRATION PURPOSES ONLY — NOT A REAL ASSESSMENT</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-area">
+
+      <!-- KPI bar -->
+      <div class="kpi-row">
+        <div class="kpi-cell">
+          <div class="kpi-label">AI Tools Detected</div>
+          <div class="kpi-val" style="color:var(--blue);">12</div>
+          <div class="kpi-sub">across 3 categories</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Governance Risk Score</div>
+          <div class="kpi-val" style="color:var(--orange);">67<span style="font-size:13px;font-weight:600;color:var(--muted);">/100</span></div>
+          <div class="kpi-sub">maturity: 33%</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Controls Flagged</div>
+          <div class="kpi-val" style="color:var(--danger);">9</div>
+          <div class="kpi-sub">of 19 assessed</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="kpi-label">Assessment Date</div>
+          <div class="kpi-val" style="color:var(--text);font-size:15px;">Jul 14</div>
+          <div class="kpi-sub">2025</div>
+        </div>
+      </div>
+
+      <!-- Risk posture + gauge -->
+      <div class="sec-label">Overall Risk Posture</div>
+      <div class="posture-layout">
+        <div>
+          <div class="posture-badge posture-high">HIGH RISK</div>
+          <p class="posture-p">
+            Meridian Financial Services has 12 AI tools actively generating network traffic,
+            3 of which are classified as Critical risk due to their exposure to sensitive financial
+            data with no documented governance controls. Immediate action is required.
+          </p>
+          <div class="bullet-list">
+            <div class="bullet-row">
+              <div class="bullet-dot" style="background:var(--danger);"></div>
+              No formal AI usage policy in place; all 12 tools are unsanctioned
+            </div>
+            <div class="bullet-row">
+              <div class="bullet-dot" style="background:var(--orange);"></div>
+              3 critical-risk tools (ChatGPT, Copilot, Claude) with no data handling agreements
+            </div>
+            <div class="bullet-row">
+              <div class="bullet-dot" style="background:var(--gold);"></div>
+              No vendor risk assessments completed; OWASP LLM06 exposure confirmed
+            </div>
+            <div class="bullet-row">
+              <div class="bullet-dot" style="background:#aaa;"></div>
+              Incident response plan does not address AI-specific failure modes
+            </div>
+          </div>
+        </div>
+
+        <!-- SVG gauge -->
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 160 100" width="160" height="100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Track -->
+            <path d="M20 90 A70 70 0 0 1 140 90" fill="none" stroke="#e8ecf5" stroke-width="14" stroke-linecap="round"/>
+            <!-- Fill (67%) -->
+            <path d="M20 90 A70 70 0 0 1 140 90" fill="none" stroke="url(#gGrad)" stroke-width="14" stroke-linecap="round"
+              stroke-dasharray="220" stroke-dashoffset="72.6"/>
+            <defs>
+              <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#33CDB6"/>
+                <stop offset="50%" stop-color="#FF8020"/>
+                <stop offset="100%" stop-color="#e05c5c"/>
+              </linearGradient>
+            </defs>
+            <text x="80" y="82" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="22" font-weight="800" fill="#0f1c38">67</text>
+            <text x="80" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="8" font-weight="700" fill="#5a6682" letter-spacing="0.08em">RISK SCORE / 100</text>
+          </svg>
+          <div class="gauge-label">Higher = more exposure</div>
+        </div>
+      </div>
+
+      <!-- Risk breakdown -->
+      <div class="sec-label">Risk Distribution</div>
+      <div class="risk-grid" style="margin-bottom:28px;">
+        <div class="risk-cell rc-critical">
+          <div class="risk-cell-label">Critical</div>
+          <div class="risk-cell-num">3</div>
+        </div>
+        <div class="risk-cell rc-high">
+          <div class="risk-cell-label">High</div>
+          <div class="risk-cell-num">4</div>
+        </div>
+        <div class="risk-cell rc-medium">
+          <div class="risk-cell-label">Medium</div>
+          <div class="risk-cell-num">3</div>
+        </div>
+        <div class="risk-cell rc-low">
+          <div class="risk-cell-label">Low</div>
+          <div class="risk-cell-num">2</div>
+        </div>
+      </div>
+
+      <!-- Detected tools -->
+      <div class="sec-label">Detected AI Tools</div>
+      <h2>12 AI Tools Identified</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tool</th>
+            <th>Category</th>
+            <th>Risk</th>
+            <th>OWASP Exposure</th>
+            <th>First Seen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">01</td>
+            <td><div class="tool-name-main">ChatGPT</div><div class="tool-vendor">OpenAI</div></td>
+            <td style="color:var(--muted);">Generative AI — Chat</td>
+            <td><span class="risk-chip rchip-critical">Critical</span></td>
+            <td><span class="owasp-chip">LLM01</span> <span class="owasp-chip">LLM06</span></td>
+            <td style="color:var(--muted);font-size:9px;">Jan 12, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">02</td>
+            <td><div class="tool-name-main">GitHub Copilot</div><div class="tool-vendor">Microsoft</div></td>
+            <td style="color:var(--muted);">Generative AI — Code</td>
+            <td><span class="risk-chip rchip-critical">Critical</span></td>
+            <td><span class="owasp-chip">LLM06</span> <span class="owasp-chip">LLM09</span></td>
+            <td style="color:var(--muted);font-size:9px;">Feb 3, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">03</td>
+            <td><div class="tool-name-main">Claude</div><div class="tool-vendor">Anthropic</div></td>
+            <td style="color:var(--muted);">Generative AI — Chat</td>
+            <td><span class="risk-chip rchip-critical">Critical</span></td>
+            <td><span class="owasp-chip">LLM01</span> <span class="owasp-chip">LLM06</span></td>
+            <td style="color:var(--muted);font-size:9px;">Mar 8, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">04</td>
+            <td><div class="tool-name-main">Cursor</div><div class="tool-vendor">Anysphere</div></td>
+            <td style="color:var(--muted);">Generative AI — Code</td>
+            <td><span class="risk-chip rchip-high">High</span></td>
+            <td><span class="owasp-chip">LLM06</span></td>
+            <td style="color:var(--muted);font-size:9px;">Apr 20, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">05</td>
+            <td><div class="tool-name-main">Perplexity AI</div><div class="tool-vendor">Perplexity AI</div></td>
+            <td style="color:var(--muted);">AI Search</td>
+            <td><span class="risk-chip rchip-high">High</span></td>
+            <td><span class="owasp-chip">LLM06</span> <span class="owasp-chip">LLM09</span></td>
+            <td style="color:var(--muted);font-size:9px;">Mar 14, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">06</td>
+            <td><div class="tool-name-main">Midjourney</div><div class="tool-vendor">Midjourney Inc.</div></td>
+            <td style="color:var(--muted);">Generative AI — Image</td>
+            <td><span class="risk-chip rchip-high">High</span></td>
+            <td><span class="owasp-chip">LLM07</span></td>
+            <td style="color:var(--muted);font-size:9px;">Feb 28, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">07</td>
+            <td><div class="tool-name-main">Jasper</div><div class="tool-vendor">Jasper AI</div></td>
+            <td style="color:var(--muted);">Generative AI — Marketing</td>
+            <td><span class="risk-chip rchip-high">High</span></td>
+            <td><span class="owasp-chip">LLM06</span></td>
+            <td style="color:var(--muted);font-size:9px;">May 5, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">08</td>
+            <td><div class="tool-name-main">Microsoft Copilot</div><div class="tool-vendor">Microsoft</div></td>
+            <td style="color:var(--muted);">Generative AI — Productivity</td>
+            <td><span class="risk-chip rchip-medium">Medium</span></td>
+            <td><span class="owasp-chip">LLM09</span></td>
+            <td style="color:var(--muted);font-size:9px;">Apr 1, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">09</td>
+            <td><div class="tool-name-main">Grammarly Business</div><div class="tool-vendor">Grammarly</div></td>
+            <td style="color:var(--muted);">AI Writing Assistant</td>
+            <td><span class="risk-chip rchip-medium">Medium</span></td>
+            <td><span class="owasp-chip">LLM06</span></td>
+            <td style="color:var(--muted);font-size:9px;">Jan 3, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">10</td>
+            <td><div class="tool-name-main">Adobe Firefly</div><div class="tool-vendor">Adobe</div></td>
+            <td style="color:var(--muted);">Generative AI — Creative</td>
+            <td><span class="risk-chip rchip-medium">Medium</span></td>
+            <td><span class="owasp-chip">LLM07</span></td>
+            <td style="color:var(--muted);font-size:9px;">Jun 10, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">11</td>
+            <td><div class="tool-name-main">Notion AI</div><div class="tool-vendor">Notion Labs</div></td>
+            <td style="color:var(--muted);">AI Productivity</td>
+            <td><span class="risk-chip rchip-low">Low</span></td>
+            <td style="color:var(--muted);">—</td>
+            <td style="color:var(--muted);font-size:9px;">Mar 22, 2025</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-size:9px;">12</td>
+            <td><div class="tool-name-main">Google Gemini</div><div class="tool-vendor">Google</div></td>
+            <td style="color:var(--muted);">Generative AI — Chat</td>
+            <td><span class="risk-chip rchip-low">Low</span></td>
+            <td><span class="owasp-chip">LLM09</span></td>
+            <td style="color:var(--muted);font-size:9px;">May 30, 2025</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- NIST gaps -->
+      <div class="sec-label">NIST AI RMF Gap Analysis</div>
+      <h2>Governance Control Findings</h2>
+      <div class="gap-table">
+        <div class="gap-row">
+          <div>
+            <div class="gap-id">GOVERN 1.1</div>
+          </div>
+          <div>
+            <div class="gap-name">AI Risk Management Policy</div>
+            <div class="gap-finding">No formal AI usage policy governing employee use of external AI tools. Staff are using 12 tools without documented authorization or data classification guidance.</div>
+          </div>
+          <div><span class="gap-status gap-gap">GAP</span></div>
+        </div>
+        <div class="gap-row">
+          <div>
+            <div class="gap-id">GOVERN 1.2</div>
+          </div>
+          <div>
+            <div class="gap-name">Accountability Structures</div>
+            <div class="gap-finding">Three critical-risk AI tools in active use with no designated owner, approval record, or business justification on file.</div>
+          </div>
+          <div><span class="gap-status gap-gap">GAP</span></div>
+        </div>
+        <div class="gap-row">
+          <div>
+            <div class="gap-id">MAP 1.1</div>
+          </div>
+          <div>
+            <div class="gap-name">AI Use Case Cataloging</div>
+            <div class="gap-finding">All 12 detected AI tools lack documented use cases. No inventory exists prior to this assessment.</div>
+          </div>
+          <div><span class="gap-status gap-gap">GAP</span></div>
+        </div>
+        <div class="gap-row">
+          <div>
+            <div class="gap-id">MAP 1.6</div>
+          </div>
+          <div>
+            <div class="gap-name">Third-Party AI Risk</div>
+            <div class="gap-finding">No vendor risk assessments on file for ChatGPT, Claude, or Copilot. Data residency and retention terms have not been reviewed.</div>
+          </div>
+          <div><span class="gap-status gap-gap">GAP</span></div>
+        </div>
+        <div class="gap-row">
+          <div>
+            <div class="gap-id">MEASURE 2.5</div>
+          </div>
+          <div>
+            <div class="gap-name">Ongoing AI Monitoring</div>
+            <div class="gap-finding">No automated monitoring for new AI tool adoption is in place. This assessment was the first detection effort; cadence is undefined.</div>
+          </div>
+          <div><span class="gap-status gap-partial">PARTIAL</span></div>
+        </div>
+        <div class="gap-row">
+          <div>
+            <div class="gap-id">MANAGE 1.3</div>
+          </div>
+          <div>
+            <div class="gap-name">AI Incident Response</div>
+            <div class="gap-finding">Existing IR plan does not address AI-specific failure modes including prompt injection, sensitive data disclosure, or model abuse.</div>
+          </div>
+          <div><span class="gap-status gap-gap">GAP</span></div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="sec-label">Recommended Actions</div>
+      <h2>Priority Remediation Steps</h2>
+      <div class="rec-list">
+        <div class="rec-row">
+          <div class="rec-num">1</div>
+          <div class="rec-text"><strong>Restrict access immediately</strong> to ChatGPT, GitHub Copilot, and Claude pending policy review and signed data handling agreements with each vendor.</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-num">2</div>
+          <div class="rec-text"><strong>Draft an AI Acceptable Use Policy</strong> within 30 days covering approved tools, permitted use cases, data classification rules, and employee acknowledgment requirements.</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-num">3</div>
+          <div class="rec-text"><strong>Assign tool owners</strong> to all 12 detected AI tools and complete a vendor risk questionnaire for each within 60 days. Prioritize critical-risk tools first.</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-num">4</div>
+          <div class="rec-text"><strong>Establish quarterly log analysis</strong> to detect new AI tool adoption. Define a monthly review cadence with the security team to maintain an up-to-date AI inventory.</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-num">5</div>
+          <div class="rec-text"><strong>Update the Incident Response plan</strong> to address AI-specific risks: prompt injection (LLM01), sensitive data disclosure (LLM06), and over-reliance on AI outputs (LLM09).</div>
+        </div>
+      </div>
+
+    </div><!-- /.content-area -->
+
+    <!-- Report footer -->
+    <div class="report-footer">
+      <span>Generated by Project Compass · AI Governance Platform · MICS 2026 Capstone</span>
+      <span>SAMPLE DATA — July 14, 2025</span>
+    </div>
+
+  </div><!-- /.report-page -->
+
+  <!-- CTA section (hidden on print) -->
+  <div class="report-cta">
+    <div class="report-cta-text">
+      <div class="report-cta-title">Ready to run your own assessment?</div>
+      <div class="report-cta-sub">Upload your actual logs and get a real report — no IT team required. Runs entirely in your browser.</div>
+    </div>
+    <div class="report-cta-btns">
+      <a class="btn-primary" href="login.html">Run Assessment →</a>
+      <a class="btn-outline" href="login.html?demo=true">Try Demo First</a>
+    </div>
+  </div>
+
+</body>
+</html>
