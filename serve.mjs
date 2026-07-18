@@ -138,6 +138,7 @@ const server = createServer(async (req, res) => {
     '/inventory':     '/app/inventory.html',
     '/report':        '/app/report.html',
     '/about':         '/app/info.html',
+    '/news':          '/app/news.html',
     '/assess':        '/app/assess.html',
     '/detect':        '/app/detect.html',
     '/upload':        '/app/upload.html',

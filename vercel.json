@@ -7,6 +7,7 @@
     { "source": "/inventory",     "destination": "/app/inventory.html" },
     { "source": "/report",        "destination": "/app/report.html" },
     { "source": "/about",         "destination": "/app/info.html" },
+    { "source": "/news",          "destination": "/app/news.html" },
     { "source": "/assess",        "destination": "/app/assess.html" },
     { "source": "/detect",        "destination": "/app/detect.html" },
     { "source": "/upload",        "destination": "/app/upload.html" },

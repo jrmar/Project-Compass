@@ -289,7 +289,7 @@
     <div class="gov-hero">
       <div class="gov-hero-label">◈ Meta-Governance</div>
       <h1>Project Compass AI Governance Policy</h1>
-      <p>How Compass governs its own use of artificial intelligence — including the Claude-powered "Explain this Finding" feature — in accordance with NIST AI RMF and OWASP LLM Top 10 2025.</p>
+      <p>This policy describes how Compass governs its own use of artificial intelligence, including the Claude powered "Explain This Finding" feature, in alignment with the NIST AI Risk Management Framework and the OWASP Top 10 for LLM Applications (2025).</p>
       <div class="gov-meta-badges">
         <span class="gov-badge"><span class="dot"></span>NIST AI RMF 1.0</span>
         <span class="gov-badge"><span class="dot orange"></span>OWASP LLM Top 10 2025</span>
@@ -300,12 +300,12 @@
     <!-- Effective date bar -->
     <div class="effective-bar reveal">
       <div>
-        <strong>Document:</strong> AI Governance Policy — Project Compass Platform &nbsp;·&nbsp;
+        <strong>Document:</strong> AI Governance Policy, Project Compass Platform &nbsp;·&nbsp;
         <strong>Version:</strong> 1.0 &nbsp;·&nbsp;
         <strong>Effective:</strong> July 2026
       </div>
       <div>
-        <strong>Owner:</strong> Compass Security &amp; Compliance Team &nbsp;·&nbsp;
+        <strong>Owner:</strong> Compass Security and Compliance Team &nbsp;·&nbsp;
         <strong>Review Cycle:</strong> Quarterly
       </div>
     </div>
@@ -317,7 +317,11 @@
 
       <div class="glass-card reveal reveal-d2">
         <p style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:20px;">
-          The <strong style="color:var(--light)">"Explain this Finding"</strong> button appears on flagged NIST AI RMF controls in the Dashboard. When clicked, it sends a minimal, structured payload to the Anthropic API (Claude Haiku) and returns a 2–3 sentence plain-language explanation of the gap plus three numbered remediation steps. This feature is local-only; it is not available in the static Vercel deployment unless a Vercel environment variable is configured.
+          The <strong style="color:var(--light)">"Explain This Finding"</strong> button appears alongside flagged NIST AI RMF controls on the dashboard. When selected, Compass sends a small, structured piece of information to the Anthropic API, using Claude Haiku, and receives a concise, plain language explanation of the gap along with three recommended remediation steps. This feature currently operates only in local environments and will not be available in the standard Vercel deployment unless the appropriate environment variable has been configured.
+        </p>
+
+        <p style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:20px;">
+          Process flow: The browser (dashboard.html) submits a request to the proxy API (POST /api/explain, handled by serve.mjs), which calls the Anthropic API (claude-haiku-4-5) and returns the explanation for display on the page.
         </p>
 
         <!-- Data flow diagram -->
@@ -348,7 +352,7 @@
         </div>
 
         <p style="font-size:12px;color:var(--muted);line-height:1.6;">
-          The proxy server (<code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:11px;">serve.mjs</code>) acts as a gatekeeper — the browser never has direct access to the API key, and the proxy enforces what fields are forwarded.  No session data, log contents, organization name, or user identity ever leaves the local server.
+          The proxy server, <code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:11px;">serve.mjs</code>, functions as a gatekeeper. The browser never has direct access to the API key, and the proxy determines exactly which fields are permitted to be transmitted. No session data, log content, organization name, or user identity leaves the local server at any point.
         </p>
       </div>
     </div>
@@ -356,7 +360,7 @@
     <!-- ── Section 2: Data Handling ── -->
     <div class="gov-section">
       <div class="section-label reveal">Data Classification</div>
-      <div class="section-heading reveal reveal-d1">What Is and Is Not Sent to Anthropic</div>
+      <div class="section-heading reveal reveal-d1">What Is Sent to Anthropic, and What Is Not</div>
 
       <div class="glass-card reveal reveal-d2" style="overflow-x:auto;">
         <table class="data-table">
@@ -373,55 +377,55 @@
               <td><code>control_id</code> (e.g. <code>GV.PO-1</code>)</td>
               <td><span class="sent-yes">✓ YES</span></td>
               <td>Public standard</td>
-              <td>NIST AI RMF control identifier — not org-specific</td>
+              <td>A NIST control identifier, not specific to any organization</td>
             </tr>
             <tr>
               <td><code>control_name</code> (e.g. "AI Risk Policy")</td>
               <td><span class="sent-yes">✓ YES</span></td>
               <td>Public standard</td>
-              <td>Human-readable label from public NIST framework</td>
+              <td>A descriptive label drawn from the public NIST framework</td>
             </tr>
             <tr>
-              <td><code>status</code> (GAP / PARTIAL / MET)</td>
+              <td><code>status</code> (Gap / Partial / Met)</td>
               <td><span class="sent-yes">✓ YES</span></td>
               <td>Non-identifying</td>
-              <td>Structural enum value, not org-specific</td>
+              <td>A structural category value, not tied to any organization</td>
             </tr>
             <tr>
               <td><code>finding_text</code></td>
               <td><span class="sent-yes">✓ YES</span></td>
               <td>Non-identifying</td>
-              <td>Template string: "Control X — 'Name' is unmet…" — no org name, log content, or user data</td>
+              <td>A fixed sentence such as "Control X, Name, is unmet," with no organization name, log content, or user data</td>
             </tr>
             <tr>
-              <td>Organization name (<code>org_name</code>)</td>
+              <td>Organization name</td>
               <td><span class="sent-no">✗ NO</span></td>
-              <td>Sensitive — PII</td>
-              <td>Stays in <code>compass_session</code> in browser only</td>
+              <td>Sensitive, personal</td>
+              <td>Remains within the browser session only</td>
             </tr>
             <tr>
               <td>Log file contents</td>
               <td><span class="sent-no">✗ NO</span></td>
-              <td>Sensitive — operational</td>
-              <td>Never leaves the browser; processed client-side</td>
+              <td>Sensitive, operational</td>
+              <td>Never leaves the browser; all processing occurs on the user's device</td>
             </tr>
             <tr>
               <td>User name or email</td>
               <td><span class="sent-no">✗ NO</span></td>
-              <td>Sensitive — PII</td>
-              <td>Stays in MSAL session; never in API payload</td>
+              <td>Sensitive, personal</td>
+              <td>Remains within the login session and is never included in any request to the API</td>
             </tr>
             <tr>
-              <td>AI tool inventory (<code>inv_overrides</code>)</td>
+              <td>AI tool inventory</td>
               <td><span class="sent-no">✗ NO</span></td>
-              <td>Sensitive — operational</td>
-              <td>Session-only; not included in any server call</td>
+              <td>Sensitive, operational</td>
+              <td>Remains within the session and is never included in any server call</td>
             </tr>
             <tr>
-              <td>NIST gap scores / counts</td>
+              <td>NIST gap scores or counts</td>
               <td><span class="sent-no">✗ NO</span></td>
-              <td>Sensitive — operational</td>
-              <td>Dashboard computed client-side; not forwarded</td>
+              <td>Sensitive, operational</td>
+              <td>Calculated within the browser and never transmitted</td>
             </tr>
           </tbody>
         </table>
@@ -431,50 +435,50 @@
     <!-- ── Section 3: NIST AI RMF Mapping ── -->
     <div class="gov-section">
       <div class="section-label reveal">Framework Mapping</div>
-      <div class="section-heading reveal reveal-d1">NIST AI RMF Controls — Compass's Own AI System</div>
-      <p class="reveal reveal-d2" style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px;">Compass applies the same NIST AI RMF lens to itself that it uses to audit client AI tools. The table below shows how each core function applies to the "Explain this Finding" Claude integration.</p>
+      <div class="section-heading reveal reveal-d1">Application of NIST AI RMF to Compass Itself</div>
+      <p class="reveal reveal-d2" style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px;">Compass applies the same standard to its own AI feature that it applies when evaluating a client's AI tools. The following outlines how each relevant control applies to the "Explain This Finding" feature.</p>
 
       <div class="nist-grid">
         <div class="nist-card reveal">
           <div class="nist-card-id">GV.PO-1 — GOVERN</div>
           <div class="nist-card-title">AI Risk Policy</div>
-          <div class="nist-card-body">This document constitutes Compass's AI usage policy for the platform. It defines scope, data classification, vendor accountability, and review cadence for the Claude integration.</div>
+          <div class="nist-card-body">This document constitutes Compass's AI use policy for the platform. It defines the scope of the feature, the classification of data involved, accountability for the vendor relationship, and the review cadence.</div>
           <div class="nist-status status-met">Met</div>
         </div>
 
         <div class="nist-card reveal reveal-d1">
           <div class="nist-card-id">GV.OV-1 — GOVERN</div>
           <div class="nist-card-title">Organizational Oversight</div>
-          <div class="nist-card-body">The Compass Security &amp; Compliance Team owns this policy. Review occurs quarterly or upon any change to the Claude integration payload, model, or vendor terms.</div>
+          <div class="nist-card-body">The Compass Security and Compliance Team owns this policy. It is reviewed on a quarterly basis, or whenever the Claude integration, its data handling, or the vendor terms change.</div>
           <div class="nist-status status-met">Met</div>
         </div>
 
         <div class="nist-card reveal reveal-d2">
           <div class="nist-card-id">GV.AT-1 — GOVERN</div>
-          <div class="nist-card-title">AI Literacy and Awareness</div>
-          <div class="nist-card-body">Every AI-generated explanation carries an inline disclosure note: "Generated by Claude (Anthropic) · Only control ID and description were sent — no org data or log content." Users are never left unaware they are reading AI output.</div>
+          <div class="nist-card-title">AI Awareness</div>
+          <div class="nist-card-body">Every explanation generated by the feature includes a disclosure statement identifying it as AI generated and listing exactly what was sent. Users are never left uncertain about whether they are viewing AI generated content.</div>
           <div class="nist-status status-met">Met</div>
         </div>
 
         <div class="nist-card reveal reveal-d3">
           <div class="nist-card-id">MP.AC-1 — MAP</div>
-          <div class="nist-card-title">AI Context Established</div>
-          <div class="nist-card-body">The system prompt instructs Claude to act as a "concise NIST AI RMF compliance advisor," constraining outputs to the compliance domain. Off-domain responses are not solicited or expected.</div>
+          <div class="nist-card-title">Defining the AI's Role</div>
+          <div class="nist-card-body">Claude is instructed to operate solely as a concise NIST AI RMF advisor. It is not asked to perform any function outside that role, and no such function is expected of it.</div>
           <div class="nist-status status-met">Met</div>
         </div>
 
         <div class="nist-card reveal">
           <div class="nist-card-id">MS.MC-1 — MEASURE</div>
-          <div class="nist-card-title">Trustworthiness Evaluation</div>
-          <div class="nist-card-body">Explanations are advisory only. The disclosure note reinforces that users should verify AI guidance against official NIST documentation. No automated decisions are made from Claude outputs.</div>
-          <div class="nist-status status-partial">Partial — advisory use</div>
+          <div class="nist-card-title">Evaluating Trustworthiness</div>
+          <div class="nist-card-body">Every explanation is intended to be advisory rather than authoritative. The disclosure statement reminds users to verify AI guidance against official NIST documentation. No automated decisions are made on the basis of Claude's output.</div>
+          <div class="nist-status status-partial">Partial, advisory use only</div>
         </div>
 
         <div class="nist-card reveal reveal-d1">
           <div class="nist-card-id">MG.AN-1 — MANAGE</div>
-          <div class="nist-card-title">AI Incident Monitoring</div>
-          <div class="nist-card-body">Server-side errors from the Anthropic API are logged to the local console with prefix <code>[/api/explain]</code>. Production deployments should route these to a log aggregator. Hallucination incidents should be reported to the Compass team.</div>
-          <div class="nist-status status-partial">Partial — prod logging TBD</div>
+          <div class="nist-card-title">Monitoring for Incidents</div>
+          <div class="nist-card-body">Errors returned by the Anthropic API are logged locally. In a production environment, these logs should be routed to a formal monitoring system. Any inaccurate or unexpected output from Claude should be reported to the Compass team.</div>
+          <div class="nist-status status-partial">Partial, production logging to be established</div>
         </div>
       </div>
     </div>
@@ -482,7 +486,7 @@
     <!-- ── Section 4: OWASP LLM Top 10 ── -->
     <div class="gov-section">
       <div class="section-label reveal">Security Controls</div>
-      <div class="section-heading reveal reveal-d1">OWASP LLM Top 10 2025 — Applied Controls</div>
+      <div class="section-heading reveal reveal-d1">Application of the OWASP Top 10 for LLM Applications (2025)</div>
 
       <div class="glass-card reveal reveal-d2" style="overflow-x:auto;">
         <table class="owasp-table">
@@ -498,62 +502,62 @@
             <tr>
               <td><span class="owasp-id">LLM01:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Prompt Injection</td>
-              <td style="font-size:12px;color:var(--muted);">User has no free-text input field that reaches the LLM. The payload is a fixed template constructed server-side from whitelisted fields (<code style="color:var(--teal)">control_id</code>, <code style="color:var(--teal)">control_name</code>, <code style="color:var(--teal)">status</code>, <code style="color:var(--teal)">finding_text</code>). Template strings contain no user-supplied text.</td>
-              <td><span class="control-chip chip-applied">Applied</span></td>
+              <td style="font-size:12px;color:var(--muted);">There is no free text field through which a user can reach the model. All content sent to Claude is drawn from a fixed set of approved fields, constructed server side rather than entered by a user, leaving no opportunity to introduce unauthorized instructions.</td>
+              <td><span class="control-chip chip-applied">Addressed</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM02:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Sensitive Information Disclosure</td>
-              <td style="font-size:12px;color:var(--muted);">Data classification table above confirms no PII, org name, log content, or inventory data is sent. Proxy enforces the allowlist at the server layer, not the client layer.</td>
-              <td><span class="control-chip chip-applied">Applied</span></td>
+              <td style="font-size:12px;color:var(--muted);">As shown in the data classification table above, no personal information, organization name, log content, or inventory data is transmitted. This restriction is enforced at the server level rather than the browser level.</td>
+              <td><span class="control-chip chip-applied">Addressed</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM03:2025</span></td>
-              <td style="color:var(--light);font-size:12px;">Supply Chain</td>
-              <td style="font-size:12px;color:var(--muted);">Anthropic is a named, contracted vendor. Model version (<code style="color:var(--teal)">claude-haiku-4-5-20251001</code>) is pinned in code. Vendor risk assessment (Section 5) is reviewed quarterly.</td>
-              <td><span class="control-chip chip-applied">Applied</span></td>
+              <td style="color:var(--light);font-size:12px;">Supply Chain Risk</td>
+              <td style="font-size:12px;color:var(--muted);">Anthropic is a named, contracted vendor. The specific model version, <code style="color:var(--teal)">claude-haiku-4-5-20251001</code>, is fixed within the code rather than permitted to update automatically. Vendor risk is reviewed quarterly.</td>
+              <td><span class="control-chip chip-applied">Addressed</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM04:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Data and Model Poisoning</td>
-              <td style="font-size:12px;color:var(--muted);">Compass does not fine-tune or provide training feedback to Claude. Read-only inference only. Not applicable to this integration.</td>
-              <td><span class="control-chip chip-na">N/A</span></td>
+              <td style="font-size:12px;color:var(--muted);">Compass does not fine tune Claude or provide feedback that could influence future versions of the model. The integration performs read only inference.</td>
+              <td><span class="control-chip chip-na">Not applicable</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM05:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Improper Output Handling</td>
-              <td style="font-size:12px;color:var(--muted);">Claude output is HTML-escaped via <code style="color:var(--teal)">escHtml()</code> before injection into the DOM. Only <code style="color:var(--teal)">&lt;strong&gt;</code> tags are allowed (from <code>**bold**</code> markdown conversion). No raw HTML from Claude is ever rendered.</td>
-              <td><span class="control-chip chip-applied">Applied</span></td>
+              <td style="font-size:12px;color:var(--muted);">All output returned by Claude is safely escaped prior to being displayed, preventing execution as code. The only formatting permitted is bold text, converted from simple markdown.</td>
+              <td><span class="control-chip chip-applied">Addressed</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM06:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Excessive Agency</td>
-              <td style="font-size:12px;color:var(--muted);">Claude has no tools, no memory, no ability to take actions. It returns text only. The system prompt explicitly scopes it to "concise NIST AI RMF advisor." Outputs are advisory and never trigger automated decisions.</td>
-              <td><span class="control-chip chip-applied">Applied</span></td>
+              <td style="font-size:12px;color:var(--muted);">Claude has no access to tools, memory, or the ability to take action within this integration. It returns text only, and its output never triggers an automated action.</td>
+              <td><span class="control-chip chip-applied">Addressed</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM07:2025</span></td>
               <td style="color:var(--light);font-size:12px;">System Prompt Leakage</td>
-              <td style="font-size:12px;color:var(--muted);">The system prompt contains no secrets, keys, or confidential instructions. It is a behavior directive only. Leaking it would not create a security risk.</td>
-              <td><span class="control-chip chip-applied">Applied</span></td>
+              <td style="font-size:12px;color:var(--muted);">The instructions provided to Claude contain no secrets, credentials, or confidential business logic. Their disclosure would not create a security risk.</td>
+              <td><span class="control-chip chip-applied">Addressed</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM08:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Vector and Embedding Weaknesses</td>
-              <td style="font-size:12px;color:var(--muted);">No vector database, RAG pipeline, or embeddings are used. Not applicable to this integration.</td>
-              <td><span class="control-chip chip-na">N/A</span></td>
+              <td style="font-size:12px;color:var(--muted);">This feature does not employ a vector database, retrieval pipeline, or embeddings of any kind.</td>
+              <td><span class="control-chip chip-na">Not applicable</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM09:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Misinformation</td>
-              <td style="font-size:12px;color:var(--muted);">Every explanation is labeled "Generated by Claude · advisory only." Users are directed to verify guidance against official NIST documentation. The feature description uses "advisory" language throughout, not "authoritative."</td>
-              <td><span class="control-chip chip-partial">Residual risk</span></td>
+              <td style="font-size:12px;color:var(--muted);">Every explanation carries a label identifying it as AI generated and advising verification against official NIST documentation. The feature is described as advisory throughout, and never presented as authoritative.</td>
+              <td><span class="control-chip chip-partial">Residual risk remains</span></td>
             </tr>
             <tr>
               <td><span class="owasp-id">LLM10:2025</span></td>
               <td style="color:var(--light);font-size:12px;">Unbounded Consumption</td>
-              <td style="font-size:12px;color:var(--muted);">Token limit is capped at 400 per call (<code style="color:var(--teal)">max_tokens: 400</code>). The API key is gated server-side; the browser cannot call Anthropic directly or in a loop. Rate limiting and cost monitoring are the operator's responsibility via Anthropic console.</td>
-              <td><span class="control-chip chip-applied">Applied</span></td>
+              <td style="font-size:12px;color:var(--muted);">Each response is limited to 400 tokens. The API key is never exposed to the browser, preventing direct or repeated calls to Anthropic from outside the server.</td>
+              <td><span class="control-chip chip-applied">Addressed</span></td>
             </tr>
           </tbody>
         </table>
@@ -563,7 +567,7 @@
     <!-- ── Section 5: Vendor Risk ── -->
     <div class="gov-section">
       <div class="section-label reveal">Vendor Risk</div>
-      <div class="section-heading reveal reveal-d1">Anthropic — Third-Party AI Vendor Assessment</div>
+      <div class="section-heading reveal reveal-d1">Anthropic: Third Party Vendor Assessment</div>
 
       <div class="glass-card reveal reveal-d2">
         <div class="vendor-card">
@@ -573,15 +577,15 @@
           </div>
           <div class="vendor-field">
             <label>Service Used</label>
-            <span>Anthropic Messages API (Claude Haiku)</span>
+            <span>Anthropic Messages API, Claude Haiku</span>
           </div>
           <div class="vendor-field">
-            <label>Model Pinned</label>
+            <label>Model Version</label>
             <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);">claude-haiku-4-5-20251001</span>
           </div>
           <div class="vendor-field">
-            <label>Data Sent</label>
-            <span>NIST control IDs and descriptions only — no PII, no org data</span>
+            <label>Data Transmitted</label>
+            <span>NIST control identifiers and descriptions only; no personal or organization specific data</span>
           </div>
           <div class="vendor-field">
             <label>Inherent Risk</label>
@@ -592,20 +596,20 @@
             <span><span class="risk-pill low">Low</span></span>
           </div>
           <div class="vendor-field">
-            <label>Data Retention by Vendor</label>
-            <span>Anthropic's API usage policy may log prompts for safety monitoring. See <em>Anthropic Privacy Policy</em> (api.anthropic.com/privacy).</span>
+            <label>Vendor Data Handling</label>
+            <span>Anthropic's API usage policy may retain prompts briefly for safety monitoring purposes. Refer to Anthropic's privacy policy at api.anthropic.com/privacy.</span>
           </div>
           <div class="vendor-field">
             <label>Mitigation</label>
-            <span>Sending only public-standard identifiers (not org-specific data) limits the sensitivity of any retained logs.</span>
+            <span>Because only public, standard identifiers are transmitted rather than organization specific data, any information retained by the vendor carries limited sensitivity.</span>
           </div>
           <div class="vendor-field">
             <label>Authentication</label>
-            <span>API key stored in <code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:11px;">.env</code> (gitignored) locally; Vercel environment variable in production. Never committed to source control.</span>
+            <span>The API key is stored in a local <code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:11px;">.env</code> file excluded from version control, and as an environment variable within Vercel in production. It is never committed to source control.</span>
           </div>
           <div class="vendor-field">
             <label>Next Review</label>
-            <span>October 2026 (quarterly cadence)</span>
+            <span>October 2026, in accordance with the quarterly review cycle</span>
           </div>
         </div>
       </div>
@@ -617,10 +621,10 @@
       <div class="section-heading reveal reveal-d1">Responsible AI Use Statement</div>
 
       <div class="statement-card reveal reveal-d2">
-        <p>Project Compass uses AI to augment, not replace, human compliance judgment. The "Explain this Finding" feature is designed to help compliance professionals understand NIST AI RMF control gaps more quickly — it is not a substitute for qualified professional review, legal counsel, or official NIST guidance.</p>
-        <p>Compass limits AI system scope to the minimum necessary: one feature, advisory outputs only, no automated decisions, no sensitive data transmitted. This reflects our commitment to the same responsible-AI principles we help our users assess in their own tools.</p>
-        <p>Users who observe unexpected, harmful, or inaccurate AI outputs should report them to the Compass team so they can be investigated and, where appropriate, used to improve the system prompt or disable the feature.</p>
-        <p style="color:var(--muted);font-size:12px;">This policy is reviewed quarterly. Changes to the AI integration that alter data flow, model, or vendor require an updated review before deployment.</p>
+        <p>Compass employs artificial intelligence to support human judgment, not to replace it. The "Explain This Finding" feature is intended to help compliance professionals understand a NIST AI RMF control gap more efficiently. It does not serve as a substitute for qualified professional review, legal counsel, or official NIST documentation.</p>
+        <p>The scope of this AI feature is deliberately limited: a single function, advisory output only, no automated decision-making, and no transmission of sensitive data. This reflects the same standard of responsible AI use that Compass asks its users to apply to their own tools.</p>
+        <p>Users who observe an explanation that appears inaccurate, unexpected, or unhelpful are encouraged to report it to the Compass team. This feedback is used to refine the instructions provided to Claude or, where appropriate, to disable the feature.</p>
+        <p>This policy is reviewed on a quarterly basis. Any change affecting the data transmitted, the model in use, or the vendor relationship will be reviewed prior to deployment.</p>
       </div>
     </div>
 

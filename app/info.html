@@ -372,7 +372,7 @@
         About the Project
       </div>
       <h1>Understanding Project Compass</h1>
-      <p>A capstone AI governance tool that helps organizations discover, assess, and manage AI tool risk — entirely in the browser, with no data leaving your device.</p>
+      <p>Project Compass is an AI governance tool that helps organizations discover, assess, and manage AI tool risk. Detection and assessment run in the browser, and no organizational data leaves the device except for one narrow, documented exception described later on this page.</p>
     </div>
 
     <!-- ── How It Works ── -->
@@ -388,25 +388,60 @@
           <div class="flow-step-bar bar-blue"></div>
           <div class="flow-step-num">Step 01</div>
           <div class="flow-step-title">Upload Logs</div>
-          <div class="flow-step-desc">Provide network or proxy logs (DNS, HTTP, firewall exports) from your organization. Files are read locally in your browser — nothing is uploaded to any server.</div>
+          <div class="flow-step-desc">Provide network or proxy logs, such as DNS, HTTP, or firewall exports, from your organization. Files are read locally in the browser. Nothing is uploaded to any server during this step.</div>
         </div>
         <div class="flow-step reveal reveal-d2">
           <div class="flow-step-bar bar-teal"></div>
           <div class="flow-step-num">Step 02</div>
           <div class="flow-step-title">Detect AI Tools</div>
-          <div class="flow-step-desc">The log parser matches hostnames against a registry of known AI service domains — OpenAI, Anthropic, Copilot, Hugging Face, and hundreds more — and assigns each a risk tier.</div>
+          <div class="flow-step-desc">The log parser matches hostnames against a registry of known AI service domains, including OpenAI, Anthropic, GitHub Copilot, and Hugging Face among others, and assigns each detected tool a risk tier based on its data exposure and external connectivity.</div>
         </div>
         <div class="flow-step reveal reveal-d3">
           <div class="flow-step-bar bar-orange"></div>
           <div class="flow-step-num">Step 03</div>
           <div class="flow-step-title">Assess Controls</div>
-          <div class="flow-step-desc">A structured questionnaire maps your existing policies against NIST AI RMF control domains. Responses generate a maturity score and gap analysis across Govern, Map, Measure, and Manage.</div>
+          <div class="flow-step-desc">A 13 question governance questionnaire, along with four additional checks scored automatically from vendor registry data, maps an organization's practices against NIST AI RMF control domains. Responses generate a gap score across all four core functions: Govern, Map, Measure, and Manage.</div>
         </div>
         <div class="flow-step reveal reveal-d4">
           <div class="flow-step-bar bar-grad"></div>
           <div class="flow-step-num">Step 04</div>
           <div class="flow-step-title">Generate Report</div>
-          <div class="flow-step-desc">Three audience-specific views — IT Security, Executive, and Auditor — summarize posture, risk score, maturity rating, and prioritized remediation recommendations.</div>
+          <div class="flow-step-desc">Three audience specific views, IT Security, Executive, and Auditor, summarize posture, gap score, and prioritized remediation recommendations.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ── NIST Framework ── -->
+    <div class="info-section">
+      <div class="reveal">
+        <div class="section-eyebrow">Framework</div>
+        <div class="section-heading">How the NIST Framework Applies</div>
+        <div class="glass-card" style="margin-top:16px;">
+          <p style="font-size:13px;color:rgba(208,212,226,0.78);line-height:1.78;">Compass is built around the NIST AI Risk Management Framework (NIST AI 100-1, January 2023) and its generative AI companion, NIST AI 600-1 (July 2024), organized into four functions: <strong style="color:var(--light);">Govern</strong> (policy, ownership, and training), <strong style="color:var(--light);">Map</strong> (what AI tools exist and their risk), <strong style="color:var(--light);">Measure</strong> (monitoring, review, and data protection), and <strong style="color:var(--light);">Manage</strong> (incident response and enforcement). Compass evaluates 19 NIST controls across these four functions, through 13 analyst questions and 4 automated vendor checks.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Scoring ── -->
+    <div class="info-section">
+      <div class="reveal">
+        <div class="section-eyebrow">Scoring</div>
+        <div class="section-heading">How Scoring Works</div>
+        <div class="glass-card" style="margin-top:16px;">
+          <p style="font-size:13px;color:rgba(208,212,226,0.78);line-height:1.78;">Each control carries a severity weight: High = 100, Medium = 50, Low = 0 (tracked but not scored). Each answer earns a matching credit: Yes/Pass = 100 (met), Unsure/Partial = 50 (half a gap), No/Fail = 0 (unmet). A control's gap points equal its severity weight times (100 minus the answer score), divided by 100, summed across all controls and tools to produce the overall gap score.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Two Scores ── -->
+    <div class="info-section">
+      <div class="reveal">
+        <div class="section-eyebrow">Interpretation</div>
+        <div class="section-heading">Two Scores, Two Different Purposes</div>
+        <div class="glass-card" style="margin-top:16px;">
+          <p style="font-size:13px;color:rgba(208,212,226,0.78);line-height:1.78;">Compass scores two different things. Each AI tool gets a risk tier (Critical, High, Medium, Low) based on how dangerous the tool itself could be. Each NIST control gets a severity weight (High, Medium, Low) based on how serious it is if that particular safeguard is missing. The two scales look similar but measure different questions.</p>
         </div>
       </div>
     </div>
@@ -418,13 +453,13 @@
       <div class="reveal">
         <div class="section-eyebrow">Log Parser</div>
         <div class="section-heading">What the Parser Analyzes</div>
-        <p class="section-body">The log parser is the detection engine at the core of Compass. It reads structured log files and matches hostnames and endpoints against a curated registry of known AI service domains, returning enriched tool metadata for each match.</p>
+        <p class="section-body">The log parser is the detection engine at the core of Compass. It reads structured log files and matches hostnames and endpoints against a curated registry of known AI service domains, returning enriched tool metadata for each match. Supported formats include .log, .txt, .csv, and .json, exported from proxy servers, next generation firewalls, and DNS resolvers.</p>
       </div>
 
       <div class="feature-grid">
         <div class="feature-card reveal reveal-d1">
           <div class="feature-card-title">Supported File Formats</div>
-          <div class="feature-card-desc">Accepts common network log formats exported from proxy servers, next-gen firewalls, and DNS resolvers.</div>
+          <div class="feature-card-desc">.log, .txt, .csv, .json, exported from proxy servers, next generation firewalls, and DNS resolvers.</div>
           <div class="tag-row">
             <span class="tag tag-teal">.log</span>
             <span class="tag tag-teal">.txt</span>
@@ -434,7 +469,7 @@
         </div>
         <div class="feature-card reveal reveal-d2">
           <div class="feature-card-title">Extracted Fields</div>
-          <div class="feature-card-desc">For each detected AI tool, the parser surfaces the following attributes from the registry lookup.</div>
+          <div class="feature-card-desc">Tool name, vendor, category, risk level, data classification, and access frequency.</div>
           <div class="tag-row">
             <span class="tag tag-blue">Tool Name</span>
             <span class="tag tag-blue">Vendor</span>
@@ -446,7 +481,7 @@
         </div>
         <div class="feature-card reveal reveal-d3">
           <div class="feature-card-title">Risk Tier Assignment</div>
-          <div class="feature-card-desc">Each tool is automatically tiered based on data exposure potential, external connectivity, and model type.</div>
+          <div class="feature-card-desc">Critical, High, Medium, or Low, based on data exposure potential, external connectivity, and model type.</div>
           <div class="tag-row">
             <span class="tag tag-red">Critical</span>
             <span class="tag tag-orange">High</span>
@@ -456,7 +491,7 @@
         </div>
         <div class="feature-card reveal reveal-d4">
           <div class="feature-card-title">Tool Categories Detected</div>
-          <div class="feature-card-desc">The registry covers major categories of AI tools in enterprise environments.</div>
+          <div class="feature-card-desc">Generative AI and chat, code assistants, open source models, writing assistants, image generation, voice and speech, data pipelines, and search or retrieval tools.</div>
           <div class="tag-row">
             <span class="tag tag-blue">LLM / Chat</span>
             <span class="tag tag-blue">Code Assistant</span>
@@ -476,7 +511,7 @@
       <div class="reveal">
         <div class="section-eyebrow">AI Registry</div>
         <div class="section-heading">The AI Tool Inventory</div>
-        <p class="section-body">After detection, every identified tool is added to an AI Inventory — a structured registry your team can review, annotate, and act on. This gives you a living record of AI usage across your organization and the foundation for a governance decision log.</p>
+        <p class="section-body">After detection, every identified tool is added to an AI inventory, a structured registry a team can review, annotate, and act on. This provides a living record of AI usage across the organization and the foundation for a governance decision log.</p>
       </div>
 
       <div class="feature-grid">
@@ -486,15 +521,15 @@
         </div>
         <div class="feature-card reveal reveal-d2">
           <div class="feature-card-title">Approval Workflow</div>
-          <div class="feature-card-desc">Each tool is individually marked <span style="color:var(--teal);">Approved</span>, <span style="color:#f5c842;">Under Review</span>, or <span style="color:#e05c5c;">Blocked</span> — tracking governance decisions at the tool level.</div>
+          <div class="feature-card-desc">Each tool is individually marked <span style="color:var(--teal);">Approved</span>, <span style="color:#f5c842;">Under Review</span>, or <span style="color:#e05c5c;">Blocked</span>, tracking governance decisions at the tool level.</div>
         </div>
         <div class="feature-card reveal reveal-d3">
           <div class="feature-card-title">Analyst Notes</div>
-          <div class="feature-card-desc">Expand any inventory row to add free-text notes — document exceptions, risk acceptance rationale, or remediation steps per tool.</div>
+          <div class="feature-card-desc">Any inventory row can be expanded to add free text notes documenting exceptions, risk acceptance rationale, or remediation steps.</div>
         </div>
         <div class="feature-card reveal reveal-d4">
           <div class="feature-card-title">Session Storage</div>
-          <div class="feature-card-desc">Inventory and notes persist within your active browser session. Persistent cross-session storage backed by a database is planned for a future release.</div>
+          <div class="feature-card-desc">Inventory and notes persist within the active browser session. Persistent, cross session storage backed by a database is planned for a future release.</div>
         </div>
       </div>
     </div>
@@ -506,24 +541,24 @@
       <div class="reveal">
         <div class="section-eyebrow">Reporting</div>
         <div class="section-heading">Three Audience-Tuned Report Views</div>
-        <p class="section-body">The same assessment data is presented three ways so each stakeholder gets exactly the signal they need — without wading through sections written for a different audience.</p>
+        <p class="section-body">The same assessment data, scored using the method described above, is presented three ways so each stakeholder receives the signal relevant to their role, without wading through sections written for a different audience.</p>
       </div>
 
       <div class="flow-grid">
         <div class="flow-step reveal reveal-d1" style="border-color:rgba(64,130,232,0.2);">
           <div class="flow-step-bar bar-blue"></div>
           <div class="flow-step-title">IT Security View</div>
-          <div class="flow-step-desc">Full tool list with risk tiers, per-control gap analysis, OWASP LLM mapping, and technical remediation actions sorted by severity.</div>
+          <div class="flow-step-desc">Full tool list with risk tiers, per control gap analysis, OWASP LLM mapping, and technical remediation actions sorted by severity.</div>
         </div>
         <div class="flow-step reveal reveal-d2" style="border-color:rgba(51,205,182,0.2);">
           <div class="flow-step-bar bar-teal"></div>
           <div class="flow-step-title">Executive View</div>
-          <div class="flow-step-desc">One-page posture summary with a risk score, maturity rating, and three strategic recommendations — designed for a 5-minute briefing.</div>
+          <div class="flow-step-desc">One page posture summary with a gap score, maturity rating, and the top three priority recommendations, designed for a short leadership briefing.</div>
         </div>
         <div class="flow-step reveal reveal-d3" style="border-color:rgba(255,128,32,0.2);">
           <div class="flow-step-bar bar-orange"></div>
           <div class="flow-step-title">Auditor View</div>
-          <div class="flow-step-desc">NIST AI RMF control-by-control coverage table, evidence notes, and a compliance posture declaration formatted for audit documentation.</div>
+          <div class="flow-step-desc">NIST AI RMF control by control coverage table, evidence notes, and a compliance posture declaration formatted for audit documentation.</div>
         </div>
       </div>
     </div>
@@ -534,26 +569,30 @@
     <div class="info-section">
       <div class="reveal">
         <div class="section-eyebrow">Data &amp; Privacy</div>
-        <div class="section-heading">No Data Leaves Your Browser</div>
-        <p class="section-body">Project Compass is a client-side application. Your log files, questionnaire answers, and generated reports are processed entirely within your browser tab and are never transmitted to any external server.</p>
+        <div class="section-heading">No Data Leaves the Browser, With One Documented Exception</div>
+        <p class="section-body">Project Compass runs primarily as a client side application. Log files, questionnaire answers, and generated reports are processed within the browser tab and are not transmitted to any external server, with one narrow exception.</p>
+      </div>
+
+      <div class="glass-card reveal" style="margin-bottom:20px;">
+        <p style="font-size:13px;color:rgba(208,212,226,0.78);line-height:1.78;">The optional "Explain This Finding" feature sends a small, non sensitive payload, limited to a NIST control identifier, its public description, and a gap status, to the Anthropic API through a local proxy, in order to generate a short plain language explanation. No organization name, log content, user identity, or inventory data is ever included in that request. Full detail on this feature, including a field by field data classification table, is available in the <a href="/governance" style="color:var(--blue);text-underline-offset:2px;">AI Governance Policy</a>.</p>
       </div>
 
       <div class="privacy-grid">
         <div class="privacy-card reveal reveal-d1">
           <div class="privacy-card-label">Log Files</div>
-          <div class="privacy-card-desc">Parsed in-browser using the File API. The raw file content is never uploaded to any server.</div>
+          <div class="privacy-card-desc">Parsed in the browser using the File API. Raw file content is never uploaded to any server.</div>
         </div>
         <div class="privacy-card reveal reveal-d2">
           <div class="privacy-card-label">Session Data</div>
-          <div class="privacy-card-desc">Detection results, assessment answers, and inventory state are held in <code>sessionStorage</code> and cleared automatically when you close the tab.</div>
+          <div class="privacy-card-desc">Detection results, assessment answers, and inventory state are held in <code>sessionStorage</code> and cleared automatically when the tab is closed.</div>
         </div>
         <div class="privacy-card reveal reveal-d3">
           <div class="privacy-card-label">Profile</div>
-          <div class="privacy-card-desc">Org name, your name, and role are saved to <code>localStorage</code> for returning-user convenience. Cleared on Sign Out.</div>
+          <div class="privacy-card-desc">Organization name, user name, and role are saved to <code>localStorage</code> for returning user convenience, and cleared on sign out.</div>
         </div>
         <div class="privacy-card reveal reveal-d4">
           <div class="privacy-card-label">Authentication</div>
-          <div class="privacy-card-desc">Identity via Microsoft Entra External ID using PKCE flow. Tokens stay browser-side; no Compass server holds your credentials.</div>
+          <div class="privacy-card-desc">Identity is verified through Microsoft Entra External ID using the PKCE flow. Tokens remain browser side; no Compass server holds user credentials.</div>
         </div>
       </div>
 
@@ -561,7 +600,7 @@
         <div class="capstone-icon">🎓</div>
         <div class="capstone-text">
           <strong>Academic Context</strong>
-          Project Compass is a capstone project developed for the Master of Information and Cybersecurity (MICS) program. It is intended as a demonstration of AI governance concepts and tooling, not a production security product. Use of sample or synthetic log data is recommended for demo purposes.
+          Project Compass is a capstone project developed for the Master of Information and Cybersecurity (MICS) program, Summer 2026 cohort, at the UC Berkeley School of Information. It is intended as a demonstration of AI governance concepts and tooling, not a production security product. Use of sample or synthetic log data is recommended for demonstration purposes.
         </div>
       </div>
     </div>

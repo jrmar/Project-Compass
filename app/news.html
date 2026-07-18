@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/app/">
+  <title>Project Compass — What's Changing in AI Governance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    /* ── Starfield canvas ── */
+    #star-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Noise grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── Layer content above canvas ── */
+    header, main { position: relative; z-index: 2; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: rgba(64,130,232,0.35); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(64,130,232,0.65); }
+
+    /* ── Scroll-reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.08s; }
+    .reveal-d2 { transition-delay: 0.18s; }
+    .reveal-d3 { transition-delay: 0.28s; }
+
+    /* ── Keyframes ── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Hero ── */
+    .news-hero {
+      text-align: center;
+      padding: 56px 0 48px;
+      animation: fade-up 0.75s ease both;
+    }
+    .news-hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      background: rgba(64,130,232,0.08);
+      border: 1px solid rgba(64,130,232,0.18);
+      border-radius: 20px;
+      padding: 5px 14px;
+      margin-bottom: 20px;
+    }
+    .org-badge-dot {
+      width: 6px; height: 6px;
+      background: var(--teal);
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .news-hero h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      color: var(--light);
+      letter-spacing: -0.02em;
+      margin: 0 0 16px;
+      line-height: 1.15;
+    }
+    .news-hero p {
+      font-size: 14px;
+      color: rgba(208,212,226,0.7);
+      line-height: 1.8;
+      max-width: 680px;
+      margin: 0 auto 14px;
+    }
+    .news-tagline {
+      font-size: 12px;
+      font-style: italic;
+      color: rgba(208,212,226,0.48);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Feed container ── */
+    .news-feed {
+      max-width: 740px;
+      margin: 0 auto;
+      padding-bottom: 48px;
+    }
+
+    /* ── Divider ── */
+    .divider-line {
+      height: 1px;
+      background: var(--glass-border);
+      margin: 40px 0;
+    }
+
+    /* ── Article card ── */
+    .news-article {
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 28px 32px 24px;
+      margin-bottom: 28px;
+    }
+    .news-article-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .news-date {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      background: rgba(51,205,182,0.07);
+      border: 1px solid rgba(51,205,182,0.18);
+      border-radius: 4px;
+      padding: 3px 9px;
+    }
+    .news-tag {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(208,212,226,0.4);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 3px 9px;
+    }
+    .news-article-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--light);
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+    .news-article-body {
+      font-size: 13px;
+      color: rgba(208,212,226,0.72);
+      line-height: 1.82;
+    }
+    .news-article-body p + p {
+      margin-top: 12px;
+    }
+    .news-article-source {
+      font-size: 11px;
+      font-style: italic;
+      color: rgba(208,212,226,0.38);
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      line-height: 1.6;
+    }
+
+    /* ── Footer tagline ── */
+    .news-footer-tagline {
+      text-align: center;
+      font-size: 12px;
+      font-style: italic;
+      color: rgba(208,212,226,0.38);
+      padding: 12px 0 48px;
+      border-top: 1px solid var(--glass-border);
+      margin-top: 8px;
+    }
+
+    /* ── CTA row ── */
+    .cta-row {
+      text-align: center;
+      padding: 32px 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .cta-btn-primary {
+      background: linear-gradient(135deg,var(--blue),#2d64c4);
+      color: #fff; border: none; border-radius: 6px;
+      padding: 10px 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; display: inline-block;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(64,130,232,0.45); }
+    .cta-btn-outline {
+      background: transparent; color: rgba(208,212,226,0.65);
+      border: 1px solid var(--glass-border); border-radius: 6px;
+      padding: 10px 22px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; display: inline-block;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .cta-btn-outline:hover { border-color: rgba(64,130,232,0.4); color: var(--light); }
+  </style>
+</head>
+<body>
+
+<!-- Starfield canvas (behind everything) -->
+<canvas id="star-canvas"></canvas>
+
+<!-- Decorative orbs -->
+<div class="orb" style="width:700px;height:700px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(64,130,232,0.07) 0%,transparent 68%);"></div>
+<div class="orb" style="width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(51,205,182,0.05) 0%,transparent 68%);"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <a class="app-header-logo" href="/">
+      <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+      <span class="app-header-logo-text">Project Compass</span>
+    </a>
+    <nav class="app-header-nav">
+      <a href="/" class="app-nav-link">Home</a>
+      <a href="/about" class="app-nav-link">About</a>
+      <a href="/news"  class="app-nav-link active">News</a>
+      <div class="nav-dropdown" id="gov-dropdown">
+        <button class="nav-dropdown-btn" onclick="toggleDropdown('gov-dropdown')">
+          Governance <span class="nav-dropdown-caret">▾</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/compliance"  class="nav-dropdown-item">Compliance Reference</a>
+          <a href="/governance"  class="nav-dropdown-item">AI Governance Policy</a>
+        </div>
+      </div>
+    </nav>
+    <div class="app-header-right">
+      <a href="/login" class="cta-btn-primary">Run Assessment</a>
+    </div>
+  </header>
+
+  <main class="page-content-wide">
+
+    <!-- ── Hero ── -->
+    <div class="news-hero">
+      <div class="news-hero-label">
+        <span class="org-badge-dot"></span>
+        AI Governance Updates
+      </div>
+      <h1>What's Changing in AI Governance</h1>
+      <p>AI is moving faster than the rules meant to govern it — and the rules themselves are moving faster than most organizations can track. In the past year alone, NIST has drafted an AI-specific cybersecurity framework, opened a formal inquiry into securing autonomous agents, launched a standing initiative to standardize agent security, and published a mathematical proof that static defenses can never fully hold. OWASP released the first risk framework built for agentic systems rather than chatbots. Independent research keeps confirming the same underlying problem: employees are adopting AI faster than anyone is tracking it.</p>
+      <p>This page follows those developments as they happen — each one explained in plain language, sourced directly, and read together as a single, evolving picture of where AI governance is headed next.</p>
+      <div class="news-tagline">A running log of the developments reshaping how organizations are expected to secure, monitor, and govern the AI tools running inside their walls.</div>
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- ── Articles ── -->
+    <div class="news-feed">
+
+      <!-- Article 1 -->
+      <div class="news-article reveal">
+        <div class="news-article-meta">
+          <span class="news-date">December 2025</span>
+          <span class="news-tag">NIST</span>
+        </div>
+        <div class="news-article-title">NIST Opens the Door to an AI-Specific Cybersecurity Framework</div>
+        <div class="news-article-body">
+          <p>In mid-December 2025, after a yearlong effort that pulled in more than 6,500 contributors, the National Institute of Standards and Technology released the preliminary draft of its Cybersecurity Framework Profile for Artificial Intelligence — informally, the "Cyber AI Profile." Built as a companion to the widely adopted CSF 2.0, the profile is organized around three overlapping ideas: securing the AI systems an organization runs, using AI to strengthen its own defenses, and blocking the new wave of AI-enabled attacks aimed at it.</p>
+          <p>It's a notable moment because it's the first time NIST has tried to formally translate its general-purpose cybersecurity language into something built specifically for AI systems — rather than asking security teams to awkwardly retrofit older frameworks onto a technology that didn't exist when those frameworks were written. Public comment closed January 30, 2026, with a fuller release expected later in the year.</p>
+          <p>What the draft doesn't solve, at least not yet, is the more basic question sitting underneath it: an organization can't secure AI systems it doesn't know it has. A framework for how to secure AI is only useful once there's a reliable inventory of what AI is actually running.</p>
+        </div>
+        <div class="news-article-source">Source: NIST, "Draft NIST Guidelines Rethink Cybersecurity for the AI Era"</div>
+      </div>
+
+      <!-- Article 2 -->
+      <div class="news-article reveal reveal-d1">
+        <div class="news-article-meta">
+          <span class="news-date">December 2025</span>
+          <span class="news-tag">OWASP</span>
+        </div>
+        <div class="news-article-title">OWASP Publishes the First Top 10 Built for Agents, Not Just Models</div>
+        <div class="news-article-body">
+          <p>Two days before NIST's draft dropped, the OWASP GenAI Security Project released something the industry had been asking for: a Top 10 list built specifically for agentic applications, not the chatbot-era LLM risks the original OWASP Top 10 for LLMs already covered. Peer-reviewed by more than 100 security researchers and practitioners, the list catalogs risks that only exist once an AI system stops just answering questions and starts taking actions — calling APIs, executing code, moving files, delegating to other agents.</p>
+          <p>The list opens with Agent Goal Hijack, where an attacker manipulates an agent's objective by hiding instructions inside content the agent processes — a poisoned email, a malicious calendar invite, a compromised document pulled into a retrieval pipeline. It continues through tool misuse, identity and privilege abuse, memory and context poisoning, cascading failures across multi-agent systems, and what OWASP calls "rogue agents" — systems whose behavior has quietly drifted from its intended purpose while still looking authorized on paper. The project also introduced a new design principle for builders: least agency, the idea that an agent should be granted only the minimum autonomy its task actually requires.</p>
+          <p>The throughline across all ten risks is that none of them show up in a single prompt or a single response. They emerge across a chain of decisions, tool calls, and delegated actions — which means catching them requires visibility into that whole chain, not just a snapshot of any one exchange.</p>
+        </div>
+        <div class="news-article-source">Source: OWASP GenAI Security Project, "OWASP Top 10 for Agentic Applications for 2026"</div>
+      </div>
+
+      <!-- Article 3 -->
+      <div class="news-article reveal">
+        <div class="news-article-meta">
+          <span class="news-date">January 2026</span>
+          <span class="news-tag">Policy</span>
+        </div>
+        <div class="news-article-title">Washington Starts Asking How to Secure AI Agents Specifically</div>
+        <div class="news-article-body">
+          <p>By January 2026, the conversation had moved from "how do we secure AI models" to "how do we secure AI agents" at the federal level. NIST's Center for AI Standards and Innovation (CAISI) published a formal Request for Information — Federal Register docket NIST-2025-0035 — asking industry, academia, and the security community how existing cybersecurity practices hold up against risks unique to autonomous systems: indirect prompt injection buried in retrieved documents, data poisoning, and models that behave badly not because they were hacked, but because their objectives were subtly gamed or misaligned from the start.</p>
+          <p>It was the first formal U.S. government effort scoped specifically to agent security rather than AI security in general, and the response was significant — organizations ranging from the OpenID Foundation to commercial AI providers submitted formal comments before the March 9 deadline.</p>
+        </div>
+        <div class="news-article-source">Source: NIST, "CAISI Issues Request for Information About Securing AI Agent Systems"</div>
+      </div>
+
+      <!-- Article 4 -->
+      <div class="news-article reveal reveal-d1">
+        <div class="news-article-meta">
+          <span class="news-date">February 2026</span>
+          <span class="news-tag">NIST / CAISI</span>
+        </div>
+        <div class="news-article-title">CAISI Turns the RFI Into a Standing Initiative</div>
+        <div class="news-article-body">
+          <p>The RFI wasn't a one-off. In February, CAISI folded what it had learned into a formal, ongoing program: the AI Agent Standards Initiative. It rests on three pillars — pushing industry-led technical standards for agent security and identity, supporting open-source protocol development (including work on things like the Model Context Protocol), and funding deeper research into how agents can be verified, monitored, and trusted at scale.</p>
+          <p>NIST framed the stakes plainly: agents can already work autonomously for hours, write and debug code, manage someone's email and calendar, and make purchases on their behalf. The productivity upside is real, but so is the fact that almost none of the identity management, access control, or audit infrastructure built for traditional software was designed with that kind of autonomy in mind.</p>
+        </div>
+        <div class="news-article-source">Source: NIST, "Announcing the 'AI Agent Standards Initiative' for Interoperable and Secure Innovation"</div>
+      </div>
+
+      <!-- Article 5 -->
+      <div class="news-article reveal">
+        <div class="news-article-meta">
+          <span class="news-date">May 2026</span>
+          <span class="news-tag">NIST</span>
+        </div>
+        <div class="news-article-title">NIST Rebrands Its Flagship AI Consortium — and Widens the Lens</div>
+        <div class="news-article-body">
+          <p>In late May, NIST renamed the group formerly known as the AI Safety Institute Consortium to the NIST AI Consortium — a small naming change that signals a larger shift in emphasis, from AI safety narrowly defined to AI measurement, innovation, and adoption more broadly. Six new task groups now sit under the consortium, and NIST opened the door to new member organizations on a rolling basis.</p>
+          <p>The reframing matters less for what it removes and more for what it adds: adoption and measurement, sitting alongside safety, as co-equal priorities. It's a signal that the federal posture on AI is shifting from "how do we prevent harm" toward "how do we responsibly scale this everywhere" — which puts even more weight on organizations having a reliable, ongoing way to measure what they've actually deployed.</p>
+        </div>
+        <div class="news-article-source">Source: NIST, "NIST Expands AI Consortium's Scope, Calls for New Members"</div>
+      </div>
+
+      <!-- Article 6 -->
+      <div class="news-article reveal reveal-d1">
+        <div class="news-article-meta">
+          <span class="news-date">2026 DBIR</span>
+          <span class="news-tag">Research</span>
+        </div>
+        <div class="news-article-title">The Numbers Behind the Governance Gap</div>
+        <div class="news-article-body">
+          <p>While standards bodies were busy publishing frameworks, Verizon's 2026 Data Breach Investigations Report quantified just how far ahead of policy actual employee behavior has run. Shadow AI — AI tools used without IT's knowledge or approval — showed up as the third most common non-malicious insider action detected across enterprise environments, a fourfold jump from the year before. Separately, a survey of 1,250 office professionals across four countries found that two-thirds had used an AI tool at work despite believing it went against company policy.</p>
+          <p>Put together, the pattern is consistent across nearly every independent data source tracking this in 2026: employees are adopting AI faster than IT departments are discovering it, and the discovery gap itself — not any single tool — has become the primary source of exposure. Most organizations aren't blind to AI use in the abstract. They're blind to which tools, used by whom, sending what data, right now.</p>
+        </div>
+        <div class="news-article-source">Source: Verizon 2026 Data Breach Investigations Report, as reported by Tech Times; PagerDuty, "Two-Thirds of Office Professionals Have Used Unauthorized AI Tools at Work"</div>
+      </div>
+
+      <!-- Article 7 -->
+      <div class="news-article reveal">
+        <div class="news-article-meta">
+          <span class="news-date">June 2026</span>
+          <span class="news-tag">NIST / Research</span>
+        </div>
+        <div class="news-article-title">NIST Proves, Mathematically, That Static Defenses Aren't Enough</div>
+        <div class="news-article-body">
+          <p>In June, NIST researcher Apostol Vassilev published a peer-reviewed proof in IEEE Security &amp; Privacy that reframed the entire conversation about AI guardrails. Extending the logic of Kurt Gödel's century-old incompleteness theorems, Vassilev showed that no finite set of rules governing an AI system's behavior can ever be universally robust against adversarial prompts. There will always exist some prompt, in principle, that a fixed set of guardrails cannot catch — it's simply a matter of an adversary finding it.</p>
+          <p>The practical implication isn't that defense is futile — it's that defense built around a single point-in-time evaluation is the wrong model entirely. Vassilev's recommended posture has three parts: continuous red-teaming to find new weaknesses before attackers do, continuous updates to harden guardrails against what's found, and operational resilience that assumes an exploit will eventually succeed and prioritizes fast containment and recovery over prevention alone.</p>
+          <p>It's a rare thing: a mathematical, rather than merely observational, argument for why "we assessed our AI posture last quarter" is a fundamentally different — and weaker — claim than "we are continuously watching what our AI systems are doing right now."</p>
+        </div>
+        <div class="news-article-source">Source: NIST, "NIST Mathematical Proof Supports Transition to a Continuous-Monitor-and-Update Security Model for AI Systems"</div>
+      </div>
+
+    </div><!-- /news-feed -->
+
+    <div class="news-footer-tagline">This page is updated as new governance, standards, and research developments emerge.</div>
+
+    <!-- ── CTA ── -->
+    <div class="cta-row reveal">
+      <a href="/login"      class="cta-btn-primary">Run Your Assessment</a>
+      <a href="/compliance" class="cta-btn-outline">View Compliance Reference →</a>
+    </div>
+
+  </main>
+
+<script>
+// ── Starfield canvas ──
+(function () {
+  const canvas = document.getElementById('star-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = document.body.scrollHeight;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); initStars(); });
+
+  const STAR_COUNT = 280;
+  let stars = [];
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x:         rand(0, canvas.width),
+        y:         rand(0, canvas.height * 0.85),
+        r:         rand(0.3, 1.8),
+        baseAlpha: rand(0.25, 0.9),
+        alpha:     rand(0.25, 0.9),
+        speed:     rand(0.003, 0.012),
+        phase:     rand(0, Math.PI * 2),
+        color:     Math.random() < 0.15 ? '#99ccff' : '#ffffff',
+      });
+    }
+  }
+  initStars();
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.phase += s.speed;
+      s.alpha = s.baseAlpha * (0.5 + 0.5 * Math.sin(s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = s.alpha;
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ── Governance dropdown ──
+function toggleDropdown(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  document.querySelectorAll('.nav-dropdown.open').forEach(function(d) {
+    if (!d.contains(e.target)) d.classList.remove('open');
+  });
+});
+
+// ── Scroll-reveal ──
+(function(){
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+</script>
+</body>
+</html>

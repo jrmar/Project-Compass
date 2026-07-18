@@ -453,10 +453,10 @@
         Compliance Reference
       </div>
       <h1>Frameworks &amp; Standards</h1>
-      <p>How Project Compass aligns to NIST AI RMF, NIST SP 800-218A, and the OWASP Top 10 for LLM Applications — and how to interpret risk across these frameworks.</p>
+      <p>This page describes how Project Compass aligns with the NIST AI Risk Management Framework, NIST SP 800-218A, and the OWASP Top 10 for LLM Applications, and how to interpret risk across these three frameworks.</p>
       <div class="updated-badge">
         <div class="updated-dot"></div>
-        Content last reviewed: July 2025
+        Content Last Reviewed: July 2026
       </div>
     </div>
 
@@ -467,7 +467,7 @@
       <div class="reveal">
         <div class="section-eyebrow">NIST AI 100-1</div>
         <div class="section-heading">NIST AI Risk Management Framework</div>
-        <p class="section-body">The NIST AI RMF (January 2023) provides a voluntary, flexible framework for managing risks associated with AI systems throughout their lifecycle. It is organized into four core functions.</p>
+        <p class="section-body">The NIST AI RMF, published in January 2023, is a voluntary framework that helps organizations manage risk across the lifecycle of an AI system. It is organized around four core functions.</p>
       </div>
 
       <div class="framework-meta reveal">
@@ -484,16 +484,10 @@
           <div class="nist-card-bar" style="background:var(--blue);"></div>
           <div class="nist-fn-label" style="color:var(--blue);">Function 1</div>
           <div class="nist-fn-name">GOVERN</div>
-          <div class="nist-fn-desc">Establishes the organizational culture, policies, and accountability structures needed for responsible AI risk management across the enterprise.</div>
-          <ul class="nist-key-activities">
-            <li>Define AI risk tolerance and appetite</li>
-            <li>Establish roles, responsibilities, accountability</li>
-            <li>Build AI risk governance policies</li>
-            <li>Train staff on AI risk concepts</li>
-          </ul>
+          <div class="nist-fn-desc">Establishes the organizational culture, policy, and accountability structures required to manage AI risk responsibly, including determining risk tolerance, assigning clear roles, formalizing AI risk policies, and training staff on foundational AI risk concepts.</div>
           <div class="nist-compass-row">
             <strong>Compass Support</strong>
-            Org profile setup and role-based report views reflect GOVERN by capturing who uses AI and in what capacity, establishing accountability context for each assessment.
+            The Compass questionnaire asks directly whether an organization maintains a written AI use policy, has designated a person accountable for AI governance, includes AI risk within regular risk reporting, and has trained staff on responsible AI use. These responses establish the accountability record that the Govern function requires.
           </div>
         </div>
 
@@ -502,16 +496,10 @@
           <div class="nist-card-bar" style="background:var(--teal);"></div>
           <div class="nist-fn-label" style="color:var(--teal);">Function 2</div>
           <div class="nist-fn-name">MAP</div>
-          <div class="nist-fn-desc">Establishes the context in which AI systems operate and identifies the risks, impacts, and harms associated with each system and use case.</div>
-          <ul class="nist-key-activities">
-            <li>Categorize AI tools and use cases</li>
-            <li>Identify stakeholders and impacted groups</li>
-            <li>Document data sources and provenance</li>
-            <li>Assess organizational exposure</li>
-          </ul>
+          <div class="nist-fn-desc">Establishes the context in which an AI system operates and identifies the risks and impacts associated with each system and use case, including categorizing AI tools, identifying affected stakeholders, documenting data sources, and assessing organizational exposure.</div>
           <div class="nist-compass-row">
             <strong>Compass Support</strong>
-            The log-based AI tool discovery phase (Detect) directly fulfills MAP — surfacing what AI systems exist, their categories, vendors, and risk tiers.
+            The log based discovery process identifies which AI tools are actively in use within an environment, along with their category, vendor, and associated risk level. This is where the Map function is fulfilled in practice.
           </div>
         </div>
 
@@ -520,16 +508,10 @@
           <div class="nist-card-bar" style="background:var(--orange);"></div>
           <div class="nist-fn-label" style="color:var(--orange);">Function 3</div>
           <div class="nist-fn-name">MEASURE</div>
-          <div class="nist-fn-desc">Analyzes and assesses identified AI risks, impacts, and uncertainties — including bias, explainability, robustness, and privacy concerns.</div>
-          <ul class="nist-key-activities">
-            <li>Evaluate risks against defined criteria</li>
-            <li>Test for bias and fairness</li>
-            <li>Assess explainability and transparency</li>
-            <li>Track residual risks over time</li>
-          </ul>
+          <div class="nist-fn-desc">Evaluates identified AI risks in detail, including considerations of bias, explainability, robustness, and privacy, and tracks residual risk over time.</div>
           <div class="nist-compass-row">
             <strong>Compass Support</strong>
-            The NIST control questionnaire (Assess phase) measures your organization's maturity across each RMF domain, producing a gap score that quantifies current vs. target posture.
+            The monitoring and data handling questions within the questionnaire, covering active monitoring, human review of outputs, and protection of sensitive data, produce a gap score reflecting an organization's current maturity relative to its target posture.
           </div>
         </div>
 
@@ -538,16 +520,10 @@
           <div class="nist-card-bar" style="background:linear-gradient(180deg,var(--blue),var(--teal));"></div>
           <div class="nist-fn-label" style="color:var(--light);">Function 4</div>
           <div class="nist-fn-name">MANAGE</div>
-          <div class="nist-fn-desc">Prioritizes and addresses identified risks through treatment plans, monitoring protocols, incident response, and ongoing documentation.</div>
-          <ul class="nist-key-activities">
-            <li>Develop risk treatment plans</li>
-            <li>Implement monitoring and response</li>
-            <li>Document decisions and residual risks</li>
-            <li>Continuously improve controls</li>
-          </ul>
+          <div class="nist-fn-desc">Prioritizes and addresses identified risks through treatment plans, monitoring protocols, and ongoing documentation.</div>
           <div class="nist-compass-row">
             <strong>Compass Support</strong>
-            Report phase delivers prioritized remediation recommendations. The inventory approval workflow (Approved / Review / Blocked) creates a traceable management decision log.
+            The Compass report presents remediation recommendations in priority order. The inventory approval workflow, through which each tool is designated as approved, under review, or blocked, maintains a documented record of every management decision.
           </div>
         </div>
 
@@ -555,7 +531,7 @@
 
       <div class="update-note">
         <div class="update-note-icon">ℹ️</div>
-        <div>NIST released the AI RMF Playbook alongside AI 100-1, providing actionable guidance for each subcategory. A companion document, <strong>NIST AI 600-1</strong> (Generative AI), was published in July 2024 and addresses specific risks from large language models. Check <a href="https://airc.nist.gov" target="_blank" rel="noopener">airc.nist.gov</a> for the latest publications.</div>
+        <div>NIST released a companion playbook alongside AI 100-1 that provides practical guidance for each of these functions. A related publication, <strong>NIST AI 600-1</strong>, addressing generative AI, was released in July 2024 and covers risks specific to large language models. For the latest publications, refer to <a href="https://airc.nist.gov" target="_blank" rel="noopener">airc.nist.gov</a>.</div>
       </div>
     </div>
 
@@ -568,7 +544,7 @@
       <div class="reveal">
         <div class="section-eyebrow">NIST SP 800-218A</div>
         <div class="section-heading">Secure Software Development for AI</div>
-        <p class="section-body">NIST SP 800-218A extends the Secure Software Development Framework (SSDF) to address unique challenges in AI and machine learning system development, including model training, data pipelines, and generative AI integrations.</p>
+        <p class="section-body">NIST SP 800-218A extends the Secure Software Development Framework to address the specific challenges of building AI and machine learning systems, including model training, data pipelines, and generative AI integrations.</p>
       </div>
 
       <div class="framework-meta reveal">
@@ -581,41 +557,41 @@
         <div class="nist-card reveal reveal-d1">
           <div class="nist-card-bar" style="background:var(--blue);"></div>
           <div class="nist-fn-label" style="color:var(--blue);">PO</div>
-          <div class="nist-fn-name">Prepare the Org</div>
-          <div class="nist-fn-desc">Define security requirements for AI systems before development begins. Establish roles, tools, and policies specific to AI/ML workflows.</div>
+          <div class="nist-fn-name">Prepare the Organization</div>
+          <div class="nist-fn-desc">Establishes security requirements for AI systems prior to development, along with the roles, tools, and policies specific to AI and machine learning work.</div>
           <div class="nist-compass-row">
             <strong>Compass Relevance</strong>
-            Org profile + role collection during login captures who is accountable for AI governance decisions.
+            Collecting organizational and role information during setup helps identify who is accountable for AI governance decisions.
           </div>
         </div>
         <div class="nist-card reveal reveal-d2">
           <div class="nist-card-bar" style="background:var(--teal);"></div>
           <div class="nist-fn-label" style="color:var(--teal);">PW</div>
           <div class="nist-fn-name">Produce Well-Secured Software</div>
-          <div class="nist-fn-desc">Design and implement AI systems with security controls, including data validation, model integrity checks, and output filtering.</div>
+          <div class="nist-fn-desc">Designs and implements AI systems with appropriate security controls, including data validation, model integrity checks, and output filtering.</div>
           <div class="nist-compass-row">
             <strong>Compass Relevance</strong>
-            Detection phase flags tools with missing data controls; questionnaire covers model security practices.
+            The discovery process flags tools with missing data controls, and the questionnaire addresses common model security practices.
           </div>
         </div>
         <div class="nist-card reveal reveal-d3">
           <div class="nist-card-bar" style="background:var(--orange);"></div>
           <div class="nist-fn-label" style="color:var(--orange);">PS</div>
           <div class="nist-fn-name">Protect the Software</div>
-          <div class="nist-fn-desc">Protect AI artifacts (models, datasets, pipelines) from unauthorized access, tampering, and supply chain compromise throughout their lifecycle.</div>
+          <div class="nist-fn-desc">Protects AI models, datasets, and pipelines from unauthorized access, tampering, and supply chain compromise throughout their lifecycle.</div>
           <div class="nist-compass-row">
             <strong>Compass Relevance</strong>
-            Supply chain risk is surfaced in inventory via third-party tool flagging and vendor risk tiers.
+            Supply chain risk is reflected in the inventory through vendor flagging and risk tiers assigned to third party tools.
           </div>
         </div>
         <div class="nist-card reveal reveal-d4">
           <div class="nist-card-bar" style="background:#e05c5c;"></div>
           <div class="nist-fn-label" style="color:#e05c5c;">RV</div>
           <div class="nist-fn-name">Respond to Vulnerabilities</div>
-          <div class="nist-fn-desc">Identify, triage, and remediate vulnerabilities in AI systems, models, and dependencies — including those introduced post-deployment.</div>
+          <div class="nist-fn-desc">Identifies, prioritizes, and remediates vulnerabilities in AI systems and their dependencies, including those discovered after deployment.</div>
           <div class="nist-compass-row">
             <strong>Compass Relevance</strong>
-            Report remediation recommendations are severity-ordered to support triage and incident response planning.
+            The Compass report orders remediation recommendations by severity to support this prioritization.
           </div>
         </div>
       </div>
@@ -630,7 +606,7 @@
       <div class="reveal">
       <div class="section-eyebrow">OWASP LLM Top 10 · 2025</div>
       <div class="section-heading">Top Security Risks for LLM Applications</div>
-      <p class="section-body">The OWASP Top 10 for LLM Applications (2025, v2.0) identifies the most critical security vulnerabilities specific to systems built with large language models. The table below notes which risks Compass can surface through log analysis.</p>
+      <p class="section-body">The OWASP Top 10 for LLM Applications (2025, Version 2.0) identifies the most critical security risks specific to systems built on large language models. The following describes which of these risks Compass is able to surface through log analysis.</p>
       </div>
 
       <div class="framework-meta reveal">
@@ -654,81 +630,81 @@
                 <td class="owasp-id">LLM01:2025</td>
                 <td>
                   <div class="owasp-name">Prompt Injection</div>
-                  <div class="owasp-desc">Adversarial inputs manipulate LLM behavior — including indirect injection via untrusted external content retrieved by the model.</div>
+                  <div class="owasp-desc">Adversarial input manipulates AI behavior, including hidden instructions embedded in retrieved content.</div>
                 </td>
-                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Log volume anomalies from LLM API calls can indicate injection campaigns; payload content is not inspected.</div></td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Unusual traffic volume to LLM APIs may indicate an attempt, though content is not inspected.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM02:2025</td>
                 <td>
                   <div class="owasp-name">Sensitive Information Disclosure</div>
-                  <div class="owasp-desc">LLM outputs inadvertently reveal PII, credentials, proprietary data, or confidential system information.</div>
+                  <div class="owasp-desc">AI output inadvertently reveals personal information, credentials, or confidential details.</div>
                 </td>
-                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Tools with a "Confidential" data classification flag are surfaced; content of API responses is not inspected.</div></td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Tools handling confidential data are flagged; response content is not inspected.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM03:2025</td>
                 <td>
-                  <div class="owasp-name">Supply Chain</div>
-                  <div class="owasp-desc">Vulnerabilities in third-party models, datasets, plugins, or pre-trained weights used within the AI stack.</div>
+                  <div class="owasp-name">Supply Chain Risk</div>
+                  <div class="owasp-desc">Vulnerabilities introduced through third party models, datasets, or pre-trained components.</div>
                 </td>
-                <td><span class="detect-badge detect-yes">Yes</span><div class="owasp-desc" style="margin-top:5px;">The AI Inventory enumerates third-party vendors and tools, giving visibility into supply chain dependencies.</div></td>
+                <td><span class="detect-badge detect-yes">Yes</span><div class="owasp-desc" style="margin-top:5px;">The AI inventory lists every third party vendor and tool in use.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM04:2025</td>
                 <td>
                   <div class="owasp-name">Data and Model Poisoning</div>
-                  <div class="owasp-desc">Training data or fine-tuning datasets are corrupted to introduce backdoors, biases, or malicious behavior into the model.</div>
+                  <div class="owasp-desc">Training data is corrupted to introduce backdoors, bias, or harmful behavior.</div>
                 </td>
-                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires inspection of training pipelines — outside the scope of network log analysis.</div></td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires inspection of training pipelines, outside the scope of log analysis.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM05:2025</td>
                 <td>
                   <div class="owasp-name">Improper Output Handling</div>
-                  <div class="owasp-desc">Downstream systems consume LLM output without sufficient validation, enabling injection attacks (XSS, SSRF, code execution).</div>
+                  <div class="owasp-desc">A downstream system accepts AI output without validation, enabling injection attacks.</div>
                 </td>
-                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires application-level output inspection; not observable in network logs.</div></td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires inspecting how an application processes AI output.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM06:2025</td>
                 <td>
                   <div class="owasp-name">Excessive Agency</div>
-                  <div class="owasp-desc">LLM-based agents are granted too many permissions, actions, or autonomy — enabling unintended or harmful automated actions.</div>
+                  <div class="owasp-desc">An AI agent is granted more permissions or autonomy than necessary.</div>
                 </td>
-                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Agentic AI tools (e.g., autonomous code execution platforms) are flagged as Critical risk in the inventory.</div></td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Agentic tools capable of autonomous action are flagged as critical risk.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM07:2025</td>
                 <td>
                   <div class="owasp-name">System Prompt Leakage</div>
-                  <div class="owasp-desc">Confidential system prompt contents — including instructions, personas, or business logic — are exposed to end users.</div>
+                  <div class="owasp-desc">Confidential system instructions are exposed to end users.</div>
                 </td>
-                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires application-layer inspection of request/response payloads.</div></td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Requires inspection of application level requests and responses.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM08:2025</td>
                 <td>
                   <div class="owasp-name">Vector and Embedding Weaknesses</div>
-                  <div class="owasp-desc">Attacks against retrieval-augmented generation (RAG) pipelines — including poisoned vector stores, embedding inversion, or cross-tenant data leakage.</div>
+                  <div class="owasp-desc">Attacks against retrieval systems, including tampered data stores.</div>
                 </td>
-                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">RAG/vector DB tools (Pinecone, Weaviate, Chroma) are detected and inventoried; attack patterns are not.</div></td>
+                <td><span class="detect-badge detect-partial">Partial</span><div class="owasp-desc" style="margin-top:5px;">Common retrieval and vector database tools are detected; the attacks themselves are not.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM09:2025</td>
                 <td>
                   <div class="owasp-name">Misinformation</div>
-                  <div class="owasp-desc">LLMs generate plausible but false information (hallucinations) that is then acted upon by users or downstream systems.</div>
+                  <div class="owasp-desc">AI produces plausible but factually incorrect output.</div>
                 </td>
-                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Output accuracy requires semantic evaluation — outside the scope of network log analysis.</div></td>
+                <td><span class="detect-badge detect-no">Not Detected</span><div class="owasp-desc" style="margin-top:5px;">Evaluating accuracy requires human judgment.</div></td>
               </tr>
               <tr>
                 <td class="owasp-id">LLM10:2025</td>
                 <td>
                   <div class="owasp-name">Unbounded Consumption</div>
-                  <div class="owasp-desc">Unrestricted resource consumption by LLM workloads — leading to denial of service, excessive cost, or degraded availability.</div>
+                  <div class="owasp-desc">AI workloads consume resources without limits.</div>
                 </td>
-                <td><span class="detect-badge detect-yes">Yes</span><div class="owasp-desc" style="margin-top:5px;">High-frequency call patterns to LLM APIs are surfaced via log volume analysis; anomalous usage is flagged.</div></td>
+                <td><span class="detect-badge detect-yes">Yes</span><div class="owasp-desc" style="margin-top:5px;">Unusually high call volume is reflected clearly in log analysis.</div></td>
               </tr>
             </tbody>
           </table>
@@ -737,7 +713,7 @@
 
       <div class="update-note">
         <div class="update-note-icon">ℹ️</div>
-        <div>The OWASP LLM Top 10 is a living document updated by the community. Check the official project page for the latest version and changelog. New entries and re-rankings are released periodically as the threat landscape evolves.</div>
+        <div>The OWASP Top 10 for LLM Applications is a living document maintained by the community. Refer to the official project page for the most current version, as new risks and rankings are released periodically.</div>
       </div>
     </div>
 
@@ -750,33 +726,33 @@
       <div class="reveal">
         <div class="section-eyebrow">Risk Reference</div>
         <div class="section-heading">Compass Risk Classification</div>
-        <p class="section-body">Each AI tool detected in the log analysis is assigned a risk tier based on three factors: data exposure potential, external connectivity, and the type of AI capability the tool provides.</p>
+        <p class="section-body">Each AI tool identified through log analysis is assigned a risk tier based on three factors: the potential for data exposure, external connectivity, and the type of AI capability the tool provides.</p>
       </div>
 
       <div class="risk-grid">
         <div class="risk-card reveal reveal-d1">
           <div class="risk-card-bar bar-critical"></div>
           <div class="risk-level color-critical">Critical</div>
-          <div class="risk-desc">Direct data exfiltration risk or autonomous action capability. These tools send or process sensitive organizational data with minimal controls or oversight.</div>
-          <div class="risk-examples">Examples: LLM APIs with file upload, agentic platforms, unsanctioned AI data pipelines</div>
+          <div class="risk-desc">Presents a direct risk of data leaving the organization, or the tool is capable of autonomous action. These tools process sensitive organizational data with minimal oversight.</div>
+          <div class="risk-examples">Examples: AI tools with file upload capability, agentic platforms, and unsanctioned AI data pipelines</div>
         </div>
         <div class="risk-card reveal reveal-d2">
           <div class="risk-card-bar bar-high"></div>
           <div class="risk-level color-high">High</div>
-          <div class="risk-desc">Significant data sharing with external AI providers, or tools likely to be used with confidential business content without explicit policy coverage.</div>
-          <div class="risk-examples">Examples: AI writing assistants, code completion tools, document summarizers</div>
+          <div class="risk-desc">Involves meaningful data sharing with an external AI provider, or is likely to be used with confidential business content in the absence of a defined policy.</div>
+          <div class="risk-examples">Examples: AI writing assistants, code completion tools, and document summarizers</div>
         </div>
         <div class="risk-card reveal reveal-d3">
           <div class="risk-card-bar bar-medium"></div>
           <div class="risk-level color-medium">Medium</div>
-          <div class="risk-desc">Moderate risk — AI-assisted features that process user input externally but have limited data persistence or established vendor data handling agreements.</div>
-          <div class="risk-examples">Examples: AI search enhancement, sentiment analysis tools, grammar assistants</div>
+          <div class="risk-desc">Represents a moderate level of risk. These tools process external input through an AI provider but retain limited data, or operate under an established data handling agreement.</div>
+          <div class="risk-examples">Examples: AI enhanced search, sentiment analysis tools, and grammar assistants</div>
         </div>
         <div class="risk-card reveal reveal-d4">
           <div class="risk-card-bar bar-low"></div>
           <div class="risk-level color-low">Low</div>
-          <div class="risk-desc">Minimal risk — AI features operating locally, with anonymous inputs, or with established enterprise data processing agreements and access controls.</div>
-          <div class="risk-examples">Examples: On-device spell check, approved enterprise AI add-ins with DPA</div>
+          <div class="risk-desc">Presents minimal risk. These tools operate locally, process anonymous input, or are governed by an established enterprise data processing agreement with defined access controls.</div>
+          <div class="risk-examples">Examples: On-device spell check and approved enterprise AI features with a signed data agreement</div>
         </div>
       </div>
     </div>
