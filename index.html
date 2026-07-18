@@ -724,6 +724,16 @@
       <li><a href="#for-teams">For Teams</a></li>
       <li><a href="/about">About</a></li>
       <li><a href="/news">News</a></li>
+      <li class="nav-dropdown" id="landing-uc-dd">
+        <button class="nav-dropdown-btn" onclick="toggleLandingUCDD()">
+          Use Cases <span class="nav-dropdown-caret">▾</span>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/executive"     class="nav-dropdown-item">Executive</a>
+          <a href="/security-team" class="nav-dropdown-item">Security Team</a>
+          <a href="/auditor"       class="nav-dropdown-item">Auditor</a>
+        </div>
+      </li>
       <li class="nav-dropdown" id="landing-gov-dd">
         <button class="nav-dropdown-btn" onclick="toggleLandingDD()">
           Governance <span class="nav-dropdown-caret">▾</span>
@@ -1660,13 +1670,20 @@
   };
 })();
 
-// ── Nav governance dropdown ──
+// ── Nav dropdowns ──
 function toggleLandingDD() {
   document.getElementById('landing-gov-dd').classList.toggle('open');
+  document.getElementById('landing-uc-dd').classList.remove('open');
+}
+function toggleLandingUCDD() {
+  document.getElementById('landing-uc-dd').classList.toggle('open');
+  document.getElementById('landing-gov-dd').classList.remove('open');
 }
 document.addEventListener('click', function(e) {
-  var dd = document.getElementById('landing-gov-dd');
-  if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+  ['landing-gov-dd', 'landing-uc-dd'].forEach(function(id) {
+    var dd = document.getElementById(id);
+    if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+  });
 });
 </script>
 

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/app/">
+  <title>Project Compass — For Auditors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    #star-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body::after {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:1000; opacity:0.03;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    header, main { position:relative; z-index:2; }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--navy); }
+    ::-webkit-scrollbar-thumb { background:rgba(64,130,232,0.35); border-radius:3px; }
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-d1 { transition-delay:0.08s; }
+    .reveal-d2 { transition-delay:0.18s; }
+    .reveal-d3 { transition-delay:0.28s; }
+    .reveal-d4 { transition-delay:0.38s; }
+    @keyframes fade-up { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+    .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
+
+    .uc-hero { text-align:center; padding:56px 0 48px; animation:fade-up 0.75s ease both; }
+    .uc-hero-label {
+      display:inline-flex; align-items:center; gap:6px;
+      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,178,70,0.9);
+      background:rgba(255,178,70,0.07); border:1px solid rgba(255,178,70,0.2);
+      border-radius:20px; padding:5px 14px; margin-bottom:20px;
+    }
+    .uc-hero-dot { width:6px; height:6px; background:rgba(255,178,70,0.9); border-radius:50%; display:inline-block; }
+    .uc-hero h1 {
+      font-family:'Montserrat',sans-serif;
+      font-size:clamp(1.75rem,4vw,2.75rem); font-weight:800;
+      color:var(--light); letter-spacing:-0.02em; margin:0 0 16px; line-height:1.15;
+    }
+    .uc-hero-tagline { font-size:15px; color:rgba(208,212,226,0.72); line-height:1.75; max-width:640px; margin:0 auto; }
+
+    .uc-section { margin-bottom:0; }
+    .divider-line { height:1px; background:var(--glass-border); margin:40px 0; }
+    .section-eyebrow {
+      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); margin-bottom:8px;
+    }
+    .section-heading {
+      font-family:'Montserrat',sans-serif; font-size:clamp(1.1rem,2.5vw,1.5rem);
+      font-weight:700; color:var(--light); letter-spacing:-0.01em; margin-bottom:20px;
+    }
+
+    .why-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-top:20px; }
+    .why-card {
+      background:var(--glass-bg); border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg); padding:22px 24px; position:relative; overflow:hidden;
+    }
+    .why-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,rgba(255,178,70,0.8),var(--teal));
+    }
+    .why-card-title { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; color:var(--light); margin-bottom:10px; line-height:1.4; }
+    .why-card-desc { font-size:13px; color:rgba(208,212,226,0.65); line-height:1.75; }
+
+    .report-card {
+      background:var(--glass-bg); border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg); padding:28px 32px; margin-top:20px;
+    }
+    .report-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .report-item:last-child { border-bottom:none; padding-bottom:0; }
+    .report-item:first-child { padding-top:0; }
+    .report-item-dot { width:7px; height:7px; background:var(--teal); border-radius:50%; flex-shrink:0; margin-top:6px; }
+    .report-item-title { font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; color:var(--light); margin-bottom:4px; letter-spacing:0.01em; }
+    .report-item-desc { font-size:12px; color:rgba(208,212,226,0.62); line-height:1.7; }
+
+    .faq-list { margin-top:20px; display:flex; flex-direction:column; gap:14px; }
+    .faq-card { background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:22px 26px; }
+    .faq-q { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; color:var(--light); margin-bottom:10px; line-height:1.5; }
+    .faq-a { font-size:13px; color:rgba(208,212,226,0.65); line-height:1.75; }
+
+    .cta-row { text-align:center; padding:40px 0 24px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+    .cta-btn-primary {
+      background:linear-gradient(135deg,var(--blue),#2d64c4); color:#fff; border:none; border-radius:6px; padding:10px 22px;
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:inline-block; transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(64,130,232,0.45); }
+    .cta-btn-outline {
+      background:transparent; color:rgba(208,212,226,0.65); border:1px solid var(--glass-border); border-radius:6px; padding:10px 22px;
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:inline-block; transition:border-color 0.2s, color 0.2s;
+    }
+    .cta-btn-outline:hover { border-color:rgba(64,130,232,0.4); color:var(--light); }
+  </style>
+</head>
+<body>
+
+<canvas id="star-canvas"></canvas>
+<div class="orb" style="width:700px;height:700px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(255,178,70,0.04) 0%,transparent 68%);"></div>
+<div class="orb" style="width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(64,130,232,0.05) 0%,transparent 68%);"></div>
+
+<header class="app-header">
+  <a class="app-header-logo" href="/">
+    <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+    <span class="app-header-logo-text">Project Compass</span>
+  </a>
+  <nav class="app-header-nav">
+    <a href="/" class="app-nav-link">Home</a>
+    <a href="/about" class="app-nav-link">About</a>
+    <a href="/news" class="app-nav-link">News</a>
+    <div class="nav-dropdown" id="uc-dropdown">
+      <button class="nav-dropdown-btn active" onclick="toggleDropdown('uc-dropdown')">
+        Use Cases <span class="nav-dropdown-caret">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="/executive"     class="nav-dropdown-item">Executive</a>
+        <a href="/security-team" class="nav-dropdown-item">Security Team</a>
+        <a href="/auditor"       class="nav-dropdown-item active">Auditor</a>
+      </div>
+    </div>
+    <div class="nav-dropdown" id="gov-dropdown">
+      <button class="nav-dropdown-btn" onclick="toggleDropdown('gov-dropdown')">
+        Governance <span class="nav-dropdown-caret">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="/compliance" class="nav-dropdown-item">Compliance Reference</a>
+        <a href="/governance" class="nav-dropdown-item">AI Governance Policy</a>
+      </div>
+    </div>
+  </nav>
+  <div class="app-header-right">
+    <a href="/login" class="cta-btn-primary">Run Assessment</a>
+  </div>
+</header>
+
+<main class="page-content-wide">
+
+  <div class="uc-hero">
+    <div class="uc-hero-label">
+      <span class="uc-hero-dot"></span>
+      Use Case
+    </div>
+    <h1>For Auditors</h1>
+    <p class="uc-hero-tagline">A structured evidence record: every control, its status, its supporting evidence, and a certification statement, formatted for a compliance file rather than a conversation.</p>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- Why -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Why It Matters</div>
+      <div class="section-heading">Why Auditors Need This</div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal reveal-d1">
+        <div class="why-card-title">Assurances Aren't Evidence.</div>
+        <div class="why-card-desc">An organization saying it takes AI governance seriously doesn't hold up in an audit. What holds up is a specific control, a specific status, and a specific piece of evidence behind it.</div>
+      </div>
+      <div class="why-card reveal reveal-d2">
+        <div class="why-card-title">Frameworks Are Voluntary, but Reviewers Still Expect Them.</div>
+        <div class="why-card-desc">NIST AI RMF isn't legally mandated, but it has become the reference point most reviewers measure an organization against. Without a structured self-assessment, that comparison has to be built from scratch every time.</div>
+      </div>
+      <div class="why-card reveal reveal-d3">
+        <div class="why-card-title">Findings Need to Be Traceable.</div>
+        <div class="why-card-desc">An auditor needs to know exactly where a claim came from — which questionnaire answer, which log evidence, which control it maps to — not just a final score with no paper trail behind it.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- What's in the Report -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Report Contents</div>
+      <div class="section-heading">What's in the Auditor Evidence Package</div>
+      <p style="font-size:13px;color:rgba(208,212,226,0.62);line-height:1.75;max-width:680px;">This is the same underlying assessment used across every Compass report — upload a log, detect AI tools, answer the governance questionnaire — just formatted as a structured evidence record instead of a technical or leadership one.</p>
+    </div>
+    <div class="report-card reveal reveal-d1">
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Assessment Metadata</div>
+          <div class="report-item-desc">Assessment type, methodology, scope, and a clearly stated limitation: this is a self-assessment based on DNS log evidence and self-reported answers, not a formal third party audit.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Summary Statistics</div>
+          <div class="report-item-desc">Tools detected, governance risk score, controls flagged, gap score, and overall risk posture, presented as fixed figures rather than visual summaries.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">NIST Function Compliance Summary</div>
+          <div class="report-item-desc">Gap score, maximum potential, and percentage unmet for each of the four functions, giving a reviewer the top level compliance picture before they reach individual controls.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Control Status Matrix</div>
+          <div class="report-item-desc">All 19 controls in one table, each with its function, severity, and status, so a reviewer can confirm coverage at a glance.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Structured Findings</div>
+          <div class="report-item-desc">Every unmet or partially met control, documented with its NIST reference, the questionnaire question behind it, the evidence basis, and a recommended remediation, ranked by severity.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Evidence Summary</div>
+          <div class="report-item-desc">A table describing exactly where each type of evidence came from — DNS log analysis, the governance questionnaire, the AI domain registry, and the NIST control mapping — along with the limitations of each source.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Certification Statement</div>
+          <div class="report-item-desc">A closing statement summarizing what was assessed, what was found, and an explicit note that this document should be reviewed by a qualified information security professional before use in a formal filing.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- FAQ -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Questions</div>
+      <div class="section-heading">Frequently Asked Questions</div>
+    </div>
+    <div class="faq-list">
+      <div class="faq-card reveal reveal-d1">
+        <div class="faq-q">Does this count as a NIST certification?</div>
+        <div class="faq-a">No. NIST AI RMF is a voluntary framework, not a certification. This package is a structured, evidence backed self-assessment against that framework, not a third party certification, and the document says so directly.</div>
+      </div>
+      <div class="faq-card reveal reveal-d2">
+        <div class="faq-q">What counts as evidence in this report?</div>
+        <div class="faq-a">Two things: DNS log data submitted by the organization, and self-reported answers to the governance questionnaire. Both are documented plainly as their own evidence type, along with what each one can and can't confirm.</div>
+      </div>
+      <div class="faq-card reveal reveal-d3">
+        <div class="faq-q">Why do so many findings share the same evidence basis?</div>
+        <div class="faq-a">Because they do. A single "unsure" answer to one questionnaire question can leave several related NIST controls only partially demonstrated at once. The evidence record reflects that honestly rather than fabricating separate justifications for each one.</div>
+      </div>
+      <div class="faq-card reveal reveal-d4">
+        <div class="faq-q">Can this replace an external audit?</div>
+        <div class="faq-a">No, and the document says so in its own limitations section. It's meant to prepare an organization for an audit, by giving a reviewer a structured starting point, not to substitute for independent controls testing.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-row reveal">
+    <a href="/login" class="cta-btn-primary">Run Your Assessment</a>
+    <a href="/"      class="cta-btn-outline">← Back to Home</a>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  const canvas=document.getElementById('star-canvas'); const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=window.innerWidth;canvas.height=document.body.scrollHeight;}
+  resize(); window.addEventListener('resize',()=>{resize();init();});
+  const N=280; let stars=[];
+  function rand(a,b){return Math.random()*(b-a)+a;}
+  function init(){stars=[];for(let i=0;i<N;i++)stars.push({x:rand(0,canvas.width),y:rand(0,canvas.height*0.85),r:rand(0.3,1.8),ba:rand(0.25,0.9),a:rand(0.25,0.9),sp:rand(0.003,0.012),ph:rand(0,Math.PI*2),col:Math.random()<0.15?'#99ccff':'#ffffff'});}
+  init();
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.ph+=s.sp;s.a=s.ba*(0.5+0.5*Math.sin(s.ph));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.col;ctx.globalAlpha=s.a;ctx.fill();});ctx.globalAlpha=1;requestAnimationFrame(draw);}
+  requestAnimationFrame(draw);
+})();
+function toggleDropdown(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
+document.addEventListener('click',function(e){document.querySelectorAll('.nav-dropdown.open').forEach(function(d){if(!d.contains(e.target))d.classList.remove('open');});});
+(function(){const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));})();
+</script>
+</body>
+</html>

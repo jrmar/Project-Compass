@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/app/">
+  <title>Project Compass — For Security Teams</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    #star-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body::after {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:1000; opacity:0.03;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    header, main { position:relative; z-index:2; }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--navy); }
+    ::-webkit-scrollbar-thumb { background:rgba(64,130,232,0.35); border-radius:3px; }
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-d1 { transition-delay:0.08s; }
+    .reveal-d2 { transition-delay:0.18s; }
+    .reveal-d3 { transition-delay:0.28s; }
+    .reveal-d4 { transition-delay:0.38s; }
+    @keyframes fade-up { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+    .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
+
+    .uc-hero { text-align:center; padding:56px 0 48px; animation:fade-up 0.75s ease both; }
+    .uc-hero-label {
+      display:inline-flex; align-items:center; gap:6px;
+      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; color:var(--teal);
+      background:rgba(51,205,182,0.08); border:1px solid rgba(51,205,182,0.18);
+      border-radius:20px; padding:5px 14px; margin-bottom:20px;
+    }
+    .uc-hero-dot { width:6px; height:6px; background:var(--blue); border-radius:50%; display:inline-block; }
+    .uc-hero h1 {
+      font-family:'Montserrat',sans-serif;
+      font-size:clamp(1.75rem,4vw,2.75rem); font-weight:800;
+      color:var(--light); letter-spacing:-0.02em; margin:0 0 16px; line-height:1.15;
+    }
+    .uc-hero-tagline { font-size:15px; color:rgba(208,212,226,0.72); line-height:1.75; max-width:640px; margin:0 auto; }
+
+    .uc-section { margin-bottom:0; }
+    .divider-line { height:1px; background:var(--glass-border); margin:40px 0; }
+    .section-eyebrow {
+      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); margin-bottom:8px;
+    }
+    .section-heading {
+      font-family:'Montserrat',sans-serif; font-size:clamp(1.1rem,2.5vw,1.5rem);
+      font-weight:700; color:var(--light); letter-spacing:-0.01em; margin-bottom:20px;
+    }
+
+    .why-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-top:20px; }
+    .why-card {
+      background:var(--glass-bg); border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg); padding:22px 24px; position:relative; overflow:hidden;
+    }
+    .why-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,var(--teal),var(--blue));
+    }
+    .why-card-title { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; color:var(--light); margin-bottom:10px; line-height:1.4; }
+    .why-card-desc { font-size:13px; color:rgba(208,212,226,0.65); line-height:1.75; }
+
+    .report-card {
+      background:var(--glass-bg); border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg); padding:28px 32px; margin-top:20px;
+    }
+    .report-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .report-item:last-child { border-bottom:none; padding-bottom:0; }
+    .report-item:first-child { padding-top:0; }
+    .report-item-dot { width:7px; height:7px; background:var(--teal); border-radius:50%; flex-shrink:0; margin-top:6px; }
+    .report-item-title { font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; color:var(--light); margin-bottom:4px; letter-spacing:0.01em; }
+    .report-item-desc { font-size:12px; color:rgba(208,212,226,0.62); line-height:1.7; }
+
+    .faq-list { margin-top:20px; display:flex; flex-direction:column; gap:14px; }
+    .faq-card { background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:22px 26px; }
+    .faq-q { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700; color:var(--light); margin-bottom:10px; line-height:1.5; }
+    .faq-a { font-size:13px; color:rgba(208,212,226,0.65); line-height:1.75; }
+
+    .cta-row { text-align:center; padding:40px 0 24px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+    .cta-btn-primary {
+      background:linear-gradient(135deg,var(--blue),#2d64c4); color:#fff; border:none; border-radius:6px; padding:10px 22px;
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:inline-block; transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(64,130,232,0.45); }
+    .cta-btn-outline {
+      background:transparent; color:rgba(208,212,226,0.65); border:1px solid var(--glass-border); border-radius:6px; padding:10px 22px;
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:inline-block; transition:border-color 0.2s, color 0.2s;
+    }
+    .cta-btn-outline:hover { border-color:rgba(64,130,232,0.4); color:var(--light); }
+  </style>
+</head>
+<body>
+
+<canvas id="star-canvas"></canvas>
+<div class="orb" style="width:700px;height:700px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(51,205,182,0.06) 0%,transparent 68%);"></div>
+<div class="orb" style="width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(64,130,232,0.05) 0%,transparent 68%);"></div>
+
+<header class="app-header">
+  <a class="app-header-logo" href="/">
+    <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+    <span class="app-header-logo-text">Project Compass</span>
+  </a>
+  <nav class="app-header-nav">
+    <a href="/" class="app-nav-link">Home</a>
+    <a href="/about" class="app-nav-link">About</a>
+    <a href="/news" class="app-nav-link">News</a>
+    <div class="nav-dropdown" id="uc-dropdown">
+      <button class="nav-dropdown-btn active" onclick="toggleDropdown('uc-dropdown')">
+        Use Cases <span class="nav-dropdown-caret">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="/executive"     class="nav-dropdown-item">Executive</a>
+        <a href="/security-team" class="nav-dropdown-item active">Security Team</a>
+        <a href="/auditor"       class="nav-dropdown-item">Auditor</a>
+      </div>
+    </div>
+    <div class="nav-dropdown" id="gov-dropdown">
+      <button class="nav-dropdown-btn" onclick="toggleDropdown('gov-dropdown')">
+        Governance <span class="nav-dropdown-caret">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="/compliance" class="nav-dropdown-item">Compliance Reference</a>
+        <a href="/governance" class="nav-dropdown-item">AI Governance Policy</a>
+      </div>
+    </div>
+  </nav>
+  <div class="app-header-right">
+    <a href="/login" class="cta-btn-primary">Run Assessment</a>
+  </div>
+</header>
+
+<main class="page-content-wide">
+
+  <div class="uc-hero">
+    <div class="uc-hero-label">
+      <span class="uc-hero-dot"></span>
+      Use Case
+    </div>
+    <h1>For Security Teams</h1>
+    <p class="uc-hero-tagline">Get the full technical picture: every detected AI tool, every unmet NIST control, and ready to deploy remediation steps, organized by cloud platform.</p>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- Why -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Why It Matters</div>
+      <div class="section-heading">Why Security Teams Need This</div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal reveal-d1">
+        <div class="why-card-title">A Summary Isn't Enough to Act On.</div>
+        <div class="why-card-desc">Knowing an organization has a governance gap doesn't tell a security team what to actually configure. Closing a gap requires the specific control, the specific tool it applies to, and the specific console steps to fix it.</div>
+      </div>
+      <div class="why-card reveal reveal-d2">
+        <div class="why-card-title">Every Platform Does It Differently.</div>
+        <div class="why-card-desc">The same control — blocking a non-compliant AI tool — looks completely different in Azure, AWS, and GCP. Generic guidance forces an engineer to translate it themselves before it's usable.</div>
+      </div>
+      <div class="why-card reveal reveal-d3">
+        <div class="why-card-title">Detection Without Enforcement Isn't Governance.</div>
+        <div class="why-card-desc">Finding shadow AI is only half the job. A security team also needs a way to actually restrict what shouldn't be running, and a record of what was blocked and why.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- What's in the Report -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Report Contents</div>
+      <div class="section-heading">What's in the Security Team Findings Report</div>
+      <p style="font-size:13px;color:rgba(208,212,226,0.62);line-height:1.75;max-width:680px;">This is the same underlying assessment used across every Compass report — upload a log, detect AI tools, answer the governance questionnaire — just formatted for a technical audience instead of a leadership or audit one.</p>
+    </div>
+    <div class="report-card reveal reveal-d1">
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Assessment Summary</div>
+          <div class="report-item-desc">Tools found, the governance risk score, the gap score, and how many of the 19 NIST controls were flagged, all in one glance.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Full AI Tool Inventory</div>
+          <div class="report-item-desc">Every detected tool, its domain, category, and risk tier, laid out in a single table rather than summarized away.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">NIST Function Gap Analysis</div>
+          <div class="report-item-desc">A breakdown of points unmet and percentage met for each of the four functions — Govern, Map, Measure, and Manage — so the team can see where the organization's weakest area actually is.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Flagged NIST Controls</div>
+          <div class="report-item-desc">Every partially met or unmet control, with its severity and status, giving the team a prioritized worklist rather than a single score to interpret.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">DNS Block Rules</div>
+          <div class="report-item-desc">Ready to use block lists for Pi-hole, AdGuard, and Windows DNS sinkholing, plus a Sentinel KQL query, generated directly from the tools this specific assessment detected.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Technical Remediation Steps by Control</div>
+          <div class="report-item-desc">Step by step configuration instructions for the highest severity gaps, written separately for Azure, AWS, and GCP, down to the specific console screen and setting.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- FAQ -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Questions</div>
+      <div class="section-heading">Frequently Asked Questions</div>
+    </div>
+    <div class="faq-list">
+      <div class="faq-card reveal reveal-d1">
+        <div class="faq-q">Is this report just a more detailed version of the Executive report?</div>
+        <div class="faq-a">It's the same assessment, not a more detailed rewrite. The Executive report leads with one score and three priorities. This report keeps every control, every tool, and every remediation step intact, because a security team needs the detail an executive briefing intentionally leaves out.</div>
+      </div>
+      <div class="faq-card reveal reveal-d2">
+        <div class="faq-q">Do the remediation steps assume a specific cloud provider?</div>
+        <div class="faq-a">No. Every remediation section covers Azure, AWS, and GCP separately, since the same control requires different configuration steps depending on the platform.</div>
+      </div>
+      <div class="faq-card reveal reveal-d3">
+        <div class="faq-q">Are the DNS block rules safe to deploy immediately?</div>
+        <div class="faq-a">Compass generates the rules; it doesn't apply them. They're meant to go through normal change management and lab testing before reaching production DNS infrastructure, the same as any other block list.</div>
+      </div>
+      <div class="faq-card reveal reveal-d4">
+        <div class="faq-q">Where do the severity ratings on each control come from?</div>
+        <div class="faq-a">Each NIST control carries a fixed severity of High, Medium, or Low, reflecting how foundational that control is to AI governance. This is separate from the risk tier assigned to each detected tool, which reflects how dangerous that particular tool could be.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-row reveal">
+    <a href="/login" class="cta-btn-primary">Run Your Assessment</a>
+    <a href="/"      class="cta-btn-outline">← Back to Home</a>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  const canvas=document.getElementById('star-canvas'); const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=window.innerWidth;canvas.height=document.body.scrollHeight;}
+  resize(); window.addEventListener('resize',()=>{resize();init();});
+  const N=280; let stars=[];
+  function rand(a,b){return Math.random()*(b-a)+a;}
+  function init(){stars=[];for(let i=0;i<N;i++)stars.push({x:rand(0,canvas.width),y:rand(0,canvas.height*0.85),r:rand(0.3,1.8),ba:rand(0.25,0.9),a:rand(0.25,0.9),sp:rand(0.003,0.012),ph:rand(0,Math.PI*2),col:Math.random()<0.15?'#99ccff':'#ffffff'});}
+  init();
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.ph+=s.sp;s.a=s.ba*(0.5+0.5*Math.sin(s.ph));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.col;ctx.globalAlpha=s.a;ctx.fill();});ctx.globalAlpha=1;requestAnimationFrame(draw);}
+  requestAnimationFrame(draw);
+})();
+function toggleDropdown(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
+document.addEventListener('click',function(e){document.querySelectorAll('.nav-dropdown.open').forEach(function(d){if(!d.contains(e.target))d.classList.remove('open');});});
+(function(){const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));})();
+</script>
+</body>
+</html>

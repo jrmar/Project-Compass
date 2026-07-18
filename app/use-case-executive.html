@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/app/">
+  <title>Project Compass — For Executives</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    #star-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    body::after {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:1000; opacity:0.03;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    header, main { position:relative; z-index:2; }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--navy); }
+    ::-webkit-scrollbar-thumb { background:rgba(64,130,232,0.35); border-radius:3px; }
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-d1 { transition-delay:0.08s; }
+    .reveal-d2 { transition-delay:0.18s; }
+    .reveal-d3 { transition-delay:0.28s; }
+    .reveal-d4 { transition-delay:0.38s; }
+    @keyframes fade-up { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+    .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
+
+    /* ── Hero ── */
+    .uc-hero {
+      text-align:center;
+      padding:56px 0 48px;
+      animation:fade-up 0.75s ease both;
+    }
+    .uc-hero-label {
+      display:inline-flex; align-items:center; gap:6px;
+      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; color:var(--blue);
+      background:rgba(64,130,232,0.08); border:1px solid rgba(64,130,232,0.18);
+      border-radius:20px; padding:5px 14px; margin-bottom:20px;
+    }
+    .uc-hero-dot { width:6px; height:6px; background:var(--teal); border-radius:50%; display:inline-block; }
+    .uc-hero h1 {
+      font-family:'Montserrat',sans-serif;
+      font-size:clamp(1.75rem,4vw,2.75rem); font-weight:800;
+      color:var(--light); letter-spacing:-0.02em; margin:0 0 16px; line-height:1.15;
+    }
+    .uc-hero-tagline {
+      font-size:15px; color:rgba(208,212,226,0.72); line-height:1.75;
+      max-width:640px; margin:0 auto;
+    }
+
+    /* ── Section layout ── */
+    .uc-section { margin-bottom:0; }
+    .divider-line { height:1px; background:var(--glass-border); margin:40px 0; }
+    .section-eyebrow {
+      font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; color:var(--teal);
+      margin-bottom:8px;
+    }
+    .section-heading {
+      font-family:'Montserrat',sans-serif; font-size:clamp(1.1rem,2.5vw,1.5rem);
+      font-weight:700; color:var(--light); letter-spacing:-0.01em; margin-bottom:20px;
+    }
+
+    /* ── Why cards ── */
+    .why-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:16px; margin-top:20px;
+    }
+    .why-card {
+      background:var(--glass-bg); border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg); padding:22px 24px; position:relative;
+      overflow:hidden;
+    }
+    .why-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,var(--blue),var(--teal));
+    }
+    .why-card-title {
+      font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700;
+      color:var(--light); margin-bottom:10px; line-height:1.4;
+    }
+    .why-card-desc {
+      font-size:13px; color:rgba(208,212,226,0.65); line-height:1.75;
+    }
+
+    /* ── Report contents ── */
+    .report-card {
+      background:var(--glass-bg); border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg); padding:28px 32px; margin-top:20px;
+    }
+    .report-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .report-item:last-child { border-bottom:none; padding-bottom:0; }
+    .report-item:first-child { padding-top:0; }
+    .report-item-dot {
+      width:7px; height:7px; background:var(--teal); border-radius:50%;
+      flex-shrink:0; margin-top:6px;
+    }
+    .report-item-title {
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700;
+      color:var(--light); margin-bottom:4px; letter-spacing:0.01em;
+    }
+    .report-item-desc { font-size:12px; color:rgba(208,212,226,0.62); line-height:1.7; }
+
+    /* ── FAQ ── */
+    .faq-list { margin-top:20px; display:flex; flex-direction:column; gap:14px; }
+    .faq-card {
+      background:var(--glass-bg); border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg); padding:22px 26px;
+    }
+    .faq-q {
+      font-family:'Montserrat',sans-serif; font-size:13px; font-weight:700;
+      color:var(--light); margin-bottom:10px; line-height:1.5;
+    }
+    .faq-a { font-size:13px; color:rgba(208,212,226,0.65); line-height:1.75; }
+
+    /* ── CTA ── */
+    .cta-row {
+      text-align:center; padding:40px 0 24px;
+      display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+    }
+    .cta-btn-primary {
+      background:linear-gradient(135deg,var(--blue),#2d64c4);
+      color:#fff; border:none; border-radius:6px; padding:10px 22px;
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700;
+      letter-spacing:0.05em; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:inline-block;
+      transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(64,130,232,0.45); }
+    .cta-btn-outline {
+      background:transparent; color:rgba(208,212,226,0.65);
+      border:1px solid var(--glass-border); border-radius:6px; padding:10px 22px;
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700;
+      letter-spacing:0.05em; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:inline-block;
+      transition:border-color 0.2s, color 0.2s;
+    }
+    .cta-btn-outline:hover { border-color:rgba(64,130,232,0.4); color:var(--light); }
+  </style>
+</head>
+<body>
+
+<canvas id="star-canvas"></canvas>
+<div class="orb" style="width:700px;height:700px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(64,130,232,0.07) 0%,transparent 68%);"></div>
+<div class="orb" style="width:500px;height:500px;bottom:10%;right:-100px;background:radial-gradient(circle,rgba(51,205,182,0.05) 0%,transparent 68%);"></div>
+
+<header class="app-header">
+  <a class="app-header-logo" href="/">
+    <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
+    <span class="app-header-logo-text">Project Compass</span>
+  </a>
+  <nav class="app-header-nav">
+    <a href="/" class="app-nav-link">Home</a>
+    <a href="/about" class="app-nav-link">About</a>
+    <a href="/news" class="app-nav-link">News</a>
+    <div class="nav-dropdown" id="uc-dropdown">
+      <button class="nav-dropdown-btn active" onclick="toggleDropdown('uc-dropdown')">
+        Use Cases <span class="nav-dropdown-caret">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="/executive"    class="nav-dropdown-item active">Executive</a>
+        <a href="/security-team" class="nav-dropdown-item">Security Team</a>
+        <a href="/auditor"      class="nav-dropdown-item">Auditor</a>
+      </div>
+    </div>
+    <div class="nav-dropdown" id="gov-dropdown">
+      <button class="nav-dropdown-btn" onclick="toggleDropdown('gov-dropdown')">
+        Governance <span class="nav-dropdown-caret">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        <a href="/compliance" class="nav-dropdown-item">Compliance Reference</a>
+        <a href="/governance" class="nav-dropdown-item">AI Governance Policy</a>
+      </div>
+    </div>
+  </nav>
+  <div class="app-header-right">
+    <a href="/login" class="cta-btn-primary">Run Assessment</a>
+  </div>
+</header>
+
+<main class="page-content-wide">
+
+  <div class="uc-hero">
+    <div class="uc-hero-label">
+      <span class="uc-hero-dot"></span>
+      Use Case
+    </div>
+    <h1>For Executives</h1>
+    <p class="uc-hero-tagline">One page. One score. Three priorities. Everything a leadership briefing on AI risk actually needs, and nothing it doesn't.</p>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- Why -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Why It Matters</div>
+      <div class="section-heading">Why Executives Need This</div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal reveal-d1">
+        <div class="why-card-title">A Board Doesn't Need 19 Controls, It Needs One Number.</div>
+        <div class="why-card-desc">Asked how exposed the organization is on AI, an executive needs an answer that fits in a sentence, not a walkthrough of every NIST subcategory.</div>
+      </div>
+      <div class="why-card reveal reveal-d2">
+        <div class="why-card-title">Technical Reports Don't Travel to a Boardroom.</div>
+        <div class="why-card-desc">A report built for a security engineer, full of control IDs and severity weights, doesn't hold up in a ten minute leadership update. Something always gets lost translating it, or someone has to spend hours turning it into slides.</div>
+      </div>
+      <div class="why-card reveal reveal-d3">
+        <div class="why-card-title">Without Ranking, Everything Looks Equally Urgent.</div>
+        <div class="why-card-desc">A list of eighteen unmet controls, with no order to it, doesn't tell leadership what to greenlight first. Priorities need to already be sorted by the time they reach the top.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- What's in the Report -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Report Contents</div>
+      <div class="section-heading">What's in the Executive Summary Report</div>
+      <p style="font-size:13px;color:rgba(208,212,226,0.62);line-height:1.75;max-width:680px;">This is the same underlying assessment used across every Compass report — upload a log, detect AI tools, answer the governance questionnaire — just formatted for a leadership audience instead of a technical or audit one.</p>
+    </div>
+    <div class="report-card reveal reveal-d1">
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Key Metrics</div>
+          <div class="report-item-desc">AI tools detected, how many are high risk, the governance gap score, and the overall governance risk score, all visible in a single row.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Executive Overview</div>
+          <div class="report-item-desc">A short, plain language paragraph explaining what was found and what it means in practice, written the way someone would actually say it out loud, not the way a control matrix would phrase it.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Governance Gaps by NIST Function</div>
+          <div class="report-item-desc">A simple breakdown of Govern, Map, Measure, and Manage, showing which function has the largest gap, without requiring familiarity with individual control IDs.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">AI Tools Detected</div>
+          <div class="report-item-desc">The tool inventory, presented for context rather than as a technical worklist.</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-item-dot"></div>
+        <div>
+          <div class="report-item-title">Priority Actions</div>
+          <div class="report-item-desc">The highest severity gaps translated into four concrete next steps, each with a plain explanation of why it matters, backed by the same platform specific detail the Security Team report uses, so nothing has to be re-derived later.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- FAQ -->
+  <div class="uc-section">
+    <div class="reveal">
+      <div class="section-eyebrow">Questions</div>
+      <div class="section-heading">Frequently Asked Questions</div>
+    </div>
+    <div class="faq-list">
+      <div class="faq-card reveal reveal-d1">
+        <div class="faq-q">Is the Executive report a simplified version, or a different assessment?</div>
+        <div class="faq-a">The same assessment. It draws from the identical inventory and questionnaire data as the Security Team and Auditor reports, just reordered and summarized for a non technical audience.</div>
+      </div>
+      <div class="faq-card reveal reveal-d2">
+        <div class="faq-q">Where do the four priority actions come from?</div>
+        <div class="faq-a">They're the highest severity confirmed gaps in the assessment, the same ones documented in full technical detail in the Security Team report. Nothing is invented for the executive version; it's the same findings, explained differently.</div>
+      </div>
+      <div class="faq-card reveal reveal-d3">
+        <div class="faq-q">Can I hand this directly to a board or a client?</div>
+        <div class="faq-a">It's designed to be read in a short meeting without requiring a translator, but it's still generated by an automated assessment. We'd recommend a quick review by whoever owns AI governance internally before it leaves the building.</div>
+      </div>
+      <div class="faq-card reveal reveal-d4">
+        <div class="faq-q">Does the executive summary hide anything that's in the other two reports?</div>
+        <div class="faq-a">No information is hidden, only reordered and summarized. The full control level detail remains available in the Security Team and Auditor reports for anyone who needs it.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-row reveal">
+    <a href="/login" class="cta-btn-primary">Run Your Assessment</a>
+    <a href="/"      class="cta-btn-outline">← Back to Home</a>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  const canvas=document.getElementById('star-canvas'); const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=window.innerWidth;canvas.height=document.body.scrollHeight;}
+  resize(); window.addEventListener('resize',()=>{resize();init();});
+  const N=280; let stars=[];
+  function rand(a,b){return Math.random()*(b-a)+a;}
+  function init(){stars=[];for(let i=0;i<N;i++)stars.push({x:rand(0,canvas.width),y:rand(0,canvas.height*0.85),r:rand(0.3,1.8),ba:rand(0.25,0.9),a:rand(0.25,0.9),sp:rand(0.003,0.012),ph:rand(0,Math.PI*2),col:Math.random()<0.15?'#99ccff':'#ffffff'});}
+  init();
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.ph+=s.sp;s.a=s.ba*(0.5+0.5*Math.sin(s.ph));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.col;ctx.globalAlpha=s.a;ctx.fill();});ctx.globalAlpha=1;requestAnimationFrame(draw);}
+  requestAnimationFrame(draw);
+})();
+function toggleDropdown(id){var el=document.getElementById(id);if(el)el.classList.toggle('open');}
+document.addEventListener('click',function(e){document.querySelectorAll('.nav-dropdown.open').forEach(function(d){if(!d.contains(e.target))d.classList.remove('open');});});
+(function(){const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));})();
+</script>
+</body>
+</html>
