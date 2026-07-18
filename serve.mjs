@@ -25,6 +25,28 @@ function loadEnv() {
 }
 loadEnv();
 
+// ── MDCA connection state (dev server — ephemeral per process) ────────────────
+const mdcaSessions = new Map(); // tenantId → { connectedAt }
+
+async function getMdcaToken(tenantId) {
+  const resp = await fetch(
+    `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+    {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body:    new URLSearchParams({
+        grant_type:    'client_credentials',
+        client_id:     process.env.MDCA_CLIENT_ID,
+        client_secret: process.env.MDCA_CLIENT_SECRET,
+        scope:         'https://graph.microsoft.com/.default',
+      }),
+    }
+  );
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error_description || `Token error ${resp.status}`);
+  return data.access_token;
+}
+
 // ── Read POST body ─────────────────────────────────────────────────────────────
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -127,6 +149,95 @@ const server = createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST', 'Access-Control-Allow-Headers': 'Content-Type' });
     return res.end();
+  }
+
+  // ── GET /auth/mdca/connect ──────────────────────────────────────────────────
+  if (req.method === 'GET' && url === '/auth/mdca/connect') {
+    const clientId    = process.env.MDCA_CLIENT_ID;
+    const redirectUri = process.env.MDCA_REDIRECT_URI || 'http://localhost:3000/auth/mdca/callback';
+    const params      = new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, state: Date.now().toString(36) });
+    res.writeHead(302, { Location: `https://login.microsoftonline.com/common/adminconsent?${params}` });
+    return res.end();
+  }
+
+  // ── GET /auth/mdca/callback ─────────────────────────────────────────────────
+  if (req.method === 'GET' && url === '/auth/mdca/callback') {
+    const qs      = req.url.includes('?') ? req.url.slice(req.url.indexOf('?') + 1) : '';
+    const p       = new URLSearchParams(qs);
+    const tenant  = p.get('tenant');
+    const consent = p.get('admin_consent');
+    const error   = p.get('error');
+    const errDesc = p.get('error_description');
+
+    if (error || !tenant || consent !== 'True') {
+      const msg = encodeURIComponent(errDesc || error || 'Consent was not completed');
+      res.writeHead(302, { Location: `/inventory?mdca_error=${msg}` });
+      return res.end();
+    }
+
+    mdcaSessions.set(tenant, { connectedAt: new Date().toISOString() });
+    res.writeHead(302, {
+      Location:     '/inventory?mdca=connected',
+      'Set-Cookie': `mdca_tid=${tenant}; HttpOnly; SameSite=Lax; Max-Age=604800; Path=/`,
+    });
+    return res.end();
+  }
+
+  // ── GET /api/mdca/status ────────────────────────────────────────────────────
+  if (req.method === 'GET' && url === '/api/mdca/status') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const cookie = req.headers.cookie || '';
+    const match  = cookie.match(/mdca_tid=([a-f0-9-]{36})/i);
+    const tid    = match ? match[1] : null;
+    res.writeHead(200);
+    return res.end(JSON.stringify({ connected: !!tid, tenant_id: tid }));
+  }
+
+  // ── POST /api/mdca/tag ──────────────────────────────────────────────────────
+  if (req.method === 'POST' && url === '/api/mdca/tag') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const cookie = req.headers.cookie || '';
+    const match  = cookie.match(/mdca_tid=([a-f0-9-]{36})/i);
+    const tid    = match ? match[1] : null;
+
+    if (!tid) {
+      res.writeHead(401);
+      return res.end(JSON.stringify({ error: 'Microsoft 365 not connected' }));
+    }
+
+    try {
+      const body    = await readBody(req);
+      const { app_domain, app_name, tag } = body;
+      if (!app_domain || !tag) {
+        res.writeHead(400);
+        return res.end(JSON.stringify({ error: 'Missing app_domain or tag' }));
+      }
+
+      const tagMap  = { approved: 'sanctioned', review: 'monitored', blocked: 'unsanctioned' };
+      const mdcaTag = tagMap[tag] || tag;
+
+      let tokenOk = false;
+      try { await getMdcaToken(tid); tokenOk = true; }
+      catch (e) { console.warn('[/api/mdca/tag] token error:', e.message); }
+
+      res.writeHead(200);
+      return res.end(JSON.stringify({
+        success:   true,
+        tag:       mdcaTag,
+        app:       app_name || app_domain,
+        tenant_id: tid,
+        live:      tokenOk,
+        message:   tokenOk
+          ? `${app_name || app_domain} tagged as "${mdcaTag}" in Microsoft Defender for Cloud Apps`
+          : `Policy saved locally — activate a Defender for Cloud Apps license to push to Defender`,
+      }));
+    } catch (err) {
+      console.error('[/api/mdca/tag]', err.message);
+      res.writeHead(500);
+      return res.end(JSON.stringify({ error: err.message }));
+    }
   }
 
   // ── Clean URL rewrites (mirrors vercel.json) ───────────────────────────────

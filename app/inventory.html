@@ -343,6 +343,146 @@
     }
     .notes-textarea::placeholder { color: var(--muted); }
     .notes-textarea:focus { border-color: rgba(64,130,232,0.45); }
+
+    /* ---- Activity Log ---- */
+    .activity-log-section {
+      margin-top: 20px;
+    }
+    .activity-log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .activity-log-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .activity-log-clear {
+      background: transparent;
+      border: none;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 2px 6px;
+      transition: color 0.15s;
+    }
+    .activity-log-clear:hover { color: var(--light); }
+    .activity-log-wrap {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .activity-log-empty {
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .activity-log-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 110px 130px 90px;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 20px;
+      border-bottom: 1px solid rgba(64,130,232,0.06);
+      font-size: 12px;
+    }
+    .activity-log-row:last-child { border-bottom: none; }
+    .activity-log-row:hover { background: rgba(64,130,232,0.03); }
+    .activity-time { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+    .activity-app  { font-weight: 600; color: var(--light); }
+    .activity-tag  {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+    .tag-sanctioned   { background: rgba(51,205,182,0.12); border: 1px solid rgba(51,205,182,0.3);  color: var(--teal); }
+    .tag-monitored    { background: rgba(245,200,66,0.10);  border: 1px solid rgba(245,200,66,0.3);  color: #f5c842; }
+    .tag-unsanctioned { background: rgba(224,92,92,0.12);   border: 1px solid rgba(224,92,92,0.3);   color: #e05c5c; }
+    .activity-tenant  { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+    .activity-status  { font-size: 11px; }
+    .status-live   { color: var(--teal); }
+    .status-local  { color: var(--muted); }
+
+    /* ---- MDCA Banner ---- */
+    .mdca-banner {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .mdca-banner-icon { flex-shrink: 0; line-height: 0; }
+    .mdca-banner-content { flex: 1; min-width: 180px; }
+    .mdca-banner-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 2px;
+    }
+    .mdca-banner-sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .mdca-banner-connected {
+      border-color: rgba(51,205,182,0.28);
+      background: rgba(51,205,182,0.04);
+    }
+    .mdca-status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .mdca-status-dot.connected {
+      background: var(--teal);
+      box-shadow: 0 0 6px var(--teal);
+    }
+
+    /* ---- Toast ---- */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .toast {
+      background: rgba(9,26,54,0.97);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--light);
+      max-width: 340px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: auto;
+      backdrop-filter: blur(8px);
+      line-height: 1.4;
+    }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+    .toast-success { border-color: rgba(51,205,182,0.45); color: var(--teal); }
+    .toast-error   { border-color: rgba(224,92,92,0.45);  color: #e05c5c; }
+    .toast-info    { border-color: rgba(64,130,232,0.45);  color: var(--blue); }
   </style>
 </head>
 <body>
@@ -375,6 +515,25 @@
         <div class="page-subtitle" id="inv-subtitle">AI tools identified across your organization</div>
       </div>
       <button class="btn btn-ghost" onclick="window.location.href='/upload'">&#43; New Assessment</button>
+    </div>
+
+    <!-- MDCA Integration Banner -->
+    <div class="mdca-banner" id="mdca-banner">
+      <div class="mdca-banner-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="0"  y="0"  width="9" height="9" fill="#f25022"/>
+          <rect x="11" y="0"  width="9" height="9" fill="#7fba00"/>
+          <rect x="0"  y="11" width="9" height="9" fill="#00a4ef"/>
+          <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
+      </div>
+      <div class="mdca-banner-content">
+        <div class="mdca-banner-title">Connect Microsoft Defender for Cloud Apps</div>
+        <div class="mdca-banner-sub">Push Approve and Block actions directly to Microsoft 365 — monitored and unsanctioned tags propagate to Defender for Endpoint.</div>
+      </div>
+      <button class="btn" style="background:rgba(0,164,239,0.1);border:1px solid rgba(0,164,239,0.3);color:#00a4ef;font-size:12px;padding:7px 16px;white-space:nowrap;flex-shrink:0;" onclick="window.location.href='/auth/mdca/connect'">
+        Connect Microsoft 365
+      </button>
     </div>
 
     <!-- Summary card -->
@@ -421,7 +580,29 @@
       Persistent cross-session storage coming soon.
     </p>
 
+    <!-- Policy Activity Log -->
+    <div class="activity-log-section" id="activity-log-section" style="display:none;">
+      <div class="activity-log-header">
+        <div class="activity-log-title">Policy Activity Log</div>
+        <button class="activity-log-clear" onclick="clearActivityLog()">Clear log</button>
+      </div>
+      <div class="activity-log-wrap">
+        <div style="display:grid;grid-template-columns:140px 1fr 110px 130px 90px;gap:12px;padding:8px 20px;border-bottom:1px solid var(--glass-border);">
+          <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);font-family:'Montserrat',sans-serif;">Time</span>
+          <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);font-family:'Montserrat',sans-serif;">Application</span>
+          <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);font-family:'Montserrat',sans-serif;">MDCA Tag</span>
+          <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);font-family:'Montserrat',sans-serif;">Tenant</span>
+          <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);font-family:'Montserrat',sans-serif;">Status</span>
+        </div>
+        <div id="activity-log-rows">
+          <div class="activity-log-empty">No policy actions recorded yet.</div>
+        </div>
+      </div>
+    </div>
+
   </main>
+
+  <div id="toast-container"></div>
 
   <script>
     // Auth guard
@@ -433,6 +614,9 @@
       document.getElementById('inv-subtitle').textContent =
         `AI tools identified for ${session.org_name}`;
     }
+
+    let mdcaConnected = false;
+    let mdcaTenantId  = null;
 
     const det   = (session && session.detection) || {};
     const tools = det.detected_tools || [];
@@ -481,6 +665,146 @@
       });
     }
 
+    // Toast notifications
+    function showToast(message, type) {
+      const c = document.getElementById('toast-container');
+      if (!c) return;
+      const t = document.createElement('div');
+      t.className = 'toast toast-' + (type || 'info');
+      t.textContent = message;
+      c.appendChild(t);
+      requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('visible')));
+      setTimeout(() => { t.classList.remove('visible'); setTimeout(() => t.remove(), 300); }, 4500);
+    }
+
+    // MDCA banner rendering
+    function renderMdcaBanner(connected, tenantId) {
+      const el = document.getElementById('mdca-banner');
+      if (!el) return;
+      if (connected) {
+        el.className = 'mdca-banner mdca-banner-connected';
+        el.innerHTML = `
+          <div class="mdca-status-dot connected"></div>
+          <div class="mdca-banner-content">
+            <div class="mdca-banner-title">Microsoft Defender for Cloud Apps</div>
+            <div class="mdca-banner-sub">Connected &middot; Tenant ${(tenantId||'').slice(0,8)}&hellip; &middot; Approve and Block push policy to Defender for Endpoint</div>
+          </div>
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px;flex-shrink:0;" onclick="disconnectMdca()">Disconnect</button>`;
+      } else {
+        el.className = 'mdca-banner';
+        el.innerHTML = `
+          <div class="mdca-banner-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="0" y="0" width="9" height="9" fill="#f25022"/>
+              <rect x="11" y="0" width="9" height="9" fill="#7fba00"/>
+              <rect x="0" y="11" width="9" height="9" fill="#00a4ef"/>
+              <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+            </svg>
+          </div>
+          <div class="mdca-banner-content">
+            <div class="mdca-banner-title">Connect Microsoft Defender for Cloud Apps</div>
+            <div class="mdca-banner-sub">Push Approve and Block actions directly to Microsoft 365 &mdash; monitored and unsanctioned tags propagate to Defender for Endpoint.</div>
+          </div>
+          <button class="btn" style="background:rgba(0,164,239,0.1);border:1px solid rgba(0,164,239,0.3);color:#00a4ef;font-size:12px;padding:7px 16px;white-space:nowrap;flex-shrink:0;" onclick="window.location.href='/auth/mdca/connect'">
+            Connect Microsoft 365
+          </button>`;
+      }
+    }
+
+    function disconnectMdca() {
+      document.cookie = 'mdca_tid=; Max-Age=0; Path=/';
+      mdcaConnected = false;
+      mdcaTenantId  = null;
+      renderMdcaBanner(false, null);
+      showToast('Microsoft 365 disconnected', 'info');
+    }
+
+    // Activity log (persisted in localStorage)
+    function logMdcaAction(appName, mdcaTag, tenantId, live) {
+      const log = JSON.parse(localStorage.getItem('compass_mdca_log') || '[]');
+      log.unshift({ ts: new Date().toISOString(), app: appName, tag: mdcaTag, tenant: tenantId, live });
+      localStorage.setItem('compass_mdca_log', JSON.stringify(log.slice(0, 100)));
+      renderActivityLog();
+    }
+
+    function renderActivityLog() {
+      const log = JSON.parse(localStorage.getItem('compass_mdca_log') || '[]');
+      const section = document.getElementById('activity-log-section');
+      const rows    = document.getElementById('activity-log-rows');
+      if (!section || !rows) return;
+
+      if (log.length === 0) {
+        section.style.display = 'none';
+        rows.innerHTML = '<div class="activity-log-empty">No policy actions recorded yet.</div>';
+        return;
+      }
+
+      section.style.display = 'block';
+      const tagClasses = { sanctioned: 'tag-sanctioned', monitored: 'tag-monitored', unsanctioned: 'tag-unsanctioned' };
+
+      rows.innerHTML = log.map(entry => {
+        const d     = new Date(entry.ts);
+        const time  = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' +
+                      d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const cls   = tagClasses[entry.tag] || '';
+        const short = (entry.tenant || '').slice(0, 8);
+        const statusHtml = entry.live
+          ? `<span class="activity-status status-live">&#10003; Token verified</span>`
+          : `<span class="activity-status status-local">Local only</span>`;
+        return `
+          <div class="activity-log-row">
+            <span class="activity-time">${time}</span>
+            <span class="activity-app">${entry.app}</span>
+            <span><span class="activity-tag ${cls}">${entry.tag}</span></span>
+            <span class="activity-tenant">${short}&hellip;</span>
+            ${statusHtml}
+          </div>`;
+      }).join('');
+    }
+
+    function clearActivityLog() {
+      localStorage.removeItem('compass_mdca_log');
+      renderActivityLog();
+    }
+
+    async function pushMdcaTag(appDomain, appName, approvalStatus) {
+      try {
+        const resp = await fetch('/api/mdca/tag', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ app_domain: appDomain, app_name: appName, tag: approvalStatus }),
+        });
+        const data = await resp.json();
+        if (data.success) {
+          showToast(data.message || 'Policy pushed to Microsoft Defender', 'success');
+          logMdcaAction(appName || appDomain, data.tag || approvalStatus, data.tenant_id || mdcaTenantId, !!data.live);
+        } else {
+          showToast(data.error || 'MDCA push failed', 'error');
+        }
+      } catch {
+        showToast('Could not reach Microsoft Defender — check connection', 'error');
+      }
+    }
+
+    async function checkMdcaStatus() {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('mdca') === 'connected') {
+        history.replaceState({}, '', '/inventory');
+        showToast('Microsoft 365 connected successfully', 'success');
+      }
+      if (sp.get('mdca_error')) {
+        history.replaceState({}, '', '/inventory');
+        showToast('Connection failed: ' + decodeURIComponent(sp.get('mdca_error')), 'error');
+      }
+      try {
+        const resp = await fetch('/api/mdca/status');
+        const data = await resp.json();
+        mdcaConnected = data.connected;
+        mdcaTenantId  = data.tenant_id;
+        renderMdcaBanner(data.connected, data.tenant_id);
+      } catch { renderMdcaBanner(false, null); }
+    }
+
     // Toggle approval status; clicking the active status deselects it
     function setApproval(key, status, evt) {
       evt.stopPropagation();
@@ -488,6 +812,12 @@
       overrides[key].approval = overrides[key].approval === status ? '' : status;
       saveOverrides();
       renderTable(filtered);
+
+      const newStatus = overrides[key].approval;
+      if (mdcaConnected && newStatus) {
+        const tool = tools.find(t => toolKey(t) === key);
+        pushMdcaTag(tool?.domain || key, tool?.name || tool?.tool_name || key, newStatus);
+      }
     }
 
     function saveNote(key, value) {
@@ -539,7 +869,7 @@
         const approval = ov.approval || '';
         const notes    = (ov.notes || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const isOpen   = expanded.has(key);
-        const kj       = JSON.stringify(key);   // safely quoted for inline handlers
+        const kj       = JSON.stringify(key).replace(/"/g, '&quot;');  // HTML-safe for onclick attrs
 
         const mainRow = `
           <tr style="cursor:pointer;" onclick="toggleDetail(${kj})">
@@ -665,6 +995,8 @@
     }
 
     renderTable(tools);
+    checkMdcaStatus();
+    renderActivityLog();
   </script>
 </body>
 </html>
