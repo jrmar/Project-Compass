@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -447,7 +447,8 @@
   <main class="page-content-wide">
     <h1 class="page-title">Assessment Dashboard</h1>
     <p class="page-subtitle">
-      Combined view of AI tool risk from your log scan and governance gaps from your NIST assessment.
+      Combined view of AI tool risk from your <span id="log-type-label">log</span> scan and governance gaps from your NIST assessment.
+      <span id="log-type-badge" style="display:inline-flex;align-items:center;gap:5px;background:rgba(51,205,182,0.08);border:1px solid rgba(51,205,182,0.2);border-radius:100px;padding:2px 10px;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--teal);margin-left:4px;vertical-align:middle;"></span>
     </p>
 
     <!-- KPI Row -->
@@ -455,7 +456,7 @@
       <div class="kpi-tile">
         <div class="kpi-label">Total Events</div>
         <div class="kpi-value" id="kpi-events" style="color:var(--light);">—</div>
-        <div class="kpi-sub">DNS queries parsed</div>
+        <div class="kpi-sub" id="kpi-events-sub">DNS queries parsed</div>
       </div>
       <div class="kpi-tile">
         <div class="kpi-label">Tools Detected</div>
@@ -581,8 +582,17 @@
     if (!session || !session.org_name) { window.location.href = 'login.html'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 
-    const det = (session && session.detection) || {};
+    const det   = (session && session.detection) || {};
     const quest = (session && session.questionnaire) || {};
+
+    // ── Log type context ──
+    const logType = det._log_type || session?.upload?.log_type || 'dns';
+    const LOG_TYPE_CONFIG = {
+      dns:      { label: 'DNS Log',      icon: '🌐', eventLabel: 'DNS queries',        eventsKPI: 'DNS Queries Parsed' },
+      firewall: { label: 'Firewall Log', icon: '🔥', eventLabel: 'firewall entries',   eventsKPI: 'Firewall Entries Parsed' },
+      proxy:    { label: 'Proxy Log',    icon: '🔁', eventLabel: 'proxy requests',     eventsKPI: 'Proxy Requests Parsed' },
+    };
+    const logConfig = LOG_TYPE_CONFIG[logType] || LOG_TYPE_CONFIG.dns;
     const orgName = (session && session.org_name) || 'Your Organization';
     const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
@@ -609,6 +619,17 @@
       if (highCount >= 1 || gapPct >= 0.35) return { label:'HIGH', color:'var(--orange)', desc:'Significant gaps identified' };
       if (gapPct >= 0.15) return { label:'MODERATE', color:'#e5b800', desc:'Several gaps to address' };
       return { label:'LOW', color:'var(--teal)', desc:'Well-governed posture' };
+    }
+
+    // ── Set log type badge ──
+    document.getElementById('log-type-label').textContent = logConfig.label.toLowerCase();
+    document.getElementById('log-type-badge').textContent = logConfig.icon + ' ' + logConfig.label;
+    document.getElementById('kpi-events-sub').textContent = logConfig.eventLabel + ' parsed';
+
+    // Also update the tool block rule description
+    const toolBlockDesc = document.querySelector('.glass-card .panel-header + div');
+    if (toolBlockDesc) {
+      toolBlockDesc.textContent = `Medium and high risk tools from ${logConfig.label.toLowerCase()} scan. Expand each to generate block rules.`;
     }
 
     // ── Render KPIs ──
