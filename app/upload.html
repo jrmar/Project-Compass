@@ -71,15 +71,18 @@
     /* ── Log type selector ── */
     .log-type-selector {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       margin-bottom: 20px;
+    }
+    @media (max-width: 560px) {
+      .log-type-selector { grid-template-columns: 1fr; }
     }
     .log-type-btn {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 14px 16px;
+      padding: 14px 14px;
       background: var(--glass-bg);
       border: 1.5px solid var(--glass-border);
       border-radius: var(--radius-md);
@@ -95,17 +98,16 @@
       border-color: var(--teal);
       background: rgba(51,205,182,0.06);
     }
-    .log-type-icon {
-      font-size: 22px;
-      flex-shrink: 0;
-    }
+    .log-type-icon { font-size: 20px; flex-shrink: 0; }
+    .log-type-text { flex: 1; min-width: 0; }
     .log-type-label {
       font-family: 'Montserrat', sans-serif;
       font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       color: var(--light);
       margin-bottom: 2px;
+      white-space: nowrap;
     }
     .log-type-desc {
       font-size: 10px;
@@ -129,7 +131,15 @@
     .log-type-btn.selected .log-type-check {
       background: var(--teal);
       border-color: var(--teal);
-      color: var(--navy, #030b1e);
+      color: #030b1e;
+    }
+
+    /* ── Step label ── */
+    .step-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
     }
 
     /* ── Sidebar panel toggle ── */
@@ -198,33 +208,41 @@
       <!-- ── Left: Log type + upload zone ── -->
       <div>
 
-        <!-- Log type selector -->
-        <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">
-          Step 1 — Select Log Type
-        </div>
+        <!-- Step 1: Log type -->
+        <div class="step-eyebrow">Step 1 — Select Log Type</div>
         <div class="log-type-selector">
+
           <button class="log-type-btn selected" id="type-dns" onclick="selectLogType('dns')">
             <span class="log-type-icon">🌐</span>
-            <div>
+            <div class="log-type-text">
               <div class="log-type-label">DNS Log</div>
-              <div class="log-type-desc">Query logs from your DNS resolver or forwarder</div>
+              <div class="log-type-desc">DNS resolver or forwarder query logs</div>
             </div>
             <div class="log-type-check">✓</div>
           </button>
+
           <button class="log-type-btn" id="type-firewall" onclick="selectLogType('firewall')">
             <span class="log-type-icon">🔥</span>
-            <div>
+            <div class="log-type-text">
               <div class="log-type-label">Firewall Log</div>
-              <div class="log-type-desc">Traffic logs from your network firewall</div>
+              <div class="log-type-desc">Network firewall traffic logs</div>
             </div>
             <div class="log-type-check">✓</div>
           </button>
+
+          <button class="log-type-btn" id="type-proxy" onclick="selectLogType('proxy')">
+            <span class="log-type-icon">🔁</span>
+            <div class="log-type-text">
+              <div class="log-type-label">Proxy Log</div>
+              <div class="log-type-desc">Web proxy or Zscaler HTTP logs</div>
+            </div>
+            <div class="log-type-check">✓</div>
+          </button>
+
         </div>
 
-        <!-- Upload zone -->
-        <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:20px;">
-          Step 2 — Upload File
-        </div>
+        <!-- Step 2: Upload -->
+        <div class="step-eyebrow" style="margin-top: 20px;">Step 2 — Upload File</div>
         <div class="upload-zone" id="drop-zone">
           <input type="file" id="file-input" accept=".csv,.log" multiple>
           <span class="upload-icon">&#128196;</span>
@@ -254,7 +272,7 @@
       <!-- ── Right: Sidebar ── -->
       <div class="upload-sidebar">
 
-        <!-- DNS sidebar panel -->
+        <!-- DNS sidebar -->
         <div class="glass-card sidebar-panel active" id="panel-dns" style="padding: 20px;">
           <div class="sidebar-section">
             <div class="info-panel">
@@ -262,14 +280,14 @@
               <ul>
                 <li>DNS queries to known AI tool domains</li>
                 <li>Traffic to generative AI APIs</li>
-                <li>Connections to sanctioned and unsanctioned tools</li>
+                <li>Sanctioned and unsanctioned tool access</li>
                 <li>Query volume per user and per tool</li>
               </ul>
             </div>
           </div>
           <div class="sidebar-section" style="margin-top: 16px;">
             <div class="info-panel info-panel-teal">
-              <div class="info-panel-title">&#128202; Expected CSV Columns</div>
+              <div class="info-panel-title">&#128202; Expected Columns</div>
               <div class="col-columns">
                 <span class="col-tag">timestamp</span>
                 <span class="col-tag">client_ip</span>
@@ -278,13 +296,13 @@
                 <span class="col-tag">response_code</span>
               </div>
               <div style="margin-top: 10px; font-size: 11px; color: var(--muted);">
-                Column names and order may vary — Compass will attempt to auto-map common DNS log formats.
+                Column names may vary — Compass will auto-map common DNS formats.
               </div>
             </div>
           </div>
           <div class="sidebar-section" style="margin-top: 16px;">
             <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
-              Don't have DNS logs handy? Use the sample file to run a demonstration.
+              Don't have DNS logs? Use the sample file for a demo.
             </div>
             <a class="sample-link" href="../SampleLogs/sample_dns_logs.csv" download>
               &#8595; Download sample_dns_logs.csv
@@ -292,14 +310,14 @@
           </div>
         </div>
 
-        <!-- Firewall sidebar panel -->
+        <!-- Firewall sidebar -->
         <div class="glass-card sidebar-panel" id="panel-firewall" style="padding: 20px;">
           <div class="sidebar-section">
             <div class="info-panel">
               <div class="info-panel-title">&#128270; What We Detect</div>
               <ul>
                 <li>Firewall traffic to known AI destinations</li>
-                <li>Allowed and blocked connections to AI services</li>
+                <li>Allowed and blocked AI connections</li>
                 <li>Data volume transferred to AI tools</li>
                 <li>AI access per source IP or user</li>
               </ul>
@@ -307,7 +325,7 @@
           </div>
           <div class="sidebar-section" style="margin-top: 16px;">
             <div class="info-panel info-panel-teal">
-              <div class="info-panel-title">&#128202; Expected CSV Columns</div>
+              <div class="info-panel-title">&#128202; Expected Columns</div>
               <div class="col-columns">
                 <span class="col-tag">timestamp</span>
                 <span class="col-tag">src_ip</span>
@@ -325,10 +343,51 @@
           </div>
           <div class="sidebar-section" style="margin-top: 16px;">
             <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
-              Don't have firewall logs handy? Use the sample file to run a demonstration.
+              Don't have firewall logs? Use the sample file for a demo.
             </div>
             <a class="sample-link" href="../SampleLogs/sample_firewall_logs.csv" download>
               &#8595; Download sample_firewall_logs.csv
+            </a>
+          </div>
+        </div>
+
+        <!-- Proxy sidebar -->
+        <div class="glass-card sidebar-panel" id="panel-proxy" style="padding: 20px;">
+          <div class="sidebar-section">
+            <div class="info-panel">
+              <div class="info-panel-title">&#128270; What We Detect</div>
+              <ul>
+                <li>HTTP/HTTPS requests to AI services</li>
+                <li>POST requests indicating data submission</li>
+                <li>Blocked vs allowed AI tool access</li>
+                <li>Data volume and user activity per tool</li>
+              </ul>
+            </div>
+          </div>
+          <div class="sidebar-section" style="margin-top: 16px;">
+            <div class="info-panel info-panel-teal">
+              <div class="info-panel-title">&#128202; Expected Columns</div>
+              <div class="col-columns">
+                <span class="col-tag">timestamp</span>
+                <span class="col-tag">src_ip</span>
+                <span class="col-tag">user</span>
+                <span class="col-tag">method</span>
+                <span class="col-tag">url</span>
+                <span class="col-tag">status_code</span>
+                <span class="col-tag">bytes_sent</span>
+                <span class="col-tag">action</span>
+              </div>
+              <div style="margin-top: 10px; font-size: 11px; color: var(--muted);">
+                Supports Generic, Squid, and Zscaler proxy log formats.
+              </div>
+            </div>
+          </div>
+          <div class="sidebar-section" style="margin-top: 16px;">
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+              Don't have proxy logs? Use the sample file for a demo.
+            </div>
+            <a class="sample-link" href="../SampleLogs/sample_proxy_logs.csv" download>
+              &#8595; Download sample_proxy_logs.csv
             </a>
           </div>
         </div>
@@ -342,11 +401,12 @@
           </div>
         </div>
 
-        <!-- Coming soon note -->
-        <div style="margin-top: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,128,32,0.05); border: 1px solid rgba(255,128,32,0.15);">
+        <!-- All three supported note -->
+        <div style="margin-top: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(51,205,182,0.04); border: 1px solid rgba(51,205,182,0.15);">
           <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
-            <strong style="color: var(--orange); display: block; margin-bottom: 4px;">&#9888;&#65039; Coming Soon</strong>
-            Proxy log support is in development. DNS and firewall logs are supported now.
+            <strong style="color: var(--teal); display: block; margin-bottom: 4px;">&#10003; Three Log Types Supported</strong>
+            DNS, Firewall, and Proxy logs are all supported. Select the log type above
+            before uploading to ensure correct parsing.
           </div>
         </div>
 
@@ -366,25 +426,36 @@
     // ── Log type state ──
     let selectedLogType = 'dns';
 
+    const DROP_TITLES = {
+      dns:      'Drop your DNS log CSV here',
+      firewall: 'Drop your firewall log CSV here',
+      proxy:    'Drop your proxy log CSV here',
+    };
+
+    const TYPE_ICONS = {
+      dns:      '🌐',
+      firewall: '🔥',
+      proxy:    '🔁',
+    };
+
+    const TYPE_LABELS = {
+      dns:      'DNS',
+      firewall: 'Firewall',
+      proxy:    'Proxy',
+    };
+
     function selectLogType(type) {
       selectedLogType = type;
 
-      // Update selector buttons
       document.querySelectorAll('.log-type-btn').forEach(btn => btn.classList.remove('selected'));
       document.getElementById(`type-${type}`).classList.add('selected');
 
-      // Update sidebar panels
       document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.remove('active'));
       document.getElementById(`panel-${type}`).classList.add('active');
 
-      // Update drop zone label
-      const labels = {
-        dns:      'Drop your DNS log CSV here',
-        firewall: 'Drop your firewall log CSV here',
-      };
-      document.getElementById('drop-title').textContent = labels[type];
+      document.getElementById('drop-title').textContent = DROP_TITLES[type];
 
-      // Clear any uploaded files when switching type
+      // Clear files when switching type
       uploadedFiles = [];
       renderFileList();
       document.getElementById('upload-error').style.display = 'none';
@@ -443,8 +514,8 @@
     }
 
     function renderFileList() {
-      const list     = document.getElementById('file-list');
-      const countEl  = document.getElementById('file-count');
+      const list       = document.getElementById('file-list');
+      const countEl    = document.getElementById('file-count');
       const analyzeBtn = document.getElementById('analyze-btn');
 
       if (uploadedFiles.length === 0) {
@@ -457,17 +528,16 @@
       countEl.textContent = uploadedFiles.length;
       analyzeBtn.disabled = false;
 
-      const typeLabel = selectedLogType === 'firewall' ? '🔥' : '🌐';
-
       list.innerHTML = uploadedFiles.map((f, i) => `
         <div class="file-chip" id="chip-${i}">
-          <span class="file-chip-icon">${typeLabel}</span>
+          <span class="file-chip-icon">${TYPE_ICONS[selectedLogType]}</span>
           <div class="file-chip-info">
             <div class="file-chip-name">${escHtml(f.name)}</div>
             <div class="file-chip-meta">
               ${formatBytes(f.size)} &nbsp;&middot;&nbsp; ${f.rows.toLocaleString()} rows
-              &nbsp;&middot;&nbsp; <span style="color:var(--teal);font-weight:600;">
-                ${selectedLogType.toUpperCase()} log
+              &nbsp;&middot;&nbsp;
+              <span style="color:var(--teal);font-weight:600;">
+                ${TYPE_LABELS[selectedLogType]} log
               </span>
             </div>
           </div>
@@ -490,17 +560,15 @@
 
       // Save metadata + log type to session
       session.upload = {
-        files: uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
+        files:      uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
         uploaded_at: new Date().toISOString(),
-        log_types: [selectedLogType],
-        log_type:  selectedLogType,
+        log_types:  [selectedLogType],
+        log_type:   selectedLogType,
       };
       sessionStorage.setItem('compass_session', JSON.stringify(session));
-
-      // Store log type so scanning.html knows which Azure Function endpoint to call
       sessionStorage.setItem('compass_log_type', selectedLogType);
 
-      // Read file as base64 and store in sessionStorage
+      // Read file as base64 for scanning.html
       const file = uploadedFiles[0].fileObj;
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -518,7 +586,7 @@
     }
 
     function formatBytes(bytes) {
-      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024)        return bytes + ' B';
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
