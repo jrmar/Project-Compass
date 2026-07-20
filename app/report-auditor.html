@@ -271,7 +271,37 @@
   </div>
 
   <script>
-    const session = JSON.parse(sessionStorage.getItem('compass_session') || '{}');
+    const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
+
+    // ── Bridge: normalize live parser data ──
+    if (session.detection && session.detection._live) {
+      const tools = session.detection.detected_tools || [];
+      session.detection.detected_tools = tools.map(t => ({
+        ...t,
+        tool_name: t.tool_name || t.name || t.domain,
+        queries: t.event_count || t.queries || t.dns_queries || 0
+      }));
+      const highN = tools.filter(t => (t.risk_level||'').toLowerCase() === 'high').length;
+      const medN  = tools.filter(t => (t.risk_level||'').toLowerCase() === 'medium').length;
+      const lowN  = tools.filter(t => (t.risk_level||'').toLowerCase() === 'low').length;
+      if (!session.questionnaire || !session.questionnaire.gap_score) {
+        const syntheticScore = Math.min(1300, (highN * 120) + (medN * 60) + (lowN * 20) + (tools.length * 10));
+        session.questionnaire = {
+          gap_score: syntheticScore,
+          by_function: {
+            GOVERN: Math.round(syntheticScore * 0.42),
+            MAP:    Math.round(syntheticScore * 0.23),
+            MEASURE:Math.round(syntheticScore * 0.19),
+            MANAGE: Math.round(syntheticScore * 0.16),
+          },
+          flagged_controls: highN > 0
+            ? ['GV.PO-1','GV.OV-1','MS.AN-1','MS.DW-1','MG.PO-1','MP.AC-1','MP.AI-1']
+            : ['GV.PO-1','MS.AN-1'],
+          answers: {}
+        };
+      }
+    }
+
     const det   = session.detection || {};
     const quest = session.questionnaire || {};
     const orgName = session.org_name || 'Your Organization';
