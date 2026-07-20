@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -67,6 +67,74 @@
       font-weight: 600;
       display: none;
     }
+
+    /* ── Log type selector ── */
+    .log-type-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .log-type-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: left;
+    }
+    .log-type-btn:hover {
+      border-color: rgba(64,130,232,0.3);
+      background: rgba(64,130,232,0.04);
+    }
+    .log-type-btn.selected {
+      border-color: var(--teal);
+      background: rgba(51,205,182,0.06);
+    }
+    .log-type-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .log-type-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--light);
+      margin-bottom: 2px;
+    }
+    .log-type-desc {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .log-type-check {
+      margin-left: auto;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--glass-border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: transparent;
+      transition: all 0.15s;
+    }
+    .log-type-btn.selected .log-type-check {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: var(--navy, #030b1e);
+    }
+
+    /* ── Sidebar panel toggle ── */
+    .sidebar-panel { display: none; }
+    .sidebar-panel.active { display: block; }
   </style>
 </head>
 <body>
@@ -121,16 +189,46 @@
   <main class="page-content">
     <h1 class="page-title">Upload Network Logs</h1>
     <p class="page-subtitle">
-      Start with your DNS query logs - these reveal which AI-related domains your
-      organization's devices are reaching out to.
+      Select a log type, then upload your file. Compass will detect AI-related
+      traffic and match it against the live domain registry.
     </p>
 
     <div class="upload-layout">
+
+      <!-- ── Left: Log type + upload zone ── -->
       <div>
+
+        <!-- Log type selector -->
+        <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">
+          Step 1 — Select Log Type
+        </div>
+        <div class="log-type-selector">
+          <button class="log-type-btn selected" id="type-dns" onclick="selectLogType('dns')">
+            <span class="log-type-icon">🌐</span>
+            <div>
+              <div class="log-type-label">DNS Log</div>
+              <div class="log-type-desc">Query logs from your DNS resolver or forwarder</div>
+            </div>
+            <div class="log-type-check">✓</div>
+          </button>
+          <button class="log-type-btn" id="type-firewall" onclick="selectLogType('firewall')">
+            <span class="log-type-icon">🔥</span>
+            <div>
+              <div class="log-type-label">Firewall Log</div>
+              <div class="log-type-desc">Traffic logs from your network firewall</div>
+            </div>
+            <div class="log-type-check">✓</div>
+          </button>
+        </div>
+
+        <!-- Upload zone -->
+        <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:20px;">
+          Step 2 — Upload File
+        </div>
         <div class="upload-zone" id="drop-zone">
           <input type="file" id="file-input" accept=".csv,.log" multiple>
           <span class="upload-icon">&#128196;</span>
-          <div class="upload-title">Drop your DNS log CSV here</div>
+          <div class="upload-title" id="drop-title">Drop your DNS log CSV here</div>
           <div class="upload-sub">or <strong>click to browse</strong></div>
           <div class="upload-sub" style="margin-top: 8px; font-size: 11px;">
             Accepts .csv and .log files &nbsp;&middot;&nbsp; Max 50 MB each
@@ -140,7 +238,7 @@
         <div class="upload-error" id="upload-error"></div>
 
         <div class="file-list" id="file-list">
-          <div class="no-files" id="no-files-msg">No files added yet.</div>
+          <div class="no-files">No files added yet.</div>
         </div>
 
         <div class="upload-actions">
@@ -153,8 +251,11 @@
         </div>
       </div>
 
+      <!-- ── Right: Sidebar ── -->
       <div class="upload-sidebar">
-        <div class="glass-card" style="padding: 20px;">
+
+        <!-- DNS sidebar panel -->
+        <div class="glass-card sidebar-panel active" id="panel-dns" style="padding: 20px;">
           <div class="sidebar-section">
             <div class="info-panel">
               <div class="info-panel-title">&#128270; What We Detect</div>
@@ -162,11 +263,10 @@
                 <li>DNS queries to known AI tool domains</li>
                 <li>Traffic to generative AI APIs</li>
                 <li>Connections to sanctioned and unsanctioned tools</li>
-                <li>Volume per user and per tool</li>
+                <li>Query volume per user and per tool</li>
               </ul>
             </div>
           </div>
-
           <div class="sidebar-section" style="margin-top: 16px;">
             <div class="info-panel info-panel-teal">
               <div class="info-panel-title">&#128202; Expected CSV Columns</div>
@@ -182,7 +282,6 @@
               </div>
             </div>
           </div>
-
           <div class="sidebar-section" style="margin-top: 16px;">
             <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
               Don't have DNS logs handy? Use the sample file to run a demonstration.
@@ -193,6 +292,48 @@
           </div>
         </div>
 
+        <!-- Firewall sidebar panel -->
+        <div class="glass-card sidebar-panel" id="panel-firewall" style="padding: 20px;">
+          <div class="sidebar-section">
+            <div class="info-panel">
+              <div class="info-panel-title">&#128270; What We Detect</div>
+              <ul>
+                <li>Firewall traffic to known AI destinations</li>
+                <li>Allowed and blocked connections to AI services</li>
+                <li>Data volume transferred to AI tools</li>
+                <li>AI access per source IP or user</li>
+              </ul>
+            </div>
+          </div>
+          <div class="sidebar-section" style="margin-top: 16px;">
+            <div class="info-panel info-panel-teal">
+              <div class="info-panel-title">&#128202; Expected CSV Columns</div>
+              <div class="col-columns">
+                <span class="col-tag">timestamp</span>
+                <span class="col-tag">src_ip</span>
+                <span class="col-tag">dst_ip</span>
+                <span class="col-tag">action</span>
+                <span class="col-tag">application</span>
+                <span class="col-tag">url</span>
+                <span class="col-tag">bytes_sent</span>
+                <span class="col-tag">user</span>
+              </div>
+              <div style="margin-top: 10px; font-size: 11px; color: var(--muted);">
+                Compass extracts AI destinations from the URL or application field automatically.
+              </div>
+            </div>
+          </div>
+          <div class="sidebar-section" style="margin-top: 16px;">
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+              Don't have firewall logs handy? Use the sample file to run a demonstration.
+            </div>
+            <a class="sample-link" href="../SampleLogs/sample_firewall_logs.csv" download>
+              &#8595; Download sample_firewall_logs.csv
+            </a>
+          </div>
+        </div>
+
+        <!-- Secure processing note -->
         <div style="margin-top: 16px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
           <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
             <strong style="color: var(--light); display: block; margin-bottom: 4px;">&#128274; Secure Processing</strong>
@@ -201,18 +342,20 @@
           </div>
         </div>
 
+        <!-- Coming soon note -->
         <div style="margin-top: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,128,32,0.05); border: 1px solid rgba(255,128,32,0.15);">
           <div style="font-size: 11px; color: var(--muted); line-height: 1.5;">
             <strong style="color: var(--orange); display: block; margin-bottom: 4px;">&#9888;&#65039; Coming Soon</strong>
-            Firewall and proxy log support are in development. DNS logs are analyzed first.
+            Proxy log support is in development. DNS and firewall logs are supported now.
           </div>
         </div>
+
       </div>
     </div>
   </main>
 
   <script>
-    // ---- Session guard ----
+    // ── Session guard ──
     const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) {
       window.location.href = 'login.html';
@@ -220,10 +363,36 @@
       document.getElementById('header-org-name').textContent = session.org_name;
     }
 
-    // ---- File state ----
+    // ── Log type state ──
+    let selectedLogType = 'dns';
+
+    function selectLogType(type) {
+      selectedLogType = type;
+
+      // Update selector buttons
+      document.querySelectorAll('.log-type-btn').forEach(btn => btn.classList.remove('selected'));
+      document.getElementById(`type-${type}`).classList.add('selected');
+
+      // Update sidebar panels
+      document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`panel-${type}`).classList.add('active');
+
+      // Update drop zone label
+      const labels = {
+        dns:      'Drop your DNS log CSV here',
+        firewall: 'Drop your firewall log CSV here',
+      };
+      document.getElementById('drop-title').textContent = labels[type];
+
+      // Clear any uploaded files when switching type
+      uploadedFiles = [];
+      renderFileList();
+      document.getElementById('upload-error').style.display = 'none';
+    }
+
+    // ── File state ──
     let uploadedFiles = [];
 
-    // ---- Drop zone ----
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
 
@@ -231,23 +400,19 @@
       e.preventDefault();
       dropZone.classList.add('drag-over');
     });
-
     dropZone.addEventListener('dragleave', () => {
       dropZone.classList.remove('drag-over');
     });
-
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('drag-over');
       handleFiles(Array.from(e.dataTransfer.files));
     });
-
     fileInput.addEventListener('change', () => {
       handleFiles(Array.from(fileInput.files));
       fileInput.value = '';
     });
 
-    // ---- Process files ----
     function handleFiles(files) {
       const errEl = document.getElementById('upload-error');
       errEl.style.display = 'none';
@@ -277,10 +442,9 @@
       });
     }
 
-    // ---- Render file chips ----
     function renderFileList() {
-      const list = document.getElementById('file-list');
-      const countEl = document.getElementById('file-count');
+      const list     = document.getElementById('file-list');
+      const countEl  = document.getElementById('file-count');
       const analyzeBtn = document.getElementById('analyze-btn');
 
       if (uploadedFiles.length === 0) {
@@ -293,12 +457,19 @@
       countEl.textContent = uploadedFiles.length;
       analyzeBtn.disabled = false;
 
+      const typeLabel = selectedLogType === 'firewall' ? '🔥' : '🌐';
+
       list.innerHTML = uploadedFiles.map((f, i) => `
         <div class="file-chip" id="chip-${i}">
-          <span class="file-chip-icon">&#128196;</span>
+          <span class="file-chip-icon">${typeLabel}</span>
           <div class="file-chip-info">
             <div class="file-chip-name">${escHtml(f.name)}</div>
-            <div class="file-chip-meta">${formatBytes(f.size)} &nbsp;&middot;&nbsp; ${f.rows.toLocaleString()} rows detected</div>
+            <div class="file-chip-meta">
+              ${formatBytes(f.size)} &nbsp;&middot;&nbsp; ${f.rows.toLocaleString()} rows
+              &nbsp;&middot;&nbsp; <span style="color:var(--teal);font-weight:600;">
+                ${selectedLogType.toUpperCase()} log
+              </span>
+            </div>
           </div>
           <button class="file-chip-remove" onclick="removeFile(${i})" title="Remove">&times;</button>
         </div>
@@ -310,7 +481,6 @@
       renderFileList();
     }
 
-    // ---- Start analysis ----
     function startAnalysis() {
       if (uploadedFiles.length === 0) return;
 
@@ -318,15 +488,19 @@
       analyzeBtn.textContent = 'Preparing...';
       analyzeBtn.disabled = true;
 
-      // Save metadata to session
+      // Save metadata + log type to session
       session.upload = {
         files: uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
         uploaded_at: new Date().toISOString(),
-        log_types: ['dns']
+        log_types: [selectedLogType],
+        log_type:  selectedLogType,
       };
       sessionStorage.setItem('compass_session', JSON.stringify(session));
 
-      // Read file as base64 and store in sessionStorage so scanning.html can use it
+      // Store log type so scanning.html knows which Azure Function endpoint to call
+      sessionStorage.setItem('compass_log_type', selectedLogType);
+
+      // Read file as base64 and store in sessionStorage
       const file = uploadedFiles[0].fileObj;
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -336,7 +510,6 @@
           sessionStorage.setItem('compass_file_type', file.type || 'text/csv');
           sessionStorage.setItem('compass_has_files', 'true');
         } catch (err) {
-          // sessionStorage full — fall back to demo mode
           sessionStorage.setItem('compass_has_files', 'false');
         }
         window.location.href = 'scanning.html';
@@ -344,7 +517,6 @@
       reader.readAsDataURL(file);
     }
 
-    // ---- Helpers ----
     function formatBytes(bytes) {
       if (bytes < 1024) return bytes + ' B';
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
