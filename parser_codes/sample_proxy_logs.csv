@@ -1,0 +1,72 @@
+timestamp,src_ip,user,method,url,status_code,bytes_sent,bytes_received,duration_ms,category,action
+2026-06-10 07:30:05,10.0.1.15,jsmith,GET,https://chat.openai.com/,200,1240,18420,342,Generative AI,allowed
+2026-06-10 07:30:18,10.0.1.15,jsmith,POST,https://chat.openai.com/backend-api/conversation,200,8940,42100,1823,Generative AI,allowed
+2026-06-10 07:30:42,10.0.1.22,mlee,GET,https://claude.ai/,200,980,12300,280,Generative AI,allowed
+2026-06-10 07:31:01,10.0.1.22,mlee,POST,https://claude.ai/api/organizations/default/chat_conversations,200,6200,28400,1540,Generative AI,allowed
+2026-06-10 07:31:15,10.0.1.33,rgarcia,GET,https://gemini.google.com/app,200,1800,14200,390,Generative AI,allowed
+2026-06-10 07:31:28,10.0.1.33,rgarcia,POST,https://gemini.google.com/api/generate,200,4800,22100,980,Generative AI,allowed
+2026-06-10 07:31:44,10.0.1.44,kpatel,GET,https://www.google.com/search?q=quarterly+results,200,420,8200,120,Search,allowed
+2026-06-10 07:31:58,10.0.1.55,tchen,GET,https://midjourney.com/,200,2100,31400,560,Image Generation,blocked
+2026-06-10 07:32:12,10.0.1.55,tchen,POST,https://midjourney.com/api/app/jobs/,403,1400,820,210,Image Generation,blocked
+2026-06-10 07:32:26,10.0.1.60,bwilson,GET,https://copilot.github.com/,200,1100,9800,240,AI Code Assistant,allowed
+2026-06-10 07:32:40,10.0.1.60,bwilson,GET,https://copilot.github.com/completions,200,580,4200,890,AI Code Assistant,allowed
+2026-06-10 07:32:54,10.0.1.15,jsmith,POST,https://api.openai.com/v1/chat/completions,200,12400,58000,2840,LLM API,allowed
+2026-06-10 07:33:08,10.0.1.71,aparker,GET,https://perplexity.ai/,200,1600,11200,310,AI Search,allowed
+2026-06-10 07:33:22,10.0.1.71,aparker,POST,https://perplexity.ai/api/search,200,2800,18600,760,AI Search,allowed
+2026-06-10 07:33:36,10.0.1.80,dkim,GET,https://character.ai/,200,1900,22400,420,AI Chatbot,blocked
+2026-06-10 07:33:50,10.0.1.80,dkim,POST,https://character.ai/chat2/streaming/,403,2400,1100,180,AI Chatbot,blocked
+2026-06-10 07:34:04,10.0.1.90,lmartinez,GET,https://huggingface.co/,200,2200,18800,380,ML Platform,allowed
+2026-06-10 07:34:18,10.0.1.90,lmartinez,GET,https://huggingface.co/models,200,1800,24600,520,ML Platform,allowed
+2026-06-10 07:34:32,10.0.1.22,mlee,GET,https://chat.openai.com/,200,1200,17600,310,Generative AI,allowed
+2026-06-10 07:34:46,10.0.1.22,mlee,POST,https://chat.openai.com/backend-api/conversation,200,9800,46200,2100,Generative AI,allowed
+2026-06-10 07:35:00,10.0.1.10,admin,GET,https://internal.corp.local/dashboard,200,400,8200,90,Internal,allowed
+2026-06-10 07:35:14,10.0.1.44,kpatel,GET,https://claude.ai/,200,1100,13400,290,Generative AI,allowed
+2026-06-10 07:35:28,10.0.1.44,kpatel,POST,https://claude.ai/api/organizations/default/chat_conversations,200,5400,24800,1380,Generative AI,allowed
+2026-06-10 07:35:42,10.0.1.33,rgarcia,GET,https://github.com/features/copilot,200,800,9200,180,AI Code Assistant,allowed
+2026-06-10 07:35:56,10.0.1.55,tchen,GET,https://stability.ai/,200,1700,19800,360,Image Generation,blocked
+2026-06-10 07:36:10,10.0.1.15,jsmith,GET,https://chat.openai.com/,200,1300,19200,330,Generative AI,allowed
+2026-06-10 07:36:24,10.0.1.15,jsmith,POST,https://api.openai.com/v1/embeddings,200,6800,14200,940,LLM API,allowed
+2026-06-10 07:36:38,10.0.1.60,bwilson,GET,https://perplexity.ai/,200,1500,10800,280,AI Search,allowed
+2026-06-10 07:36:52,10.0.1.71,aparker,GET,https://gemini.google.com/app,200,1900,15600,400,Generative AI,allowed
+2026-06-10 07:37:06,10.0.1.71,aparker,POST,https://gemini.google.com/api/generate,200,5200,24400,1120,Generative AI,allowed
+2026-06-10 07:37:20,10.0.1.80,dkim,GET,https://www.notion.so/,200,2100,28400,480,AI Productivity,allowed
+2026-06-10 07:37:34,10.0.1.90,lmartinez,POST,https://huggingface.co/api/inference,200,8400,42000,1820,ML Platform,allowed
+2026-06-10 07:37:48,10.0.1.22,mlee,GET,https://claude.ai/,200,1000,12800,270,Generative AI,allowed
+2026-06-10 07:38:02,10.0.1.44,kpatel,GET,https://perplexity.ai/,200,1400,10200,260,AI Search,allowed
+2026-06-10 07:38:16,10.0.1.44,kpatel,POST,https://perplexity.ai/api/search,200,3200,21400,820,AI Search,allowed
+2026-06-10 07:38:30,10.0.1.33,rgarcia,GET,https://chat.openai.com/,200,1100,16400,300,Generative AI,allowed
+2026-06-10 07:38:44,10.0.1.33,rgarcia,POST,https://chat.openai.com/backend-api/conversation,200,7600,34800,1680,Generative AI,allowed
+2026-06-10 07:38:58,10.0.1.55,tchen,GET,https://runwayml.com/,200,2400,38200,620,Video Generation,blocked
+2026-06-10 07:39:12,10.0.1.10,admin,GET,https://mail.company.com/inbox,200,600,12400,140,Email,allowed
+2026-06-10 07:39:26,10.0.1.15,jsmith,POST,https://api.openai.com/v1/images/generations,200,14200,68000,4200,LLM API,allowed
+2026-06-10 07:39:40,10.0.1.60,bwilson,GET,https://copilot.github.com/,200,1000,9400,220,AI Code Assistant,allowed
+2026-06-10 07:39:54,10.0.1.80,dkim,GET,https://jasper.ai/,200,1800,22600,390,AI Writing,blocked
+2026-06-10 07:40:08,10.0.1.71,aparker,GET,https://huggingface.co/spaces,200,2000,21800,450,ML Platform,allowed
+2026-06-10 07:40:22,10.0.1.90,lmartinez,GET,https://midjourney.com/showcase,200,3200,48600,840,Image Generation,blocked
+2026-06-10 07:40:36,10.0.1.22,mlee,POST,https://claude.ai/api/organizations/default/chat_conversations,200,7800,36200,1920,Generative AI,allowed
+2026-06-10 07:40:50,10.0.1.44,kpatel,GET,https://claude.ai/,200,1050,12600,260,Generative AI,allowed
+2026-06-10 07:41:04,10.0.1.15,jsmith,GET,https://chat.openai.com/,200,1400,20800,350,Generative AI,allowed
+2026-06-10 07:41:18,10.0.1.33,rgarcia,GET,https://copilot.github.com/,200,950,8800,200,AI Code Assistant,allowed
+2026-06-10 07:41:32,10.0.1.55,tchen,GET,https://elevenlabs.io/,200,1900,26400,440,Audio Generation,blocked
+2026-06-10 07:41:46,10.0.1.60,bwilson,POST,https://perplexity.ai/api/search,200,2600,16800,680,AI Search,allowed
+2026-06-10 07:42:00,10.0.1.71,aparker,GET,https://chat.openai.com/,200,1250,18000,320,Generative AI,allowed
+2026-06-10 07:42:14,10.0.1.71,aparker,POST,https://chat.openai.com/backend-api/conversation,200,8200,38400,1760,Generative AI,allowed
+2026-06-10 07:42:28,10.0.1.80,dkim,GET,https://www.notion.so/ai,200,1600,21200,380,AI Productivity,allowed
+2026-06-10 07:42:42,10.0.1.90,lmartinez,GET,https://huggingface.co/datasets,200,1400,18200,340,ML Platform,allowed
+2026-06-10 07:42:56,10.0.1.22,mlee,GET,https://gemini.google.com/app,200,1700,13800,360,Generative AI,allowed
+2026-06-10 07:43:10,10.0.1.44,kpatel,POST,https://claude.ai/api/organizations/default/chat_conversations,200,4800,22000,1220,Generative AI,allowed
+2026-06-10 07:43:24,10.0.1.15,jsmith,POST,https://api.openai.com/v1/chat/completions,200,11200,52800,2640,LLM API,allowed
+2026-06-10 07:43:38,10.0.1.33,rgarcia,GET,https://perplexity.ai/,200,1300,9800,250,AI Search,allowed
+2026-06-10 07:43:52,10.0.1.10,admin,GET,https://confluence.corp.local/wiki,200,500,16800,200,Internal,allowed
+2026-06-10 07:44:06,10.0.1.55,tchen,GET,https://pika.art/,200,2200,34800,580,Video Generation,blocked
+2026-06-10 07:44:20,10.0.1.60,bwilson,GET,https://claude.ai/,200,1100,13200,280,Generative AI,allowed
+2026-06-10 07:44:34,10.0.1.71,aparker,GET,https://perplexity.ai/,200,1450,10600,270,AI Search,allowed
+2026-06-10 07:44:48,10.0.1.80,dkim,GET,https://grammarly.com/,200,1800,24600,420,AI Writing,allowed
+2026-06-10 07:45:02,10.0.1.90,lmartinez,POST,https://huggingface.co/api/inference,200,9600,48200,2200,ML Platform,allowed
+2026-06-10 07:45:16,10.0.1.22,mlee,POST,https://gemini.google.com/api/generate,200,6400,29800,1380,Generative AI,allowed
+2026-06-10 07:45:30,10.0.1.44,kpatel,GET,https://chat.openai.com/,200,1180,17200,300,Generative AI,allowed
+2026-06-10 07:45:44,10.0.1.15,jsmith,GET,https://chat.openai.com/,200,1320,19600,340,Generative AI,allowed
+2026-06-10 07:45:58,10.0.1.33,rgarcia,POST,https://gemini.google.com/api/generate,200,5600,26200,1260,Generative AI,allowed
+2026-06-10 07:46:12,10.0.1.55,tchen,GET,https://suno.ai/,200,2000,28800,500,Audio Generation,blocked
+2026-06-10 07:46:26,10.0.1.60,bwilson,GET,https://copilot.github.com/completions,200,640,5600,760,AI Code Assistant,allowed
+2026-06-10 07:46:40,10.0.1.71,aparker,POST,https://perplexity.ai/api/search,200,3400,22800,920,AI Search,allowed
