@@ -1,9 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <base href="/app/">
   <title>Project Compass - Reports</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -27,32 +26,22 @@
     }
     .report-card:hover { border-color: rgba(64,130,232,0.22); transform: translateY(-1px); }
 
-    .report-card-top {
-      padding: 24px 22px 20px;
-      flex: 1;
-    }
+    .report-card-top { padding: 24px 22px 20px; flex: 1; }
     .report-audience {
       font-family: 'Montserrat', sans-serif;
       font-size: 8px; font-weight: 800;
       letter-spacing: 0.12em; text-transform: uppercase;
       margin-bottom: 8px;
     }
-    .report-icon {
-      font-size: 28px; margin-bottom: 12px; display: block;
-    }
+    .report-icon { font-size: 28px; margin-bottom: 12px; display: block; }
     .report-title {
       font-family: 'Montserrat', sans-serif;
       font-size: 16px; font-weight: 800;
       color: var(--light);
       line-height: 1.2; margin-bottom: 10px;
     }
-    .report-desc {
-      font-size: 12px; color: var(--muted);
-      line-height: 1.65; margin-bottom: 14px;
-    }
-    .report-includes {
-      display: flex; flex-direction: column; gap: 5px;
-    }
+    .report-desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin-bottom: 14px; }
+    .report-includes { display: flex; flex-direction: column; gap: 5px; }
     .report-include-row {
       display: flex; align-items: flex-start; gap: 7px;
       font-size: 11px; color: var(--muted); line-height: 1.4;
@@ -117,49 +106,30 @@
 <body>
 
   <header class="app-header">
-    <a class="app-header-logo" href="/login">
+    <a class="app-header-logo" href="login.html">
       <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
       <span class="app-header-logo-text">Project Compass</span>
     </a>
-    <nav class="app-header-nav">
-      <a href="/" class="app-nav-link">Home</a>
-      <a href="/inventory" class="app-nav-link">Inventory</a>
-    </nav>
     <div class="app-header-right">
       <div class="org-badge">
         <span class="org-badge-dot"></span>
         <span id="header-org-name">Organization</span>
       </div>
-      <button class="btn-logout" onclick="sessionStorage.clear(); window.location.href='/login';">Sign Out</button>
+      <button class="btn-logout" onclick="localStorage.clear(); window.location.href='login.html';">Sign Out</button>
     </div>
   </header>
 
   <div class="step-bar-wrapper">
     <div class="step-bar">
-      <div class="step-item completed">
-        <div class="step-dot">&#10003;</div>
-        <div class="step-label">Upload</div>
-      </div>
+      <div class="step-item completed"><div class="step-dot">&#10003;</div><div class="step-label">Upload</div></div>
       <div class="step-connector done"></div>
-      <div class="step-item completed">
-        <div class="step-dot">&#10003;</div>
-        <div class="step-label">Detect</div>
-      </div>
+      <div class="step-item completed"><div class="step-dot">&#10003;</div><div class="step-label">Detect</div></div>
       <div class="step-connector done"></div>
-      <div class="step-item completed">
-        <div class="step-dot">&#10003;</div>
-        <div class="step-label">Assess</div>
-      </div>
+      <div class="step-item completed"><div class="step-dot">&#10003;</div><div class="step-label">Inventory</div></div>
       <div class="step-connector done"></div>
-      <div class="step-item completed">
-        <div class="step-dot">&#10003;</div>
-        <div class="step-label">Dashboard</div>
-      </div>
+      <div class="step-item completed"><div class="step-dot">&#10003;</div><div class="step-label">Dashboard</div></div>
       <div class="step-connector done"></div>
-      <div class="step-item active">
-        <div class="step-dot">5</div>
-        <div class="step-label">Report</div>
-      </div>
+      <div class="step-item active"><div class="step-dot">6</div><div class="step-label">Report</div></div>
     </div>
   </div>
 
@@ -170,7 +140,7 @@
       Each report opens in a new tab — use your browser's <strong style="color:var(--light);">Print → Save as PDF</strong> option.
     </p>
 
-    <!-- Assessment summary bar -->
+    <!-- Summary bar -->
     <div class="summary-bar" id="summary-bar" style="display:none;">
       <div class="summary-bar-item">
         <div class="summary-bar-label">Organization</div>
@@ -184,18 +154,15 @@
       </div>
       <div class="summary-bar-divider"></div>
       <div class="summary-bar-item">
-        <div class="summary-bar-label">Governance Risk Score</div>
-        <div style="display:flex;align-items:baseline;gap:3px;">
-          <div class="summary-bar-val" id="sb-risk" style="color:var(--danger);">—</div>
-          <div style="font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;color:var(--muted);">/100</div>
-        </div>
-        <div class="summary-bar-sub" id="sb-risk-sub"></div>
+        <div class="summary-bar-label">High Risk Tools</div>
+        <div class="summary-bar-val" id="sb-high" style="color:var(--danger);">—</div>
+        <div class="summary-bar-sub">requiring review</div>
       </div>
       <div class="summary-bar-divider"></div>
       <div class="summary-bar-item">
-        <div class="summary-bar-label">Controls Flagged</div>
-        <div class="summary-bar-val" id="sb-ctrls" style="color:var(--orange);">—</div>
-        <div class="summary-bar-sub">of 19 assessed</div>
+        <div class="summary-bar-label">Registry Source</div>
+        <div class="summary-bar-val" id="sb-registry" style="color:var(--teal);font-size:13px;">—</div>
+        <div class="summary-bar-sub" id="sb-registry-sub"></div>
       </div>
       <div class="summary-bar-divider"></div>
       <div class="summary-bar-item">
@@ -213,19 +180,15 @@
     <!-- Report cards -->
     <div class="reports-grid" id="reports-grid"></div>
 
-    <!-- Share / export bar -->
+    <!-- Share bar -->
     <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
       <div>
         <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Share This Assessment</div>
         <div style="font-size:12px;color:var(--muted);">Copy a plain-text summary to paste into Slack, email, or a ticket.</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-ghost" id="copy-btn" onclick="copySummary()" style="font-size:11px;padding:7px 14px;">
-          &#128203; Copy Summary
-        </button>
-        <button class="btn btn-ghost" id="email-btn" onclick="emailSummary()" style="font-size:11px;padding:7px 14px;">
-          &#9993; Email Summary
-        </button>
+        <button class="btn btn-ghost" id="copy-btn" onclick="copySummary()" style="font-size:11px;padding:7px 14px;">&#128203; Copy Summary</button>
+        <button class="btn btn-ghost" id="email-btn" onclick="emailSummary()" style="font-size:11px;padding:7px 14px;">&#9993; Email Summary</button>
       </div>
     </div>
     <div id="copy-toast" style="display:none;text-align:center;font-size:11px;color:var(--teal);margin-bottom:12px;padding:8px;background:rgba(51,205,182,0.06);border:1px solid rgba(51,205,182,0.15);border-radius:6px;">
@@ -234,126 +197,49 @@
 
     <!-- Navigation -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--glass-border);">
-      <button class="btn btn-ghost" onclick="window.location.href='/dashboard'">&#8592; Back to Dashboard</button>
+      <button class="btn btn-ghost" onclick="history.back()">&#8592; Back</button>
       <div style="display:flex;gap:10px;">
-        <button class="btn btn-ghost" onclick="window.location.href='/'">&#8962; Home</button>
-        <button class="btn btn-teal" onclick="window.location.href='/login'">Start New Assessment &#8635;</button>
+        <button class="btn btn-ghost" onclick="window.location.href='upload.html'">&#8962; Start New Assessment</button>
       </div>
     </div>
-
     <div style="height:40px;"></div>
   </main>
 
   <script>
-    const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
+    // ---- Load session from localStorage ----
+    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) { window.location.href = 'login.html'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 
-    const det   = (session && session.detection)     || {};
-    const quest = (session && session.questionnaire) || {};
-    const orgName   = (session && session.org_name)  || 'Your Organization';
+    const det     = (session && session.detection)     || {};
+    const orgName = (session && session.org_name)      || 'Your Organization';
     const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
-    const allTools   = det.detected_tools || [];
-    const gapScore   = quest.gap_score || 0;
-    const flagged    = quest.flagged_controls || [];
-    const riskScore  = Math.round((gapScore / 1300) * 100);
-    const maturity   = 100 - riskScore;
-    const highCount  = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high').length;
-    const medCount   = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'medium').length;
+    const allTools  = det.detected_tools || [];
+    const highCount = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high').length;
+    const medCount  = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'medium').length;
+    const isLive    = det._live === true;
+    const registrySize = det._registry_size || 0;
 
-    function postureLabel() {
-      if (riskScore >= 75 || highCount >= 3) return 'CRITICAL';
-      if (riskScore >= 50 || highCount >= 1) return 'HIGH';
-      if (riskScore >= 25) return 'MODERATE';
-      return 'LOW';
-    }
-
-    // Populate summary bar
-    if (allTools.length > 0 || gapScore > 0) {
+    // ---- Summary bar ----
+    if (allTools.length > 0) {
       document.getElementById('summary-bar').style.display = 'flex';
       document.getElementById('sb-org').textContent = orgName;
       document.getElementById('sb-tools').textContent = allTools.length;
       document.getElementById('sb-tools-sub').textContent = `${highCount} high · ${medCount} medium`;
-      const riskColor = riskScore >= 75 ? 'var(--danger)' : riskScore >= 50 ? 'var(--orange)' : riskScore >= 25 ? '#e5b800' : 'var(--teal)';
-      const riskEl = document.getElementById('sb-risk');
-      riskEl.textContent = gapScore > 0 ? riskScore : '—';
-      riskEl.style.color = riskColor;
-      document.getElementById('sb-risk-sub').textContent = gapScore > 0 ? `maturity: ${maturity}%` : '';
-      document.getElementById('sb-ctrls').textContent = flagged.length;
+      document.getElementById('sb-high').textContent = highCount;
+      document.getElementById('sb-registry').textContent = isLive ? 'Azure SQL' : 'Demo Data';
+      document.getElementById('sb-registry-sub').textContent = isLive ? `${registrySize} live domains` : 'seeded results';
       document.getElementById('sb-date').textContent = assessDate;
     }
 
-    // Copy summary to clipboard
-    function copySummary() {
-      const posture  = postureLabel();
-      const critCount = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'critical').length;
-      const toolList = allTools.slice(0, 8).map(t => `  • ${t.name || t.tool_name} (${t.risk_level || t.risk || 'unknown risk'})`).join('\n');
-      const more = allTools.length > 8 ? `\n  … and ${allTools.length - 8} more` : '';
-      const text =
-`Project Compass — AI Governance Assessment Summary
-═══════════════════════════════════════════════════
-Organization : ${orgName}
-Date         : ${assessDate}
-Risk Posture : ${posture}
-
-KEY METRICS
-  AI Tools Detected : ${allTools.length}
-  Critical Risk     : ${critCount}
-  High Risk         : ${highCount}
-  Controls Flagged  : ${flagged.length} of 19 assessed
-  Risk Score        : ${gapScore > 0 ? riskScore + '/100' : 'N/A'}
-  Governance Mat.   : ${gapScore > 0 ? maturity + '%' : 'N/A'}
-
-DETECTED TOOLS
-${toolList}${more}
-
-Generated by Project Compass · AI Governance Platform
-`;
-      navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById('copy-toast');
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 3000);
-        const btn = document.getElementById('copy-btn');
-        btn.textContent = '✓ Copied!';
-        setTimeout(() => { btn.innerHTML = '&#128203; Copy Summary'; }, 2500);
-      }).catch(() => {
-        alert('Copy failed — your browser may not support clipboard access on this page.');
-      });
-    }
-
-    // Email summary
-    function emailSummary() {
-      const posture  = postureLabel();
-      const highList = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high')
-                               .map(t => `  - ${t.name || t.tool_name}`).join('\n') || '  None';
-      const subject  = encodeURIComponent(`Project Compass AI Assessment — ${orgName} (${assessDate})`);
-      const body     = encodeURIComponent(
-`Project Compass — AI Governance Assessment Summary
-Organization: ${orgName}
-Assessment Date: ${assessDate}
-Overall Risk Posture: ${posture}
-
-KEY METRICS
-  AI Tools Detected: ${allTools.length}  (${highCount} high, ${medCount} medium risk)
-  Risk Score: ${gapScore > 0 ? riskScore + '%' : 'N/A (assessment not completed)'}
-  Governance Maturity: ${gapScore > 0 ? maturity + '%' : 'N/A'}
-  Controls Flagged: ${flagged.length} of 19 assessed
-
-HIGH-RISK TOOLS
-${highList}
-
-Full report available in Project Compass.
-Generated by Project Compass — projectcompass.io`
-      );
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
-    }
-
-    // Report cards
+    // ---- Open report in new tab, passing session via localStorage ----
+    // (report pages also read from localStorage)
     function openReport(type) {
       window.open(`report-${type}.html`, '_blank');
     }
 
+    // ---- Report cards ----
     const reports = [
       {
         type: 'executive',
@@ -361,36 +247,35 @@ Generated by Project Compass — projectcompass.io`
         color: 'var(--blue)',
         icon: '📊',
         title: 'Executive Summary',
-        desc: 'Plain-language overview of AI tool risk, governance posture, and top priority actions for leadership. No technical jargon.',
+        desc: 'Plain-language overview of AI tool risk and top priority actions for leadership. No technical jargon.',
         includes: [
-          'Governance risk score gauge (0–100)',
-          'Key metrics: tools, risk posture, gap score',
-          'AI tools detected summary table',
-          'NIST function gap bar chart',
-          'Top 4 priority actions with Azure / AWS / GCP steps',
+          'Key metrics: tools detected, high-risk count, events analyzed',
+          'Risk posture assessment (Critical / High / Moderate / Low)',
+          'AI tools detected summary table sorted by risk',
+          'Top 4 priority governance actions with cloud-specific steps',
+          'Business-forward language suitable for board or C-suite',
         ],
-        preview: gapScore > 0
-          ? `${allTools.length} tools · Risk Score ${riskScore}/100 · Posture: ${postureLabel()}`
-          : 'Complete log scan and assessment to populate report'
+        preview: allTools.length > 0
+          ? `${allTools.length} tools detected · ${highCount} high-risk · ${isLive ? 'Live Azure SQL registry' : 'Demo data'}`
+          : 'Upload and analyze a DNS log to populate this report'
       },
       {
         type: 'security',
-        audience: 'Security Team',
+        audience: 'IT Security Team',
         color: 'var(--teal)',
         icon: '🔍',
         title: 'Security Team Findings',
-        desc: 'Full technical report with tool inventory, flagged NIST controls, DNS block rules, and platform-specific remediation playbooks.',
+        desc: 'Full technical report with tool inventory, DNS block rules, and platform-specific remediation playbooks.',
         includes: [
-          'Full AI tool inventory with risk levels',
-          'Risk distribution chart',
-          'NIST gap breakdown by function',
-          'Flagged controls table (19 controls)',
-          'Pi-hole, Windows, Sentinel block rules',
-          'Azure / AWS / GCP remediation steps per control',
+          'Full AI tool inventory with domains, categories, and risk levels',
+          'Risk distribution visualization',
+          'DNS block rules for Pi-hole, Windows hosts, and Sentinel KQL',
+          'Technical remediation steps for Azure, AWS, and GCP',
+          'NIST AI RMF control gap reference',
         ],
-        preview: gapScore > 0
-          ? `${flagged.length} controls flagged · ${highCount} high-risk tools · DNS block rules included`
-          : 'Complete log scan and assessment to populate report'
+        preview: allTools.length > 0
+          ? `${allTools.length} tools · ${highCount} high-risk · DNS block rules for ${highCount + medCount} domains`
+          : 'Upload and analyze a DNS log to populate this report'
       },
       {
         type: 'auditor',
@@ -398,24 +283,23 @@ Generated by Project Compass — projectcompass.io`
         color: 'var(--orange)',
         icon: '📋',
         title: 'Auditor Evidence Package',
-        desc: 'Formal compliance documentation with control status matrix, numbered structured findings, evidence chain, and certification statement.',
+        desc: 'Formal compliance documentation with evidence chain, methodology, and certification statement.',
         includes: [
-          'Assessment metadata and methodology',
-          'All 19 controls status matrix (met/partial/unmet)',
-          'Numbered structured findings with evidence',
-          'NIST function compliance summary table',
-          'Evidence source documentation',
+          'Assessment metadata and methodology documentation',
+          'DNS log evidence summary with tool inventory',
+          'Evidence source documentation (registry, log file, methodology)',
+          'NIST AI RMF control reference table',
           'Automated assessment certification statement',
+          'Formal limitations and scope disclosures',
         ],
-        preview: gapScore > 0
-          ? `${flagged.length} structured findings · NIST AI RMF 1.0 · ${assessDate}`
-          : 'Complete log scan and assessment to populate report'
+        preview: allTools.length > 0
+          ? `${allTools.length} tools detected · NIST AI RMF 1.0 · ${assessDate}`
+          : 'Upload and analyze a DNS log to populate this report'
       }
     ];
 
-    document.getElementById('reports-grid').innerHTML = reports.map(r => {
-      const dotColor = r.color;
-      return `<div class="report-card">
+    document.getElementById('reports-grid').innerHTML = reports.map(r => `
+      <div class="report-card">
         <div class="report-card-top">
           <div class="report-audience" style="color:${r.color};">${r.audience}</div>
           <span class="report-icon">${r.icon}</span>
@@ -423,7 +307,7 @@ Generated by Project Compass — projectcompass.io`
           <div class="report-desc">${r.desc}</div>
           <div class="report-includes">
             ${r.includes.map(item => `<div class="report-include-row">
-              <div class="report-include-dot" style="background:${dotColor};"></div>
+              <div class="report-include-dot" style="background:${r.color};"></div>
               <span>${item}</span>
             </div>`).join('')}
           </div>
@@ -436,8 +320,62 @@ Generated by Project Compass — projectcompass.io`
             &#8599; Open Report &amp; Save as PDF
           </button>
         </div>
-      </div>`;
-    }).join('');
+      </div>`).join('');
+
+    // ---- Copy summary ----
+    function copySummary() {
+      const toolList = allTools.slice(0, 8).map(t =>
+        `  • ${t.tool_name||t.name||t.domain} (${(t.risk_level||t.risk||'unknown').toLowerCase()})`
+      ).join('\n');
+      const more = allTools.length > 8 ? `\n  … and ${allTools.length - 8} more` : '';
+      const text =
+`Project Compass — AI Detection Assessment Summary
+═══════════════════════════════════════════════════
+Organization : ${orgName}
+Date         : ${assessDate}
+Registry     : ${isLive ? `Azure SQL Live (${registrySize} domains)` : 'Demo Data'}
+
+KEY METRICS
+  AI Tools Detected : ${allTools.length}
+  High Risk         : ${highCount}
+  Medium Risk       : ${medCount}
+
+DETECTED TOOLS
+${toolList}${more}
+
+Generated by Project Compass · AI Governance Platform · projectcompass.io
+`;
+      navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('copy-toast').style.display = 'block';
+        setTimeout(() => { document.getElementById('copy-toast').style.display = 'none'; }, 3000);
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => { btn.innerHTML = '&#128203; Copy Summary'; }, 2500);
+      }).catch(() => alert('Copy failed — try again or copy manually.'));
+    }
+
+    // ---- Email summary ----
+    function emailSummary() {
+      const highList = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high')
+                               .map(t => `  - ${t.tool_name||t.name||t.domain}`).join('\n') || '  None';
+      const subject = encodeURIComponent(`Project Compass AI Assessment — ${orgName} (${assessDate})`);
+      const body = encodeURIComponent(
+`Project Compass — AI Detection Assessment Summary
+Organization: ${orgName}
+Assessment Date: ${assessDate}
+Registry: ${isLive ? `Azure SQL Live (${registrySize} domains)` : 'Demo Data'}
+
+KEY METRICS
+  AI Tools Detected: ${allTools.length} (${highCount} high, ${medCount} medium risk)
+
+HIGH-RISK TOOLS
+${highList}
+
+Full report available in Project Compass.
+Generated by Project Compass — projectcompass.io`
+      );
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
   </script>
 </body>
 </html>
