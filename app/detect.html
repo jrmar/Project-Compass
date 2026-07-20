@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -446,7 +446,7 @@
     </div>
 
     <h1 class="page-title">Detection Results</h1>
-    <p class="page-subtitle" id="page-subtitle">AI tool activity identified in your DNS logs.</p>
+    <p class="page-subtitle" id="page-subtitle">AI tool activity identified in your network logs.</p>
 
     <!-- KPI Tiles -->
     <div class="kpi-row" id="kpi-row"></div>
@@ -492,12 +492,25 @@
     if (!session || !session.org_name) { window.location.href = 'login.html'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 
-    const det = (session && session.detection) ? session.detection : null;
+    const det     = (session && session.detection) ? session.detection : null;
+    const logType = (det && det._log_type) || session?.upload?.log_type || 'dns';
+
+    const LOG_TYPE_LABELS = {
+      dns:      { label: 'DNS Log',      icon: '🌐', eventLabel: 'DNS queries' },
+      firewall: { label: 'Firewall Log', icon: '🔥', eventLabel: 'firewall entries' },
+      proxy:    { label: 'Proxy Log',    icon: '🔁', eventLabel: 'proxy requests' },
+    };
+    const logConfig = LOG_TYPE_LABELS[logType] || LOG_TYPE_LABELS.dns;
 
     // Demo banner
     if (!det || det._fallback) {
       document.getElementById('demo-banner').style.display = 'flex';
     }
+
+    // Log type badge in subtitle area
+    const subtitleEl = document.getElementById('page-subtitle');
+    const badgeHtml = `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(51,205,182,0.08);border:1px solid rgba(51,205,182,0.2);border-radius:100px;padding:2px 10px;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--teal);margin-left:8px;vertical-align:middle;">${logConfig.icon} ${logConfig.label}</span>`;
+    subtitleEl.innerHTML = `AI tool activity identified in your ${logConfig.eventLabel}.${badgeHtml}`;
 
     // ── Normalize tools ──
     function normalizeTools(d) {
