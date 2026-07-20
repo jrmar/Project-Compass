@@ -8,103 +8,172 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
   <style>
+
+    /* ── KPI Row (same as dashboard) ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 860px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .kpi-row { grid-template-columns: 1fr; } }
+    .kpi-tile {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+    .kpi-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px; font-weight: 800;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Reports Grid ── */
     .reports-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 28px;
+      gap: 16px;
+      margin-bottom: 24px;
     }
-    @media (max-width: 720px) { .reports-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 860px) { .reports-grid { grid-template-columns: 1fr; } }
 
+    /* ── Report Card (matches dashboard .report-card) ── */
     .report-card {
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-md);
-      overflow: hidden;
+      padding: 22px 20px 18px;
       display: flex; flex-direction: column;
-      transition: border-color 0.2s, transform 0.15s;
+      transition: border-color 0.15s, transform 0.15s;
     }
-    .report-card:hover { border-color: rgba(64,130,232,0.22); transform: translateY(-1px); }
+    .report-card:hover {
+      border-color: rgba(64,130,232,0.22);
+      transform: translateY(-1px);
+    }
 
-    .report-card-top { padding: 24px 22px 20px; flex: 1; }
     .report-audience {
       font-family: 'Montserrat', sans-serif;
-      font-size: 8px; font-weight: 800;
-      letter-spacing: 0.12em; text-transform: uppercase;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
       margin-bottom: 8px;
     }
-    .report-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+    .report-icon { font-size: 26px; margin-bottom: 10px; display: block; }
     .report-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 16px; font-weight: 800;
+      font-size: 15px; font-weight: 700;
       color: var(--light);
-      line-height: 1.2; margin-bottom: 10px;
+      line-height: 1.25; margin-bottom: 8px;
     }
-    .report-desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin-bottom: 14px; }
-    .report-includes { display: flex; flex-direction: column; gap: 5px; }
+    .report-desc {
+      font-size: 11px; color: var(--muted);
+      line-height: 1.65; margin-bottom: 14px; flex: 1;
+    }
+
+    .report-includes { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
     .report-include-row {
       display: flex; align-items: flex-start; gap: 7px;
       font-size: 11px; color: var(--muted); line-height: 1.4;
     }
     .report-include-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      flex-shrink: 0; margin-top: 4px;
+      width: 4px; height: 4px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 5px;
     }
 
-    .report-card-bottom {
-      padding: 16px 22px;
-      border-top: 1px solid var(--glass-border);
-      background: rgba(255,255,255,0.015);
-    }
-    .report-preview-label {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 6px;
-    }
-    .report-preview-text {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--muted);
-      line-height: 1.5; margin-bottom: 12px;
+    /* Preview chip */
+    .report-preview {
+      font-size: 11px; color: var(--muted);
+      line-height: 1.5; margin-bottom: 14px;
       border-left: 2px solid var(--glass-border);
-      padding-left: 8px;
+      padding-left: 10px;
+      font-style: italic;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
     }
 
-    .summary-bar {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      padding: 18px 24px;
-      display: flex; align-items: center; gap: 32px;
+    /* ── Section divider ── */
+    .section-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px;
+    }
+
+    /* ── Share panel (matches glass-card style) ── */
+    .share-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
-      margin-bottom: 28px;
+      gap: 12px;
+      margin-bottom: 20px;
     }
-    .summary-bar-item { flex-shrink: 0; }
-    .summary-bar-label {
+    .share-panel-left {}
+    .share-panel-label {
       font-family: 'Montserrat', sans-serif;
-      font-size: 8px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 4px;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 3px;
     }
-    .summary-bar-val {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 20px; font-weight: 800;
-      font-variant-numeric: tabular-nums; line-height: 1;
-    }
-    .summary-bar-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
-    .summary-bar-divider { width: 1px; height: 40px; background: var(--glass-border); flex-shrink: 0; }
+    .share-panel-desc { font-size: 12px; color: var(--muted); }
 
+    /* ── Toast ── */
+    .copy-toast {
+      display: none;
+      text-align: center;
+      font-size: 11px;
+      color: var(--teal);
+      margin-bottom: 12px;
+      padding: 8px;
+      background: rgba(51,205,182,0.06);
+      border: 1px solid rgba(51,205,182,0.15);
+      border-radius: 6px;
+    }
+
+    /* ── Note box ── */
     .note-box {
       background: rgba(64,130,232,0.04);
       border: 1px solid rgba(64,130,232,0.12);
       border-radius: var(--radius-sm);
-      padding: 14px 18px;
+      padding: 12px 16px;
       font-size: 11px; color: var(--muted);
-      line-height: 1.6; margin-bottom: 28px;
+      line-height: 1.6; margin-bottom: 22px;
     }
     .note-box strong { color: var(--light); }
+
+    /* ── Registry badge ── */
+    .registry-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(51,205,182,0.08);
+      border: 1px solid rgba(51,205,182,0.2);
+      border-radius: 100px;
+      padding: 3px 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--teal);
+    }
+    .registry-badge-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
   </style>
 </head>
 <body>
 
+  <!-- ── Header ── -->
   <header class="app-header">
     <a class="app-header-logo" href="login.html">
       <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
@@ -119,6 +188,7 @@
     </div>
   </header>
 
+  <!-- ── Step Bar ── -->
   <div class="step-bar-wrapper">
     <div class="step-bar">
       <div class="step-item completed"><div class="step-dot">&#10003;</div><div class="step-label">Upload</div></div>
@@ -133,86 +203,87 @@
     </div>
   </div>
 
+  <!-- ── Main ── -->
   <main class="page-content-wide">
     <h1 class="page-title">Assessment Reports</h1>
     <p class="page-subtitle">
-      Download a detailed, print-ready PDF report tailored to each audience.
-      Each report opens in a new tab — use your browser's <strong style="color:var(--light);">Print → Save as PDF</strong> option.
+      Generate a print-ready PDF report tailored to each audience.
+      Each report opens in a new tab — use <strong style="color:var(--light);">Print → Save as PDF</strong> to download.
     </p>
 
-    <!-- Summary bar -->
-    <div class="summary-bar" id="summary-bar" style="display:none;">
-      <div class="summary-bar-item">
-        <div class="summary-bar-label">Organization</div>
-        <div class="summary-bar-val" id="sb-org" style="color:var(--light);font-size:16px;">—</div>
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-tile">
+        <div class="kpi-label">Tools Detected</div>
+        <div class="kpi-value" id="kpi-tools" style="color:var(--blue);">—</div>
+        <div class="kpi-sub" id="kpi-tools-sub">from DNS log analysis</div>
       </div>
-      <div class="summary-bar-divider"></div>
-      <div class="summary-bar-item">
-        <div class="summary-bar-label">Tools Detected</div>
-        <div class="summary-bar-val" id="sb-tools" style="color:var(--blue);">—</div>
-        <div class="summary-bar-sub" id="sb-tools-sub"></div>
+      <div class="kpi-tile">
+        <div class="kpi-label">High Risk Tools</div>
+        <div class="kpi-value" id="kpi-high" style="color:var(--danger);">—</div>
+        <div class="kpi-sub">requiring immediate review</div>
       </div>
-      <div class="summary-bar-divider"></div>
-      <div class="summary-bar-item">
-        <div class="summary-bar-label">High Risk Tools</div>
-        <div class="summary-bar-val" id="sb-high" style="color:var(--danger);">—</div>
-        <div class="summary-bar-sub">requiring review</div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Registry Source</div>
+        <div style="margin-top:6px;" id="kpi-registry-wrap">
+          <div class="kpi-value" style="color:var(--muted);font-size:20px;">—</div>
+        </div>
+        <div class="kpi-sub" id="kpi-registry-sub"></div>
       </div>
-      <div class="summary-bar-divider"></div>
-      <div class="summary-bar-item">
-        <div class="summary-bar-label">Registry Source</div>
-        <div class="summary-bar-val" id="sb-registry" style="color:var(--teal);font-size:13px;">—</div>
-        <div class="summary-bar-sub" id="sb-registry-sub"></div>
-      </div>
-      <div class="summary-bar-divider"></div>
-      <div class="summary-bar-item">
-        <div class="summary-bar-label">Assessment Date</div>
-        <div class="summary-bar-val" id="sb-date" style="color:var(--light);font-size:14px;">—</div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Assessment Date</div>
+        <div class="kpi-value" id="kpi-date" style="color:var(--light);font-size:18px;">—</div>
+        <div class="kpi-sub" id="kpi-org"></div>
       </div>
     </div>
 
+    <!-- How to save note -->
     <div class="note-box">
       <strong>How to save as PDF:</strong> Click any report card below to open it in a new tab.
-      The print dialog will open automatically. Set <em>Destination → Save as PDF</em>
+      The print dialog opens automatically. Set <em>Destination → Save as PDF</em>
       and enable <em>Background graphics</em> for color output. Then click Save.
     </div>
 
-    <!-- Report cards -->
+    <!-- Report Cards -->
+    <div class="section-eyebrow">Choose a Report</div>
     <div class="reports-grid" id="reports-grid"></div>
 
-    <!-- Share bar -->
-    <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-      <div>
-        <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Share This Assessment</div>
-        <div style="font-size:12px;color:var(--muted);">Copy a plain-text summary to paste into Slack, email, or a ticket.</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-ghost" id="copy-btn" onclick="copySummary()" style="font-size:11px;padding:7px 14px;">&#128203; Copy Summary</button>
-        <button class="btn btn-ghost" id="email-btn" onclick="emailSummary()" style="font-size:11px;padding:7px 14px;">&#9993; Email Summary</button>
+    <!-- Share Row -->
+    <div class="glass-card" style="padding:18px 20px;margin-bottom:20px;">
+      <div class="share-panel">
+        <div class="share-panel-left">
+          <div class="share-panel-label">Share This Assessment</div>
+          <div class="share-panel-desc">Copy a plain-text summary to paste into Slack, email, or a ticket.</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost" id="copy-btn" onclick="copySummary()" style="font-size:11px;padding:7px 14px;">
+            &#128203; Copy Summary
+          </button>
+          <button class="btn btn-ghost" id="email-btn" onclick="emailSummary()" style="font-size:11px;padding:7px 14px;">
+            &#9993; Email Summary
+          </button>
+        </div>
       </div>
     </div>
-    <div id="copy-toast" style="display:none;text-align:center;font-size:11px;color:var(--teal);margin-bottom:12px;padding:8px;background:rgba(51,205,182,0.06);border:1px solid rgba(51,205,182,0.15);border-radius:6px;">
-      &#10003; Assessment summary copied to clipboard
-    </div>
+    <div class="copy-toast" id="copy-toast">&#10003; Assessment summary copied to clipboard</div>
 
     <!-- Navigation -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--glass-border);">
-      <button class="btn btn-ghost" onclick="history.back()">&#8592; Back</button>
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-ghost" onclick="window.location.href='upload.html'">&#8962; Start New Assessment</button>
-      </div>
+      <button class="btn btn-ghost" onclick="history.back()">&#8592; Back to Dashboard</button>
+      <button class="btn btn-teal" onclick="window.location.href='upload.html'">Start New Assessment &#8635;</button>
     </div>
+
     <div style="height:40px;"></div>
   </main>
 
   <script>
-    // ---- Load session from localStorage ----
+    // ── Session guard ──
     const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) { window.location.href = 'login.html'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 
-    const det     = (session && session.detection)     || {};
-    const orgName = (session && session.org_name)      || 'Your Organization';
+    const det     = (session && session.detection) || {};
+    const orgName = (session && session.org_name)  || 'Your Organization';
     const assessDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
     const allTools  = det.detected_tools || [];
@@ -221,25 +292,35 @@
     const isLive    = det._live === true;
     const registrySize = det._registry_size || 0;
 
-    // ---- Summary bar ----
-    if (allTools.length > 0) {
-      document.getElementById('summary-bar').style.display = 'flex';
-      document.getElementById('sb-org').textContent = orgName;
-      document.getElementById('sb-tools').textContent = allTools.length;
-      document.getElementById('sb-tools-sub').textContent = `${highCount} high · ${medCount} medium`;
-      document.getElementById('sb-high').textContent = highCount;
-      document.getElementById('sb-registry').textContent = isLive ? 'Azure SQL' : 'Demo Data';
-      document.getElementById('sb-registry-sub').textContent = isLive ? `${registrySize} live domains` : 'seeded results';
-      document.getElementById('sb-date').textContent = assessDate;
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    // ---- Open report in new tab, passing session via localStorage ----
-    // (report pages also read from localStorage)
+    // ── KPIs ──
+    document.getElementById('kpi-tools').textContent = allTools.length || '—';
+    document.getElementById('kpi-tools-sub').textContent = `${highCount} high · ${medCount} medium · ${allTools.length - highCount - medCount} low`;
+    document.getElementById('kpi-high').textContent = highCount || '0';
+    document.getElementById('kpi-date').textContent = assessDate;
+    document.getElementById('kpi-org').textContent = orgName;
+
+    // Registry badge
+    const regWrap = document.getElementById('kpi-registry-wrap');
+    if (isLive) {
+      regWrap.innerHTML = `<div class="registry-badge"><div class="registry-badge-dot"></div>Azure SQL Live</div>`;
+      document.getElementById('kpi-registry-sub').textContent = `${registrySize.toLocaleString()} domains`;
+    } else if (allTools.length > 0) {
+      regWrap.innerHTML = `<div class="kpi-value" style="color:var(--muted);font-size:18px;">Demo Data</div>`;
+      document.getElementById('kpi-registry-sub').textContent = 'seeded results';
+    } else {
+      regWrap.innerHTML = `<div class="kpi-value" style="color:var(--muted);font-size:18px;">—</div>`;
+    }
+
+    // ── Open report ──
     function openReport(type) {
       window.open(`report-${type}.html`, '_blank');
     }
 
-    // ---- Report cards ----
+    // ── Report cards ──
     const reports = [
       {
         type: 'executive',
@@ -247,17 +328,16 @@
         color: 'var(--blue)',
         icon: '📊',
         title: 'Executive Summary',
-        desc: 'Plain-language overview of AI tool risk and top priority actions for leadership. No technical jargon.',
+        desc: 'Plain-language overview of AI tool risk and governance posture for the C-suite and board. No technical jargon.',
         includes: [
-          'Key metrics: tools detected, high-risk count, events analyzed',
           'Risk posture assessment (Critical / High / Moderate / Low)',
-          'AI tools detected summary table sorted by risk',
-          'Top 4 priority governance actions with cloud-specific steps',
-          'Business-forward language suitable for board or C-suite',
+          'Key metrics: tools detected, high-risk count, events',
+          'AI tools table sorted by risk level',
+          'Top 4 priority actions with Azure / AWS / GCP steps',
         ],
         preview: allTools.length > 0
-          ? `${allTools.length} tools detected · ${highCount} high-risk · ${isLive ? 'Live Azure SQL registry' : 'Demo data'}`
-          : 'Upload and analyze a DNS log to populate this report'
+          ? `${allTools.length} tools · ${highCount} high-risk · Posture: ${postureLabel()}`
+          : 'Upload a DNS log to populate'
       },
       {
         type: 'security',
@@ -265,17 +345,16 @@
         color: 'var(--teal)',
         icon: '🔍',
         title: 'Security Team Findings',
-        desc: 'Full technical report with tool inventory, DNS block rules, and platform-specific remediation playbooks.',
+        desc: 'Full technical report with complete tool inventory, DNS block rules, and platform-specific remediation playbooks.',
         includes: [
-          'Full AI tool inventory with domains, categories, and risk levels',
-          'Risk distribution visualization',
-          'DNS block rules for Pi-hole, Windows hosts, and Sentinel KQL',
+          'Full AI tool inventory with domains, categories, risk levels',
+          'Risk distribution bar chart',
+          'DNS block rules: Pi-hole, Windows sinkhole, Sentinel KQL',
           'Technical remediation steps for Azure, AWS, and GCP',
-          'NIST AI RMF control gap reference',
         ],
         preview: allTools.length > 0
-          ? `${allTools.length} tools · ${highCount} high-risk · DNS block rules for ${highCount + medCount} domains`
-          : 'Upload and analyze a DNS log to populate this report'
+          ? `${allTools.length} tools · ${highCount + medCount} block rules generated`
+          : 'Upload a DNS log to populate'
       },
       {
         type: 'auditor',
@@ -283,62 +362,65 @@
         color: 'var(--orange)',
         icon: '📋',
         title: 'Auditor Evidence Package',
-        desc: 'Formal compliance documentation with evidence chain, methodology, and certification statement.',
+        desc: 'Formal compliance documentation with evidence chain, NIST control reference, and certification statement.',
         includes: [
-          'Assessment metadata and methodology documentation',
-          'DNS log evidence summary with tool inventory',
-          'Evidence source documentation (registry, log file, methodology)',
-          'NIST AI RMF control reference table',
+          'Assessment metadata and methodology',
+          'DNS log evidence summary and tool inventory',
+          'Evidence source documentation',
+          'NIST AI RMF 1.0 control reference table',
           'Automated assessment certification statement',
-          'Formal limitations and scope disclosures',
         ],
         preview: allTools.length > 0
           ? `${allTools.length} tools detected · NIST AI RMF 1.0 · ${assessDate}`
-          : 'Upload and analyze a DNS log to populate this report'
+          : 'Upload a DNS log to populate'
       }
     ];
 
+    function postureLabel() {
+      if (highCount >= 3) return 'CRITICAL';
+      if (highCount >= 1) return 'HIGH';
+      if (medCount >= 3) return 'MODERATE';
+      return 'LOW';
+    }
+
     document.getElementById('reports-grid').innerHTML = reports.map(r => `
       <div class="report-card">
-        <div class="report-card-top">
-          <div class="report-audience" style="color:${r.color};">${r.audience}</div>
-          <span class="report-icon">${r.icon}</span>
-          <div class="report-title">${r.title}</div>
-          <div class="report-desc">${r.desc}</div>
-          <div class="report-includes">
-            ${r.includes.map(item => `<div class="report-include-row">
+        <div class="report-audience" style="color:${r.color};">${r.audience}</div>
+        <span class="report-icon">${r.icon}</span>
+        <div class="report-title">${r.title}</div>
+        <div class="report-desc">${r.desc}</div>
+        <div class="report-includes">
+          ${r.includes.map(item => `
+            <div class="report-include-row">
               <div class="report-include-dot" style="background:${r.color};"></div>
               <span>${item}</span>
             </div>`).join('')}
-          </div>
         </div>
-        <div class="report-card-bottom">
-          <div class="report-preview-label">Report Preview</div>
-          <div class="report-preview-text">${r.preview}</div>
-          <button class="btn btn-primary" style="width:100%;font-size:11px;padding:9px 0;"
-                  onclick="openReport('${r.type}')">
-            &#8599; Open Report &amp; Save as PDF
-          </button>
-        </div>
+        <div class="report-preview">${r.preview}</div>
+        <button class="btn btn-primary" style="width:100%;font-size:11px;padding:9px 0;"
+                onclick="openReport('${r.type}')">
+          &#8599; Open Report &amp; Save as PDF
+        </button>
       </div>`).join('');
 
-    // ---- Copy summary ----
+    // ── Copy summary ──
     function copySummary() {
-      const toolList = allTools.slice(0, 8).map(t =>
-        `  • ${t.tool_name||t.name||t.domain} (${(t.risk_level||t.risk||'unknown').toLowerCase()})`
-      ).join('\n');
+      const toolList = allTools.slice(0, 8)
+        .map(t => `  • ${t.tool_name||t.name||t.domain} (${(t.risk_level||t.risk||'unknown').toLowerCase()})`)
+        .join('\n');
       const more = allTools.length > 8 ? `\n  … and ${allTools.length - 8} more` : '';
       const text =
 `Project Compass — AI Detection Assessment Summary
 ═══════════════════════════════════════════════════
-Organization : ${orgName}
-Date         : ${assessDate}
-Registry     : ${isLive ? `Azure SQL Live (${registrySize} domains)` : 'Demo Data'}
+Organization  : ${orgName}
+Date          : ${assessDate}
+Registry      : ${isLive ? `Azure SQL Live (${registrySize} domains)` : 'Demo Data'}
 
 KEY METRICS
   AI Tools Detected : ${allTools.length}
   High Risk         : ${highCount}
   Medium Risk       : ${medCount}
+  Risk Posture      : ${postureLabel()}
 
 DETECTED TOOLS
 ${toolList}${more}
@@ -346,18 +428,21 @@ ${toolList}${more}
 Generated by Project Compass · AI Governance Platform · projectcompass.io
 `;
       navigator.clipboard.writeText(text).then(() => {
-        document.getElementById('copy-toast').style.display = 'block';
-        setTimeout(() => { document.getElementById('copy-toast').style.display = 'none'; }, 3000);
+        const toast = document.getElementById('copy-toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
         const btn = document.getElementById('copy-btn');
         btn.textContent = '✓ Copied!';
         setTimeout(() => { btn.innerHTML = '&#128203; Copy Summary'; }, 2500);
       }).catch(() => alert('Copy failed — try again or copy manually.'));
     }
 
-    // ---- Email summary ----
+    // ── Email summary ──
     function emailSummary() {
-      const highList = allTools.filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high')
-                               .map(t => `  - ${t.tool_name||t.name||t.domain}`).join('\n') || '  None';
+      const highList = allTools
+        .filter(t => (t.risk_level||t.risk||'').toLowerCase() === 'high')
+        .map(t => `  - ${t.tool_name||t.name||t.domain}`)
+        .join('\n') || '  None';
       const subject = encodeURIComponent(`Project Compass AI Assessment — ${orgName} (${assessDate})`);
       const body = encodeURIComponent(
 `Project Compass — AI Detection Assessment Summary
@@ -367,6 +452,7 @@ Registry: ${isLive ? `Azure SQL Live (${registrySize} domains)` : 'Demo Data'}
 
 KEY METRICS
   AI Tools Detected: ${allTools.length} (${highCount} high, ${medCount} medium risk)
+  Risk Posture: ${postureLabel()}
 
 HIGH-RISK TOOLS
 ${highList}
