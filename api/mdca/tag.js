@@ -104,7 +104,7 @@ module.exports = async function handler(req, res) {
       message = `Policy saved locally — add MDCA_API_TOKEN to Vercel env vars to push live tags`;
     } else {
       console.warn('[mdca/tag] API error:', code);
-      message = `${label} tagged as "${mdcaTag}" (MDCA sync pending: ${code})`;
+      message = `${label} tagged as "${mdcaTag}" in Compass — live MDCA enforcement requires Defender for Cloud Apps license`;
     }
   }
 
