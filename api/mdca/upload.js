@@ -8,7 +8,7 @@
  *               log_type: 'dns' | 'proxy' | 'firewall' | 'watchguard' }
  *
  * MDCA Cloud Discovery 3-step upload:
- *   1. POST /cas/api/v1/discovery/upload_url/  → { url, contentType }
+ *   1. GET  /cas/api/v1/discovery/upload_url/?filename=&source=  → { url, contentType }
  *   2. PUT  <url>                               (raw log bytes)
  *   3. POST /cas/api/v1/discovery/done_uploading/  { uploadUrl: url }
  */
@@ -16,13 +16,13 @@
 const MDCA_BASE = process.env.MDCA_API_URL
   || 'https://projectcompass722.us2.portal.cloudappsecurity.com';
 
-// Approximate MDCA log-type IDs.
-// Squid native (17) is closest for proxy/DNS; use for all types in demo.
+// MDCA upload_url ?source= expects a string name, not a numeric ID.
+// Squid is the closest match for all Compass log formats.
 const MDCA_LOG_TYPE = {
-  proxy:      17,  // Squid Native
-  dns:        17,
-  firewall:   17,
-  watchguard: 17,
+  proxy:      'SQUID',
+  dns:        'SQUID',
+  firewall:   'SQUID',
+  watchguard: 'WATCHGUARD_XTM',
 };
 
 async function readBody(req) {
@@ -81,7 +81,7 @@ module.exports = async function handler(req, res) {
   }
 
   const fileBuffer = decodeFileContent(file_content);
-  const logTypeId  = MDCA_LOG_TYPE[log_type] || 17;
+  const logTypeId  = MDCA_LOG_TYPE[log_type] || 'SQUID';
   const hdrs       = { Authorization: `Token ${token}`, 'Content-Type': 'application/json' };
 
   try {
