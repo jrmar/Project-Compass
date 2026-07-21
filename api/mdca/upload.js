@@ -141,50 +141,54 @@ module.exports = async function handler(req, res) {
       }));
     }
 
-    // Step 3: Notify MDCA that upload is complete.
-    // Try the snapshot-report endpoint first (requires a name + data source).
-    // Fall back to done_uploading without trailing slash if it 404s.
+    // Step 3: Create a snapshot report entry — this gives us a report ID that we need
+    // for the report-specific done_uploading endpoint (how the MDCA portal actually does it).
     const reportName = `Compass ${log_type} ${new Date().toISOString().slice(0, 10)}`;
-    const uploadUrlBase = uploadUrl.split('?')[0]; // strip SAS token for done_uploading
 
-    let step3, step3Text;
-
-    // Attempt A: create_snapshot_report (newer MDCA)
-    step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/create_snapshot_report/`, {
+    const step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/snapshot_report/`, {
       method: 'POST', headers: hdrs,
-      body: JSON.stringify({ reportName, description: 'Uploaded by Compass', dataSource: logTypeId, contentUrl: uploadUrl }),
+      body: JSON.stringify({
+        reportName,
+        description:   'Uploaded by Project Compass',
+        dataSource:    logTypeId,
+        anonymization: false,
+      }),
     });
-    step3Text = await step3.text();
-    console.log(`[mdca/upload] step3a create_snapshot_report ${step3.status}: ${step3Text.slice(0, 200)}`);
+    const step3Text = await step3.text();
+    console.log(`[mdca/upload] step3 snapshot_report ${step3.status}: ${step3Text.slice(0, 300)}`);
 
-    if (!step3.ok) {
-      // Attempt B: done_uploading with inputStreamName (classic MCAS)
-      step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/done_uploading`, {
-        method: 'POST', headers: hdrs,
-        body: JSON.stringify({ uploadUrl: uploadUrlBase, inputStreamName: file_name }),
-      });
-      step3Text = await step3.text();
-      console.log(`[mdca/upload] step3b done_uploading ${step3.status}: ${step3Text.slice(0, 200)}`);
-    }
+    let step4ok = false;
+    let snapshotId = null;
 
-    if (!step3.ok) {
-      // Attempt C: done_uploading with trailing slash and full URL
-      step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/done_uploading/`, {
-        method: 'POST', headers: hdrs,
-        body: JSON.stringify({ uploadUrl, inputStreamName: file_name }),
-      });
-      step3Text = await step3.text();
-      console.log(`[mdca/upload] step3c done_uploading/ ${step3.status}: ${step3Text.slice(0, 200)}`);
+    if (step3.ok) {
+      try {
+        const snap = JSON.parse(step3Text);
+        snapshotId = snap._id || snap.id || snap.reportId;
+      } catch { /* ignore */ }
+
+      if (snapshotId) {
+        // Step 4: Finalize the upload against the specific snapshot report
+        const step4 = await fetch(
+          `${MDCA_BASE}/cas/api/v1/discovery/snapshot_report/${snapshotId}/done_uploading/`,
+          { method: 'POST', headers: hdrs, body: JSON.stringify({ uploadUrl }) }
+        );
+        const step4Text = await step4.text();
+        console.log(`[mdca/upload] step4 done_uploading/${snapshotId} ${step4.status}: ${step4Text.slice(0, 200)}`);
+        step4ok = step4.ok;
+      } else {
+        console.log(`[mdca/upload] step3 ok but no ID in response: ${step3Text.slice(0, 200)}`);
+      }
     }
 
     res.writeHead(200);
     res.end(JSON.stringify({
-      success:    step3.ok,
-      stage:      'complete',
+      success:     step3.ok && step4ok,
+      blob_staged: true,   // file IS in MDCA blob storage — may process automatically
+      stage:       step3.ok ? (step4ok ? 'complete' : 'snapshot_created_finalize_failed') : 'snapshot_create_failed',
+      snapshot_id: snapshotId,
       file_name,
       log_type,
-      bytes:      fileBuffer.length,
-      upload_url: uploadUrl.slice(0, 80) + '...',
+      bytes:       fileBuffer.length,
     }));
 
   } catch (err) {
