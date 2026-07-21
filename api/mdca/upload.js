@@ -16,6 +16,50 @@
 const MDCA_BASE = process.env.MDCA_API_URL
   || 'https://projectcompass722.us2.portal.cloudappsecurity.com';
 
+// Acquire OAuth Bearer token via client credentials.
+// MDCA Token auth cannot create snapshot reports; Bearer auth may be able to.
+async function getBearerToken() {
+  const tid    = process.env.MDCA_TENANT_ID;
+  const cid    = process.env.MDCA_CLIENT_ID;
+  const secret = process.env.MDCA_CLIENT_SECRET;
+  if (!tid || !cid || !secret) return null;
+
+  // Try both the legacy MCAS scope and the new Defender XDR scope
+  for (const scope of [
+    `https://projectcompass722.us2.portal.cloudappsecurity.com/.default`,
+    `https://api.security.microsoft.com/.default`,
+  ]) {
+    try {
+      const r = await fetch(
+        `https://login.microsoftonline.com/${tid}/oauth2/v2.0/token`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            grant_type:    'client_credentials',
+            client_id:     cid,
+            client_secret: secret,
+            scope,
+          }),
+        }
+      );
+      if (r.ok) {
+        const j = await r.json();
+        if (j.access_token) {
+          console.log(`[mdca/upload] bearer token acquired (scope=${scope})`);
+          return j.access_token;
+        }
+      } else {
+        const t = await r.text();
+        console.log(`[mdca/upload] bearer token ${r.status} for scope=${scope}: ${t.slice(0, 120)}`);
+      }
+    } catch (e) {
+      console.log(`[mdca/upload] bearer token error: ${e.message}`);
+    }
+  }
+  return null;
+}
+
 // MDCA upload_url ?source= expects a string name, not a numeric ID.
 // Squid is the closest match for all Compass log formats.
 const MDCA_LOG_TYPE = {
@@ -141,21 +185,31 @@ module.exports = async function handler(req, res) {
       }));
     }
 
-    // Step 3: Create a snapshot report entry — this gives us a report ID that we need
-    // for the report-specific done_uploading endpoint (how the MDCA portal actually does it).
-    const reportName = `Compass ${log_type} ${new Date().toISOString().slice(0, 10)}`;
+    // Step 3: Create snapshot report via Bearer token (client credentials).
+    // MDCA Token auth cannot create snapshot reports; Bearer auth may have the permission.
+    const reportName  = `Compass ${log_type} ${new Date().toISOString().slice(0, 10)}`;
+    const bearer      = await getBearerToken();
+    const snapHdrs    = bearer
+      ? { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' }
+      : hdrs; // fall back to Token auth so we can see the error
 
-    const step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/snapshot_report/`, {
-      method: 'POST', headers: hdrs,
-      body: JSON.stringify({
-        reportName,
-        description:   'Uploaded by Project Compass',
-        dataSource:    logTypeId,
-        anonymization: false,
-      }),
+    const snapBody = JSON.stringify({
+      reportName,
+      description:   'Uploaded by Project Compass',
+      dataSource:    logTypeId,
+      anonymization: false,
     });
-    const step3Text = await step3.text();
-    console.log(`[mdca/upload] step3 snapshot_report ${step3.status}: ${step3Text.slice(0, 300)}`);
+
+    // Try old portal base first, then new Microsoft 365 Defender API base
+    let step3, step3Text;
+    for (const base of [MDCA_BASE, 'https://api.security.microsoft.com']) {
+      step3 = await fetch(`${base}/cas/api/v1/discovery/snapshot_report/`, {
+        method: 'POST', headers: snapHdrs, body: snapBody,
+      });
+      step3Text = await step3.text();
+      console.log(`[mdca/upload] step3 snapshot_report@${base} ${step3.status}: ${step3Text.slice(0, 300)}`);
+      if (step3.ok) break;
+    }
 
     let step4ok = false;
     let snapshotId = null;
@@ -167,28 +221,26 @@ module.exports = async function handler(req, res) {
       } catch { /* ignore */ }
 
       if (snapshotId) {
-        // Step 4: Finalize the upload against the specific snapshot report
         const step4 = await fetch(
           `${MDCA_BASE}/cas/api/v1/discovery/snapshot_report/${snapshotId}/done_uploading/`,
-          { method: 'POST', headers: hdrs, body: JSON.stringify({ uploadUrl }) }
+          { method: 'POST', headers: snapHdrs, body: JSON.stringify({ uploadUrl }) }
         );
         const step4Text = await step4.text();
-        console.log(`[mdca/upload] step4 done_uploading/${snapshotId} ${step4.status}: ${step4Text.slice(0, 200)}`);
+        console.log(`[mdca/upload] step4 finalize/${snapshotId} ${step4.status}: ${step4Text.slice(0, 200)}`);
         step4ok = step4.ok;
-      } else {
-        console.log(`[mdca/upload] step3 ok but no ID in response: ${step3Text.slice(0, 200)}`);
       }
     }
 
     res.writeHead(200);
     res.end(JSON.stringify({
-      success:     step3.ok && step4ok,
-      blob_staged: true,   // file IS in MDCA blob storage — may process automatically
-      stage:       step3.ok ? (step4ok ? 'complete' : 'snapshot_created_finalize_failed') : 'snapshot_create_failed',
-      snapshot_id: snapshotId,
+      success:      step3.ok && step4ok,
+      blob_staged:  true,
+      bearer_used:  !!bearer,
+      stage:        step3.ok ? (step4ok ? 'complete' : 'snapshot_created_finalize_failed') : 'snapshot_create_failed',
+      snapshot_id:  snapshotId,
       file_name,
       log_type,
-      bytes:       fileBuffer.length,
+      bytes:        fileBuffer.length,
     }));
 
   } catch (err) {
