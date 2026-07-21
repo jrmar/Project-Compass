@@ -141,15 +141,41 @@ module.exports = async function handler(req, res) {
       }));
     }
 
-    // Step 3: Notify MDCA that upload is complete
-    const step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/done_uploading/`, {
-      method:  'POST',
-      headers: hdrs,
-      body:    JSON.stringify({ uploadUrl }),
-    });
+    // Step 3: Notify MDCA that upload is complete.
+    // Try the snapshot-report endpoint first (requires a name + data source).
+    // Fall back to done_uploading without trailing slash if it 404s.
+    const reportName = `Compass ${log_type} ${new Date().toISOString().slice(0, 10)}`;
+    const uploadUrlBase = uploadUrl.split('?')[0]; // strip SAS token for done_uploading
 
-    const step3Text = await step3.text();
-    console.log(`[mdca/upload] step3 ${step3.status}: ${step3Text.slice(0, 200)}`);
+    let step3, step3Text;
+
+    // Attempt A: create_snapshot_report (newer MDCA)
+    step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/create_snapshot_report/`, {
+      method: 'POST', headers: hdrs,
+      body: JSON.stringify({ reportName, description: 'Uploaded by Compass', dataSource: logTypeId, contentUrl: uploadUrl }),
+    });
+    step3Text = await step3.text();
+    console.log(`[mdca/upload] step3a create_snapshot_report ${step3.status}: ${step3Text.slice(0, 200)}`);
+
+    if (!step3.ok) {
+      // Attempt B: done_uploading with inputStreamName (classic MCAS)
+      step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/done_uploading`, {
+        method: 'POST', headers: hdrs,
+        body: JSON.stringify({ uploadUrl: uploadUrlBase, inputStreamName: file_name }),
+      });
+      step3Text = await step3.text();
+      console.log(`[mdca/upload] step3b done_uploading ${step3.status}: ${step3Text.slice(0, 200)}`);
+    }
+
+    if (!step3.ok) {
+      // Attempt C: done_uploading with trailing slash and full URL
+      step3 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/done_uploading/`, {
+        method: 'POST', headers: hdrs,
+        body: JSON.stringify({ uploadUrl, inputStreamName: file_name }),
+      });
+      step3Text = await step3.text();
+      console.log(`[mdca/upload] step3c done_uploading/ ${step3.status}: ${step3Text.slice(0, 200)}`);
+    }
 
     res.writeHead(200);
     res.end(JSON.stringify({
