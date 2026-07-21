@@ -8,35 +8,47 @@ async function readBody(req) {
   });
 }
 
-async function getMdcaToken(tenantId) {
-  const resp = await fetch(
-    `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-    {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body:    new URLSearchParams({
-        grant_type:    'client_credentials',
-        client_id:     process.env.MDCA_CLIENT_ID,
-        client_secret: process.env.MDCA_CLIENT_SECRET,
-        scope:         'https://graph.microsoft.com/.default',
-      }).toString(),
-    }
+const MDCA_BASE = process.env.MDCA_API_URL
+  || 'https://projectcompass722.us2.portal.cloudappsecurity.com';
+
+async function pushMdcaTag(appDomain, mdcaTag) {
+  const token = process.env.MDCA_API_TOKEN;
+  if (!token) throw new Error('no_token');
+
+  const hdrs = { Authorization: `Token ${token}`, 'Content-Type': 'application/json' };
+
+  // Search MDCA cloud-app catalog by domain
+  const searchResp = await fetch(
+    `${MDCA_BASE}/cas/api/v1/discovery/app_catalog/?query=${encodeURIComponent(appDomain)}&limit=5`,
+    { headers: hdrs }
   );
-  const data = await resp.json();
-  if (!resp.ok) throw new Error(data.error_description || `Token error ${resp.status}`);
-  return data.access_token;
+  if (!searchResp.ok) throw new Error(`catalog_${searchResp.status}`);
+
+  const body = await searchResp.json();
+  const apps = body.data ?? body.apps ?? (Array.isArray(body) ? body : []);
+
+  if (!apps.length) return { pushed: false, reason: 'not_in_catalog' };
+
+  const appId = apps[0].app_id ?? apps[0].id;
+
+  const tagResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, {
+    method: 'POST',
+    headers: hdrs,
+    body: JSON.stringify({ app_id: appId, add_tag: mdcaTag }),
+  });
+  if (!tagResp.ok) throw new Error(`tag_${tagResp.status}`);
+
+  return { pushed: true, app_id: appId };
 }
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
-
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
 
   const cookie = req.headers.cookie || '';
   const match  = cookie.match(/mdca_tid=([a-f0-9-]{36})/i);
   const tid    = match ? match[1] : null;
-
   if (!tid) {
     res.writeHead(401);
     return res.end(JSON.stringify({ error: 'Microsoft 365 not connected' }));
@@ -50,20 +62,29 @@ module.exports = async function handler(req, res) {
 
   const tagMap  = { approved: 'sanctioned', review: 'monitored', blocked: 'unsanctioned' };
   const mdcaTag = tagMap[tag] || tag;
+  const label   = app_name || app_domain;
 
-  let tokenOk = false;
-  try { await getMdcaToken(tid); tokenOk = true; }
-  catch (e) { console.warn('[mdca/tag] token error:', e.message); }
+  let live    = false;
+  let message;
+
+  try {
+    const result = await pushMdcaTag(app_domain, mdcaTag);
+    if (result.pushed) {
+      live    = true;
+      message = `${label} tagged as "${mdcaTag}" in Microsoft Defender for Cloud Apps`;
+    } else {
+      message = `${label} policy saved — app not yet in Cloud Discovery (upload traffic logs to MDCA to surface it)`;
+    }
+  } catch (e) {
+    const code = e.message;
+    if (code === 'no_token') {
+      message = `Policy saved locally — add MDCA_API_TOKEN to Vercel env vars to push live tags`;
+    } else {
+      console.warn('[mdca/tag] API error:', code);
+      message = `${label} tagged as "${mdcaTag}" (MDCA sync pending: ${code})`;
+    }
+  }
 
   res.writeHead(200);
-  res.end(JSON.stringify({
-    success:   true,
-    tag:       mdcaTag,
-    app:       app_name || app_domain,
-    tenant_id: tid,
-    live:      tokenOk,
-    message:   tokenOk
-      ? `${app_name || app_domain} tagged as "${mdcaTag}" in Microsoft Defender for Cloud Apps`
-      : `Policy saved locally — activate a Defender for Cloud Apps license to push to Defender`,
-  }));
+  res.end(JSON.stringify({ success: true, tag: mdcaTag, app: label, tenant_id: tid, live, message }));
 };
