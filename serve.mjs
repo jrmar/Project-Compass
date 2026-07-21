@@ -47,14 +47,26 @@ async function pushMdcaTag(appDomain, mdcaTag) {
   const apps = body.data ?? body.apps ?? (Array.isArray(body) ? body : []);
   if (!apps.length) return { pushed: false };
 
-  const appId = apps[0].app_id ?? apps[0].id;
-  const tagResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, {
-    method: 'POST',
-    headers: hdrs,
-    body: JSON.stringify({ app_id: appId, add_tag: mdcaTag }),
-  });
-  if (!tagResp.ok) throw new Error(`tag_${tagResp.status}`);
-  return { pushed: true, app_id: appId };
+  const appId     = apps[0].appId ?? apps[0].app_id ?? apps[0].id;
+  const tagNumMap = { sanctioned: 1, unsanctioned: 2, monitored: 3 };
+  const tagNum    = tagNumMap[mdcaTag] ?? 1;
+
+  const payloads = [
+    { appId, tag: tagNum },
+    { appId, add_tag: mdcaTag },
+    { tag: tagNum, apps: [{ id: appId }] },
+    { app_id: appId, tag: tagNum },
+  ];
+
+  for (const payload of payloads) {
+    const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, {
+      method: 'POST', headers: hdrs, body: JSON.stringify(payload),
+    });
+    const txt = await r.text().catch(() => '');
+    console.log(`[mdca/tag] ${JSON.stringify(payload)} → ${r.status}: ${txt.slice(0, 120)}`);
+    if (r.ok) return { pushed: true, app_id: appId };
+  }
+  throw new Error(`tag_api_${payloads.length}_attempts_failed`);
 }
 
 // ── Read POST body ─────────────────────────────────────────────────────────────
@@ -253,10 +265,15 @@ const server = createServer(async (req, res) => {
         }
       } catch (e) {
         const code = e.message;
-        message = code === 'no_token'
-          ? `Policy saved locally — add MDCA_API_TOKEN to .env to push live tags`
-          : `${label} tagged as "${mdcaTag}" (MDCA sync pending: ${code})`;
         console.warn('[/api/mdca/tag]', code);
+        if (code === 'no_token') {
+          message = `Policy saved locally — add MDCA_API_TOKEN to .env to push live tags`;
+        } else if (code.startsWith('tag_api_')) {
+          const status = code.replace('tag_api_', '');
+          message = `${label} tagged as "${mdcaTag}" in Compass — MDCA returned ${status} (check server logs)`;
+        } else {
+          message = `${label} tagged as "${mdcaTag}" in Compass — MDCA sync error: ${code}`;
+        }
       }
 
       res.writeHead(200);

@@ -39,29 +39,38 @@ async function pushMdcaTag(appDomain, mdcaTag) {
 
   const appId = apps[0].appId ?? apps[0].app_id ?? apps[0].id;
 
-  // MDCA uses numeric tag IDs: 1 = sanctioned, 2 = unsanctioned
+  // MDCA tag IDs: 1 = sanctioned, 2 = unsanctioned, 3 = monitored
   const tagNumMap = { sanctioned: 1, unsanctioned: 2, monitored: 3 };
   const tagNum = tagNumMap[mdcaTag] ?? 1;
 
-  // Try payloads in documented order
+  // Try every known payload shape — full MDCA, O365 subset, legacy variants
   const payloads = [
-    { tag: tagNum, discovery_stream_id: streamId, apps: [{ id: appId }] },
+    // Full MDCA (camelCase appId, most common in docs)
+    { appId, tag: tagNum },
+    { appId, add_tag: mdcaTag },
+    // Apps-array format
     { tag: tagNum, apps: [{ id: appId }] },
-    { tag: mdcaTag, apps: [{ id: appId }] },
+    { tag: tagNum, discovery_stream_id: streamId, apps: [{ id: appId }] },
+    // Legacy snake_case
     { app_id: appId, tag: tagNum },
+    { app_id: appId, add_tag: mdcaTag },
   ];
+
+  let lastStatus = 0;
+  let lastBody   = '';
 
   for (const payload of payloads) {
     const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, {
       method: 'POST', headers: hdrs, body: JSON.stringify(payload),
     });
     const txt = await r.text().catch(() => '');
-    const preview = txt.startsWith('<!') ? '[HTML — route missing]' : txt.slice(0, 250);
-    console.log(`[mdca/tag] payload=${JSON.stringify(payload)} → ${r.status}: ${preview}`);
+    lastStatus = r.status;
+    lastBody   = txt.startsWith('<!') ? '[HTML]' : txt.slice(0, 120);
+    console.log(`[mdca/tag] payload=${JSON.stringify(payload)} → ${r.status}: ${lastBody}`);
     if (r.ok) return { pushed: true, app_id: appId };
   }
 
-  throw new Error('tag_failed_see_logs');
+  throw new Error(`tag_api_${lastStatus}`);
 }
 
 module.exports = async function handler(req, res) {
@@ -100,11 +109,16 @@ module.exports = async function handler(req, res) {
     }
   } catch (e) {
     const code = e.message;
+    console.warn('[mdca/tag] API error:', code);
     if (code === 'no_token') {
       message = `Policy saved locally — add MDCA_API_TOKEN to Vercel env vars to push live tags`;
+    } else if (code === 'not_in_catalog') {
+      message = `${label} tagged as "${mdcaTag}" in Compass — app not found in MDCA catalog`;
+    } else if (code.startsWith('tag_api_')) {
+      const status = code.replace('tag_api_', '');
+      message = `${label} tagged as "${mdcaTag}" in Compass — MDCA returned ${status} (check Vercel logs for payload details)`;
     } else {
-      console.warn('[mdca/tag] API error:', code);
-      message = `${label} tagged as "${mdcaTag}" in Compass — live MDCA enforcement requires Defender for Cloud Apps license`;
+      message = `${label} tagged as "${mdcaTag}" in Compass — MDCA sync error: ${code}`;
     }
   }
 
