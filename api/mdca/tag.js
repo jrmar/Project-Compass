@@ -63,67 +63,18 @@ async function pushMdcaTag(appDomain, appName, mdcaTag) {
 
   const hdrs = { Authorization: `Token ${token}`, 'Content-Type': 'application/json' };
 
+  // Verify the app exists in Cloud Discovery (confirms MDCA has seen it in traffic logs)
   const appId = await findMdcaAppId(hdrs, appDomain, appName);
   console.log(`[mdca/tag] resolved appId=${appId} for "${appName || appDomain}"`);
-  if (!appId) return { pushed: false, reason: 'not_in_catalog' };
 
-  const tagNumMap = { sanctioned: 1, unsanctioned: 2, monitored: 3 };
-  const tagNum = tagNumMap[mdcaTag] ?? 1;
-
-  // GET current tags — built-in tags (Sanctioned/Unsanctioned/Monitored) have no _id;
-  // name is the identifier. We must merge our appId into the existing appIds list.
-  const getResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, { headers: hdrs });
-  if (!getResp.ok) throw new Error(`tag_api_${getResp.status}`);
-  const tagsData = await getResp.json();
-  const allTags  = tagsData.data ?? (Array.isArray(tagsData) ? tagsData : []);
-
-  const targetTag  = allTags.find(t => (t.name ?? '').toLowerCase() === mdcaTag.toLowerCase());
-  const currentIds = targetTag?.appIds ?? [];
-  const tagName    = targetTag?.name ?? (mdcaTag.charAt(0).toUpperCase() + mdcaTag.slice(1));
-
-  console.log(`[mdca/tag] "${tagName}" currently has ${currentIds.length} apps, alreadyHasApp=${currentIds.includes(appId)}`);
-
-  if (currentIds.includes(appId)) return { pushed: true, app_id: appId };
-
-  const newIds = [...currentIds, appId];
-
-  // Attempt A: app_tags POST without builtIn (500 with builtIn:true — server rejects that field)
-  const attemptA = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, {
-    method: 'POST', headers: hdrs,
-    body: JSON.stringify({ name: tagName, appIds: newIds }),
-  });
-  const txtA = await attemptA.text().catch(() => '');
-  console.log(`[mdca/tag] A app_tags {name,appIds} → ${attemptA.status}: ${txtA.startsWith('<!') ? '[HTML]' : txtA.slice(0, 150)}`);
-  if (attemptA.ok) {
-    // Verify it actually changed
-    const vR = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, { headers: hdrs });
-    if (vR.ok) {
-      const vD = await vR.json();
-      const vTag = (vD.data ?? []).find(t => (t.name ?? '').toLowerCase() === mdcaTag.toLowerCase());
-      const vIds = vTag?.appIds ?? [];
-      console.log(`[mdca/tag] A verify: "${tagName}" now has ${vIds.length} apps, present=${vIds.includes(appId)}`);
-      if (vIds.includes(appId)) return { pushed: true, app_id: appId };
-    }
-  }
-
-  // Attempt B: discovered_apps/tags/ endpoint (community-documented write endpoint)
-  for (const payload of [
-    { appId, tag: tagName },
-    { appId, tags: [tagName] },
-    { appId, tag: tagNum },
-    { app_id: appId, tag: tagName },
-    { appIds: newIds, tag: tagName },
-  ]) {
-    const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/discovered_apps/tags/`, {
-      method: 'POST', headers: hdrs, body: JSON.stringify(payload),
-    });
-    const txt = await r.text().catch(() => '');
-    console.log(`[mdca/tag] B discovered_apps/tags ${JSON.stringify(payload)} → ${r.status}: ${txt.startsWith('<!') ? '[HTML]' : txt.slice(0, 100)}`);
-    if (r.ok) return { pushed: true, app_id: appId };
-  }
-
-  // Both failed — let caller handle as partial success (tag saved in Compass, not in MDCA)
-  throw new Error(`tag_api_exhausted`);
+  // MDCA token-based REST API does not expose a write endpoint for built-in governance
+  // tags (Sanctioned/Unsanctioned/Monitored). All known paths return 404/500:
+  //   /discovery/set_app_tags/ → 404 on this tenant
+  //   /discovery/app_tags/ POST → 200 read-only / 500 on write
+  //   /discovery/discovered_apps/tags/ → unreachable (app_tags GET blocks first)
+  // Enforcement requires the MDCA portal UI or cookie-based auth at security.microsoft.com.
+  // Return compass_only so the handler shows a clear, honest message with an MDCA link.
+  return { pushed: false, compass_only: true, app_id: appId, in_discovery: !!appId };
 }
 
 module.exports = async function handler(req, res) {
@@ -157,21 +108,22 @@ module.exports = async function handler(req, res) {
     if (result.pushed) {
       live    = true;
       message = `${label} tagged as "${mdcaTag}" in Microsoft Defender for Cloud Apps`;
+    } else if (result.compass_only) {
+      // App found in MDCA Cloud Discovery but governance tags require the portal
+      const verb = mdcaTag === 'unsanctioned' ? 'block' : mdcaTag === 'sanctioned' ? 'approve' : 'monitor';
+      message = result.in_discovery
+        ? `${label} marked as "${mdcaTag}" in Compass. To enforce in MDCA, open Cloud Discovery and ${verb} it there.`
+        : `${label} marked as "${mdcaTag}" in Compass. Upload traffic logs to MDCA to surface it in Cloud Discovery.`;
     } else {
-      message = `${label} policy saved — app not yet in Cloud Discovery (upload traffic logs to MDCA to surface it)`;
+      message = `${label} marked as "${mdcaTag}" in Compass — app not yet in Cloud Discovery.`;
     }
   } catch (e) {
     const code = e.message;
     console.warn('[mdca/tag] API error:', code);
     if (code === 'no_token') {
-      message = `Policy saved locally — add MDCA_API_TOKEN to Vercel env vars to push live tags`;
-    } else if (code === 'not_in_catalog') {
-      message = `${label} tagged as "${mdcaTag}" in Compass — app not found in MDCA catalog`;
-    } else if (code.startsWith('tag_api_')) {
-      const status = code.replace('tag_api_', '');
-      message = `${label} tagged as "${mdcaTag}" in Compass — MDCA returned ${status} (check Vercel logs for payload details)`;
+      message = `${label} marked as "${mdcaTag}" in Compass — connect Microsoft 365 and add MDCA_API_TOKEN to push live tags`;
     } else {
-      message = `${label} tagged as "${mdcaTag}" in Compass — MDCA sync error: ${code}`;
+      message = `${label} marked as "${mdcaTag}" in Compass — MDCA sync error: ${code}`;
     }
   }
 
