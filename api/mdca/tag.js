@@ -29,18 +29,22 @@ async function pushMdcaTag(appDomain, appName, mdcaTag) {
   const catBody = await searchResp.json();
   const apps = catBody.data ?? catBody.apps ?? (Array.isArray(catBody) ? catBody : []);
 
-  // Find the best match — name or domain must actually match; never take apps[0] blindly.
+  // Log first 8 results so we can see real catalog names
+  console.log(`[mdca/tag] catalog "${query}" top results:`, apps.slice(0, 8).map(a => `${a.appId ?? a.id}:${a.name ?? a.appName}`).join(' | '));
+
   const nameLower   = (appName  || '').toLowerCase();
   const domainLower = appDomain.toLowerCase().replace(/^www\./, '');
 
   const bestApp = apps.find(a => {
-    const aName   = (a.name ?? a.appName ?? '').toLowerCase();
-    const aUrl    = (a.url  ?? a.domain  ?? a.appUrl ?? '').toLowerCase().replace(/^www\./, '');
-    return (nameLower   && (aName.includes(nameLower)   || nameLower.includes(aName)))
-        || (domainLower && (aUrl.includes(domainLower)  || domainLower.includes(aUrl)));
+    const aName = (a.name ?? a.appName ?? '').toLowerCase();
+    const aUrl  = (a.url  ?? a.domain  ?? a.appUrl ?? '').toLowerCase().replace(/^www\./, '');
+    // Guard against empty strings — "anything".includes("") is always true
+    const nameMatch   = nameLower   && aName && (aName.includes(nameLower)   || nameLower.includes(aName));
+    const domainMatch = domainLower && aUrl  && (aUrl.includes(domainLower)  || domainLower.includes(aUrl));
+    return nameMatch || domainMatch;
   });
 
-  console.log(`[mdca/tag] catalog search "${query}" → ${apps.length} results, match: ${bestApp ? `appId=${bestApp.appId ?? bestApp.id} name="${bestApp.name ?? bestApp.appName}"` : 'none'}`);
+  console.log(`[mdca/tag] match: ${bestApp ? `appId=${bestApp.appId ?? bestApp.id} name="${bestApp.name ?? bestApp.appName}"` : 'none — not_in_catalog'}`);
 
   if (!bestApp) return { pushed: false, reason: 'not_in_catalog' };
 
