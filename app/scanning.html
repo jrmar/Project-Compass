@@ -402,10 +402,33 @@
           }
         }
 
-        // MDCA upload status
+        // MDCA upload status — fire-and-forget; poll sessionStorage for result
         const mdcaTriggered = sessionStorage.getItem('mdca_upload_triggered') === 'true';
         if (mdcaTriggered) {
-          addLog('INFO', `Syncing "${sessionStorage.getItem('mdca_upload_file') || file.name}" to Microsoft Defender for Cloud Apps...`);
+          const mdcaFile = sessionStorage.getItem('mdca_upload_file') || file.name;
+          addLog('INFO', `Forwarding "${mdcaFile}" to Microsoft Defender for Cloud Apps...`);
+
+          // Wait up to 6 s for the async upload to complete before scanning finishes
+          const mdcaResult = await (async () => {
+            for (let i = 0; i < 12; i++) {
+              const raw = sessionStorage.getItem('mdca_upload_result');
+              if (raw) { try { return JSON.parse(raw); } catch { break; } }
+              await delay(500);
+            }
+            return null;
+          })();
+
+          if (mdcaResult) {
+            if (mdcaResult.blob_staged) {
+              addLog('OK', `Traffic log staged in MDCA Cloud Discovery (${mdcaResult.bytes ? (mdcaResult.bytes / 1024).toFixed(1) + ' KB' : mdcaFile}) — queued for processing`);
+            } else if (mdcaResult.success) {
+              addLog('OK', `Log synced to Microsoft Defender Cloud Discovery snapshot report`);
+            } else {
+              addLog('WARN', `MDCA sync: ${mdcaResult.reason || mdcaResult.stage || 'partial — log staged in blob storage'}`);
+            }
+          } else {
+            addLog('INFO', 'MDCA upload in progress — check Cloud Discovery for results');
+          }
         }
 
         if (parseErrors > 0) {
