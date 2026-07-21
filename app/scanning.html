@@ -356,6 +356,7 @@
 
         const formData = new FormData();
         formData.append('logfile', file);
+        formData.append('log_type', logType);
 
         const responsePromise = fetch(AZURE_FN_URL, { method: 'POST', body: formData });
 
