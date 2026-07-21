@@ -17,38 +17,51 @@ async function pushMdcaTag(appDomain, mdcaTag) {
 
   const hdrs = { Authorization: `Token ${token}`, 'Content-Type': 'application/json' };
 
-  // Search MDCA cloud-app catalog by domain
+  // List discovery streams — needed as discovery_stream_id in the tag call
+  const streamsResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/`, { headers: hdrs });
+  const streamsData  = streamsResp.ok ? await streamsResp.json() : {};
+  const streams = streamsData.data ?? (Array.isArray(streamsData) ? streamsData : []);
+  const streamId = streams[0]?._id ?? streams[0]?.id ?? null;
+  console.log('[mdca/tag] streams:', JSON.stringify(streams).slice(0, 300));
+
+  // Search app catalog by domain
   const searchResp = await fetch(
     `${MDCA_BASE}/cas/api/v1/discovery/app_catalog/?query=${encodeURIComponent(appDomain)}&limit=5`,
     { headers: hdrs }
   );
   if (!searchResp.ok) throw new Error(`catalog_${searchResp.status}`);
 
-  const body = await searchResp.json();
-  console.log('[mdca/tag] catalog response keys:', Object.keys(body), 'first app:', JSON.stringify((body.data ?? body.apps ?? (Array.isArray(body) ? body : []))[0]).slice(0, 300));
-  const apps = body.data ?? body.apps ?? (Array.isArray(body) ? body : []);
+  const catBody = await searchResp.json();
+  const apps = catBody.data ?? catBody.apps ?? (Array.isArray(catBody) ? catBody : []);
+  console.log('[mdca/tag] catalog first app:', JSON.stringify(apps[0]).slice(0, 300));
 
   if (!apps.length) return { pushed: false, reason: 'not_in_catalog' };
 
   const appId = apps[0].app_id ?? apps[0].id;
 
-  // Try endpoint variations — MDCA API docs are inconsistent across tenants
-  const attempts = [
-    { url: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, payload: { app_id: appId, tag: mdcaTag } },
-    { url: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags`,  payload: { app_id: appId, tag: mdcaTag } },
-    { url: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, payload: { app_id: appId, tags: [mdcaTag] } },
+  // MDCA uses numeric tag IDs: 1 = sanctioned, 2 = unsanctioned
+  const tagNumMap = { sanctioned: 1, unsanctioned: 2, monitored: 3 };
+  const tagNum = tagNumMap[mdcaTag] ?? 1;
+
+  // Try payloads in documented order
+  const payloads = [
+    { tag: tagNum, discovery_stream_id: streamId, apps: [{ id: appId }] },
+    { tag: tagNum, apps: [{ id: appId }] },
+    { tag: mdcaTag, apps: [{ id: appId }] },
+    { app_id: appId, tag: tagNum },
   ];
 
-  for (const attempt of attempts) {
-    const r = await fetch(attempt.url, {
-      method: 'POST', headers: hdrs, body: JSON.stringify(attempt.payload),
+  for (const payload of payloads) {
+    const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, {
+      method: 'POST', headers: hdrs, body: JSON.stringify(payload),
     });
     const txt = await r.text().catch(() => '');
-    console.log(`[mdca/tag] ${attempt.url} → ${r.status}: ${txt.slice(0, 300)}`);
+    const preview = txt.startsWith('<!') ? '[HTML — route missing]' : txt.slice(0, 250);
+    console.log(`[mdca/tag] payload=${JSON.stringify(payload)} → ${r.status}: ${preview}`);
     if (r.ok) return { pushed: true, app_id: appId };
   }
 
-  throw new Error(`tag_failed_see_logs`);
+  throw new Error('tag_failed_see_logs');
 }
 
 module.exports = async function handler(req, res) {
