@@ -70,56 +70,44 @@ async function pushMdcaTag(appDomain, appName, mdcaTag) {
   const tagNumMap = { sanctioned: 1, unsanctioned: 2, monitored: 3 };
   const tagNum = tagNumMap[mdcaTag] ?? 1;
 
-  // Step 1: GET current tags to find the target tag's _id and current appIds list
+  // GET current tags — built-in tags (Sanctioned/Unsanctioned/Monitored) have no _id;
+  // name is the identifier. We must merge our appId into the existing appIds list.
   const getResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, { headers: hdrs });
   if (!getResp.ok) throw new Error(`tag_api_${getResp.status}`);
   const tagsData = await getResp.json();
   const allTags  = tagsData.data ?? (Array.isArray(tagsData) ? tagsData : []);
-  console.log(`[mdca/tag] tags GET:`, allTags.map(t => `${t._id ?? t.id}:${t.name}(${(t.appIds??[]).length}apps)`).join(' | '));
 
-  const targetTag = allTags.find(t =>
-    (t.name ?? '').toLowerCase() === mdcaTag.toLowerCase() || t.tag === tagNum
-  );
+  const targetTag  = allTags.find(t => (t.name ?? '').toLowerCase() === mdcaTag.toLowerCase());
+  const currentIds = targetTag?.appIds ?? [];
+  const tagName    = targetTag?.name ?? (mdcaTag.charAt(0).toUpperCase() + mdcaTag.slice(1));
 
-  if (targetTag) {
-    const tagObjId    = targetTag._id ?? targetTag.id;
-    const currentIds  = targetTag.appIds ?? [];
-    const alreadySet  = currentIds.includes(appId);
-    console.log(`[mdca/tag] target tag _id=${tagObjId} currentAppIds=${currentIds.length} alreadyHasApp=${alreadySet}`);
+  console.log(`[mdca/tag] "${tagName}" currently has ${currentIds.length} apps, alreadyHasApp=${currentIds.includes(appId)}`);
 
-    if (!alreadySet) {
-      // Step 2a: PATCH the tag with updated appIds (add our app)
-      const newIds   = [...currentIds, appId];
-      const patchResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/${tagObjId}/`, {
-        method: 'PATCH', headers: hdrs,
-        body: JSON.stringify({ appIds: newIds }),
-      });
-      const patchTxt = await patchResp.text().catch(() => '');
-      console.log(`[mdca/tag] PATCH app_tags/${tagObjId} → ${patchResp.status}: ${patchTxt.startsWith('<!') ? '[HTML]' : patchTxt.slice(0, 150)}`);
+  if (currentIds.includes(appId)) return { pushed: true, app_id: appId };
 
-      if (patchResp.ok) return { pushed: true, app_id: appId };
+  const newIds = [...currentIds, appId];
 
-      // Step 2b: PATCH failed — try PUT with full replacement
-      const putResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/${tagObjId}/`, {
-        method: 'PUT', headers: hdrs,
-        body: JSON.stringify({ ...targetTag, appIds: newIds }),
-      });
-      const putTxt = await putResp.text().catch(() => '');
-      console.log(`[mdca/tag] PUT app_tags/${tagObjId} → ${putResp.status}: ${putTxt.startsWith('<!') ? '[HTML]' : putTxt.slice(0, 150)}`);
-      if (putResp.ok) return { pushed: true, app_id: appId };
-    } else {
-      return { pushed: true, app_id: appId }; // already tagged
-    }
+  // POST with { name, builtIn, appIds } — name is the key, appIds replaces the list
+  const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, {
+    method: 'POST', headers: hdrs,
+    body: JSON.stringify({ name: tagName, builtIn: true, appIds: newIds }),
+  });
+  const txt  = await r.text().catch(() => '');
+  const body = txt.startsWith('<!') ? '[HTML]' : txt.slice(0, 200);
+  console.log(`[mdca/tag] POST {name:"${tagName}", appIds:[...${newIds.length}]} → ${r.status}: ${body}`);
+
+  if (!r.ok) throw new Error(`tag_api_${r.status}`);
+
+  // Verify the update took effect
+  const verifyResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, { headers: hdrs });
+  if (verifyResp.ok) {
+    const vData  = await verifyResp.json();
+    const vTags  = vData.data ?? [];
+    const vTag   = vTags.find(t => (t.name ?? '').toLowerCase() === mdcaTag.toLowerCase());
+    const vIds   = vTag?.appIds ?? [];
+    console.log(`[mdca/tag] verify: "${tagName}" now has ${vIds.length} apps, appId ${appId} present=${vIds.includes(appId)}`);
   }
 
-  // Step 2c: No tag object found or PATCH/PUT failed — fall back to POST
-  const postResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, {
-    method: 'POST', headers: hdrs,
-    body: JSON.stringify({ app_id: appId, tags: [tagNum] }),
-  });
-  const postTxt = await postResp.text().catch(() => '');
-  console.log(`[mdca/tag] POST app_tags fallback → ${postResp.status}: ${postTxt.startsWith('<!') ? '[HTML]' : postTxt.slice(0, 150)}`);
-  if (!postResp.ok) throw new Error(`tag_api_${postResp.status}`);
   return { pushed: true, app_id: appId };
 }
 
