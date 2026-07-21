@@ -85,12 +85,12 @@ module.exports = async function handler(req, res) {
   const hdrs       = { Authorization: `Token ${token}`, 'Content-Type': 'application/json' };
 
   try {
-    // Step 1: Request upload URL from MDCA
-    const step1 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/upload_url/`, {
-      method:  'POST',
-      headers: hdrs,
-      body:    JSON.stringify({ filename: file_name, logType: logTypeId }),
-    });
+    // Step 1: Request upload URL from MDCA (GET with query params — POST returns 405)
+    const uploadUrlParams = new URLSearchParams({ filename: file_name, source: logTypeId });
+    const step1 = await fetch(
+      `${MDCA_BASE}/cas/api/v1/discovery/upload_url/?${uploadUrlParams}`,
+      { method: 'GET', headers: hdrs }
+    );
 
     const step1Text = await step1.text();
     console.log(`[mdca/upload] step1 ${step1.status}: ${step1Text.slice(0, 300)}`);
