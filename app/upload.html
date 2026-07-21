@@ -259,6 +259,12 @@
           <div class="no-files">No files added yet.</div>
         </div>
 
+        <!-- M365 sync badge -->
+        <div id="m365-banner" style="display:none; margin-top:16px; padding:12px 16px; border-radius:8px; background:rgba(51,205,182,0.05); border:1px solid rgba(51,205,182,0.2); font-size:12px; color:var(--muted); display:flex; align-items:center; gap:10px;">
+          <span id="m365-icon" style="font-size:16px;">&#9729;&#65039;</span>
+          <span id="m365-msg">Checking Microsoft 365 connection...</span>
+        </div>
+
         <div class="upload-actions">
           <div class="upload-count">
             <strong id="file-count">0</strong> file(s) ready
@@ -423,6 +429,36 @@
       document.getElementById('header-org-name').textContent = session.org_name;
     }
 
+    // ── M365 / MDCA connection status ──
+    let mdcaConnected = false;
+
+    async function checkM365Status() {
+      const banner  = document.getElementById('m365-banner');
+      const iconEl  = document.getElementById('m365-icon');
+      const msgEl   = document.getElementById('m365-msg');
+      banner.style.display = 'flex';
+      try {
+        const r = await fetch('/api/mdca/status');
+        if (r.ok) {
+          const { connected } = await r.json();
+          mdcaConnected = !!connected;
+          if (connected) {
+            iconEl.textContent  = '✅';
+            msgEl.textContent   = 'Microsoft 365 connected — logs will automatically sync to Defender for Cloud Apps';
+            msgEl.style.color   = 'var(--teal)';
+          } else {
+            iconEl.textContent  = '⚪';
+            msgEl.textContent   = 'Microsoft 365 not connected — only local AI domain analysis will run';
+          }
+        } else {
+          banner.style.display = 'none';
+        }
+      } catch {
+        banner.style.display = 'none';
+      }
+    }
+    checkM365Status();
+
     // ── Log type state ──
     let selectedLogType = 'dns';
 
@@ -560,26 +596,54 @@
 
       // Save metadata + log type to session
       session.upload = {
-        files:      uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
+        files:       uploadedFiles.map(f => ({ name: f.name, size: f.size, rows: f.rows })),
         uploaded_at: new Date().toISOString(),
-        log_types:  [selectedLogType],
-        log_type:   selectedLogType,
+        log_types:   [selectedLogType],
+        log_type:    selectedLogType,
       };
       sessionStorage.setItem('compass_session', JSON.stringify(session));
       sessionStorage.setItem('compass_log_type', selectedLogType);
 
-      // Read file as base64 for scanning.html
       const file = uploadedFiles[0].fileObj;
       const reader = new FileReader();
       reader.onload = (e) => {
+        const dataUrl = e.target.result;
+
+        // Store for scanning.html
         try {
-          sessionStorage.setItem('compass_file_data', e.target.result);
+          sessionStorage.setItem('compass_file_data', dataUrl);
           sessionStorage.setItem('compass_file_name', file.name);
           sessionStorage.setItem('compass_file_type', file.type || 'text/csv');
           sessionStorage.setItem('compass_has_files', 'true');
-        } catch (err) {
+        } catch {
           sessionStorage.setItem('compass_has_files', 'false');
         }
+
+        // If M365 connected, push log to MDCA Cloud Discovery async
+        if (mdcaConnected) {
+          sessionStorage.setItem('mdca_upload_triggered', 'true');
+          sessionStorage.setItem('mdca_upload_file', file.name);
+          fetch('/api/mdca/upload', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+              file_content: dataUrl,
+              file_name:    file.name,
+              log_type:     selectedLogType,
+            }),
+          })
+          .then(r => r.json())
+          .then(result => {
+            sessionStorage.setItem('mdca_upload_result', JSON.stringify(result));
+          })
+          .catch(err => {
+            sessionStorage.setItem('mdca_upload_result', JSON.stringify({ success: false, reason: err.message }));
+          });
+        } else {
+          sessionStorage.removeItem('mdca_upload_triggered');
+          sessionStorage.removeItem('mdca_upload_result');
+        }
+
         window.location.href = 'scanning.html';
       };
       reader.readAsDataURL(file);

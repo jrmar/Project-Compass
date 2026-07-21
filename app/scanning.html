@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
+  <script src="../log_analysis/log_parsers.js"></script>
   <style>
     body {
       display: flex;
@@ -351,54 +352,68 @@
       const fileNames = files.map(f => f.name);
 
       try {
-        addLog('INFO', `Uploading "${file.name}" to analysis engine...`);
+        addLog('INFO', `Loading "${file.name}" into local analysis engine...`);
         setProgress(35);
 
-        const formData = new FormData();
-        formData.append('logfile', file);
-        formData.append('log_type', logType);
+        // Read file as text for client-side parsing
+        const fileText = await file.text();
+        const totalLines = fileText.split('\n').filter(l => l.trim() && !l.startsWith('#')).length;
 
-        const responsePromise = fetch(AZURE_FN_URL, { method: 'POST', body: formData });
-
-        await delay(800);
-        addLog('INFO', 'Matching domains against live registry (1,199 entries)...');
+        await delay(500);
+        addLog('INFO', `Matching ${totalLines.toLocaleString()} ${logConfig.entryLabel} against AI domain registry (${(CompassParsers.RULESET || []).length} entries)...`);
         setProgress(48);
 
-        await delay(1000);
+        await delay(600);
         addLog('INFO', 'Scoring risk levels using NIST AI RMF framework...');
         setProgress(60);
 
-        await delay(800);
+        // Run the appropriate parser
+        const parseResult = CompassParsers.parse(logType, fileText);
+
+        await delay(600);
         addLog('INFO', `Correlating ${logType === 'proxy' ? 'users and HTTP methods' : logType === 'firewall' ? 'source IPs and actions' : 'source IPs'} to detected tools...`);
         setProgress(72);
 
-        const response = await responsePromise;
-        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        const { flagged, skipped, errors: parseErrors, summary } = parseResult;
 
-        const text = await response.text();
-        if (!text || text.startsWith('Error:')) throw new Error(text || 'Empty response from analysis engine');
+        if (flagged.length === 0 && skipped === 0) {
+          throw new Error('No parseable entries found in file — check file format matches selected log type');
+        }
 
+        await delay(500);
         setProgress(85);
         addLog('INFO', 'Building detection findings...');
 
-        const parsed    = parseAzureResponse(text);
-        const detection = buildDetectionPayload(parsed, fileNames, logType);
-
-        await delay(600);
-        setProgress(95);
-
-        if (parsed.risk.high > 0) {
-          addLog('WARN', `${parsed.risk.high} high-risk destination(s) flagged for immediate review`);
-        }
-
-        // Extra warning for proxy POST requests
-        if (logType === 'proxy' && text.includes('POST request')) {
-          const postMatch = text.match(/(\d+) POST request/);
-          if (postMatch) addLog('WARN', `${postMatch[1]} POST request(s) detected — potential data submission to AI services`);
-        }
+        const detection = CompassParsers.buildDetectionPayload(logType, parseResult, fileNames);
 
         await delay(400);
-        addLog('INFO', `Analysis complete — ${parsed.top_domains.length} AI tools detected across ${parsed.flagged} ${logConfig.entryLabel}`);
+        setProgress(95);
+
+        const riskCounts = summary.byRisk;
+        if (riskCounts.high > 0) {
+          addLog('WARN', `${riskCounts.high} high-risk destination(s) flagged for immediate review`);
+        }
+
+        // Proxy-specific warning for POST requests
+        if (logType === 'proxy') {
+          const postCount = flagged.filter(e => (e.method || '').toUpperCase() === 'POST').length;
+          if (postCount > 0) {
+            addLog('WARN', `${postCount} POST request(s) detected — potential data submission to AI services`);
+          }
+        }
+
+        // MDCA upload status
+        const mdcaTriggered = sessionStorage.getItem('mdca_upload_triggered') === 'true';
+        if (mdcaTriggered) {
+          addLog('INFO', `Syncing "${sessionStorage.getItem('mdca_upload_file') || file.name}" to Microsoft Defender for Cloud Apps...`);
+        }
+
+        if (parseErrors > 0) {
+          addLog('WARN', `${parseErrors} unparseable line(s) skipped`);
+        }
+
+        await delay(300);
+        addLog('INFO', `Analysis complete — ${Object.keys(summary.byDomain).length} AI tool(s) detected across ${flagged.length} ${logConfig.entryLabel}`);
         setProgress(100);
 
         session.detection = detection;
