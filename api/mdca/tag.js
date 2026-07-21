@@ -43,30 +43,36 @@ async function pushMdcaTag(appDomain, mdcaTag) {
   const tagNumMap = { sanctioned: 1, unsanctioned: 2, monitored: 3 };
   const tagNum = tagNumMap[mdcaTag] ?? 1;
 
-  // Try every known payload shape — full MDCA, O365 subset, legacy variants
-  const payloads = [
-    // Full MDCA (camelCase appId, most common in docs)
-    { appId, tag: tagNum },
-    { appId, add_tag: mdcaTag },
-    // Apps-array format
-    { tag: tagNum, apps: [{ id: appId }] },
-    { tag: tagNum, discovery_stream_id: streamId, apps: [{ id: appId }] },
-    // Legacy snake_case
-    { app_id: appId, tag: tagNum },
-    { app_id: appId, add_tag: mdcaTag },
+  // Try every known endpoint × payload combination
+  // 404 on set_app_tags means the endpoint path itself is wrong for this tenant —
+  // so we also probe the app_tags and app_catalog PATCH variants.
+  const attempts = [
+    // Most-likely correct: tags array (plural) on set_app_tags
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, method: 'POST', body: { app_id: appId, tags: [tagNum] } },
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, method: 'POST', body: { appId,    tags: [tagNum] } },
+    // Singular tag variants on set_app_tags
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, method: 'POST', body: { appId,    tag: tagNum } },
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, method: 'POST', body: { app_id: appId, tag: tagNum } },
+    // Alternative endpoint: app_tags (no "set_" prefix)
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/app_tags/`,     method: 'POST', body: { app_id: appId, tags: [tagNum] } },
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/app_tags/`,     method: 'POST', body: { appId,    tag: tagNum } },
+    // PATCH directly on the catalog item
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/app_catalog/${appId}/`, method: 'PATCH', body: { tags: [tagNum] } },
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/app_catalog/${appId}/`, method: 'PATCH', body: { tag: tagNum } },
+    // Apps-array format on set_app_tags (with and without streamId)
+    ...(streamId ? [{ ep: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, method: 'POST', body: { tag: tagNum, discovery_stream_id: streamId, apps: [{ id: appId }] } }] : []),
+    { ep: `${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, method: 'POST', body: { tag: tagNum, apps: [{ id: appId }] } },
   ];
 
   let lastStatus = 0;
   let lastBody   = '';
 
-  for (const payload of payloads) {
-    const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/set_app_tags/`, {
-      method: 'POST', headers: hdrs, body: JSON.stringify(payload),
-    });
+  for (const { ep, method, body } of attempts) {
+    const r = await fetch(ep, { method, headers: hdrs, body: JSON.stringify(body) });
     const txt = await r.text().catch(() => '');
     lastStatus = r.status;
     lastBody   = txt.startsWith('<!') ? '[HTML]' : txt.slice(0, 120);
-    console.log(`[mdca/tag] payload=${JSON.stringify(payload)} → ${r.status}: ${lastBody}`);
+    console.log(`[mdca/tag] ${method} ${ep.replace(MDCA_BASE,'')} ${JSON.stringify(body)} → ${r.status}: ${lastBody}`);
     if (r.ok) return { pushed: true, app_id: appId };
   }
 
