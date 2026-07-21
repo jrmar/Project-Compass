@@ -87,28 +87,43 @@ async function pushMdcaTag(appDomain, appName, mdcaTag) {
 
   const newIds = [...currentIds, appId];
 
-  // POST with { name, builtIn, appIds } — name is the key, appIds replaces the list
-  const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, {
+  // Attempt A: app_tags POST without builtIn (500 with builtIn:true — server rejects that field)
+  const attemptA = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, {
     method: 'POST', headers: hdrs,
-    body: JSON.stringify({ name: tagName, builtIn: true, appIds: newIds }),
+    body: JSON.stringify({ name: tagName, appIds: newIds }),
   });
-  const txt  = await r.text().catch(() => '');
-  const body = txt.startsWith('<!') ? '[HTML]' : txt.slice(0, 200);
-  console.log(`[mdca/tag] POST {name:"${tagName}", appIds:[...${newIds.length}]} → ${r.status}: ${body}`);
-
-  if (!r.ok) throw new Error(`tag_api_${r.status}`);
-
-  // Verify the update took effect
-  const verifyResp = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, { headers: hdrs });
-  if (verifyResp.ok) {
-    const vData  = await verifyResp.json();
-    const vTags  = vData.data ?? [];
-    const vTag   = vTags.find(t => (t.name ?? '').toLowerCase() === mdcaTag.toLowerCase());
-    const vIds   = vTag?.appIds ?? [];
-    console.log(`[mdca/tag] verify: "${tagName}" now has ${vIds.length} apps, appId ${appId} present=${vIds.includes(appId)}`);
+  const txtA = await attemptA.text().catch(() => '');
+  console.log(`[mdca/tag] A app_tags {name,appIds} → ${attemptA.status}: ${txtA.startsWith('<!') ? '[HTML]' : txtA.slice(0, 150)}`);
+  if (attemptA.ok) {
+    // Verify it actually changed
+    const vR = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_tags/`, { headers: hdrs });
+    if (vR.ok) {
+      const vD = await vR.json();
+      const vTag = (vD.data ?? []).find(t => (t.name ?? '').toLowerCase() === mdcaTag.toLowerCase());
+      const vIds = vTag?.appIds ?? [];
+      console.log(`[mdca/tag] A verify: "${tagName}" now has ${vIds.length} apps, present=${vIds.includes(appId)}`);
+      if (vIds.includes(appId)) return { pushed: true, app_id: appId };
+    }
   }
 
-  return { pushed: true, app_id: appId };
+  // Attempt B: discovered_apps/tags/ endpoint (community-documented write endpoint)
+  for (const payload of [
+    { appId, tag: tagName },
+    { appId, tags: [tagName] },
+    { appId, tag: tagNum },
+    { app_id: appId, tag: tagName },
+    { appIds: newIds, tag: tagName },
+  ]) {
+    const r = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/discovered_apps/tags/`, {
+      method: 'POST', headers: hdrs, body: JSON.stringify(payload),
+    });
+    const txt = await r.text().catch(() => '');
+    console.log(`[mdca/tag] B discovered_apps/tags ${JSON.stringify(payload)} → ${r.status}: ${txt.startsWith('<!') ? '[HTML]' : txt.slice(0, 100)}`);
+    if (r.ok) return { pushed: true, app_id: appId };
+  }
+
+  // Both failed — let caller handle as partial success (tag saved in Compass, not in MDCA)
+  throw new Error(`tag_api_exhausted`);
 }
 
 module.exports = async function handler(req, res) {
