@@ -11,44 +11,61 @@ async function readBody(req) {
 const MDCA_BASE = process.env.MDCA_API_URL
   || 'https://projectcompass722.us2.portal.cloudappsecurity.com';
 
+async function findMdcaAppId(hdrs, appDomain, appName) {
+  const nameLower   = (appName  || '').toLowerCase();
+  const domainLower = appDomain.toLowerCase().replace(/^www\./, '');
+
+  function scoreApps(apps) {
+    return apps.find(a => {
+      const aName = (a.name ?? a.appName ?? '').toLowerCase();
+      const aUrl  = (a.url  ?? a.domain  ?? a.appUrl ?? '').toLowerCase().replace(/^www\./, '');
+      const nameMatch   = nameLower   && aName && (aName.includes(nameLower)   || nameLower.includes(aName));
+      const domainMatch = domainLower && aUrl  && (aUrl.includes(domainLower)  || domainLower.includes(aUrl));
+      return nameMatch || domainMatch;
+    });
+  }
+
+  // Strategy 1: catalog with MDCA filter format (the ?query= param is ignored by this tenant)
+  const filtersParam = encodeURIComponent(JSON.stringify({ name: { contains: appName || appDomain } }));
+  const cat1 = await fetch(`${MDCA_BASE}/cas/api/v1/discovery/app_catalog/?filters=${filtersParam}&limit=10`, { headers: hdrs });
+  if (cat1.ok) {
+    const body = await cat1.json();
+    const apps = body.data ?? body.apps ?? (Array.isArray(body) ? body : []);
+    console.log(`[mdca/tag] catalog filter results (${apps.length}):`, apps.slice(0, 6).map(a => `${a.appId ?? a.id}:${a.name ?? a.appName}`).join(' | '));
+    const match = scoreApps(apps);
+    if (match) return match.appId ?? match.app_id ?? match.id;
+  }
+
+  // Strategy 2: POST to discovered_apps — ElevenLabs/Midjourney are already in the report
+  for (const ep of ['/cas/api/v1/discovery/discovered_apps/', '/cas/api/v1/discovery/app/']) {
+    const disc = await fetch(`${MDCA_BASE}${ep}`, {
+      method: 'POST', headers: hdrs,
+      body: JSON.stringify({ filters: {}, limit: 100 }),
+    });
+    const discTxt = await disc.text().catch(() => '');
+    if (disc.ok) {
+      const discBody = JSON.parse(discTxt);
+      const apps = discBody.data ?? discBody.apps ?? (Array.isArray(discBody) ? discBody : []);
+      console.log(`[mdca/tag] ${ep} (${apps.length}):`, apps.slice(0, 6).map(a => `${a.appId ?? a.id}:${a.name ?? a.appName}`).join(' | '));
+      const match = scoreApps(apps);
+      if (match) return match.appId ?? match.app_id ?? match.id;
+    } else {
+      console.log(`[mdca/tag] ${ep} → ${disc.status}: ${discTxt.slice(0, 80)}`);
+    }
+  }
+
+  return null;
+}
+
 async function pushMdcaTag(appDomain, appName, mdcaTag) {
   const token = process.env.MDCA_API_TOKEN;
   if (!token) throw new Error('no_token');
 
   const hdrs = { Authorization: `Token ${token}`, 'Content-Type': 'application/json' };
 
-  // Search by name (more reliable than domain — MDCA catalog search is text-based,
-  // domain queries return irrelevant first results like Microsoft 365).
-  const query = appName || appDomain;
-  const searchResp = await fetch(
-    `${MDCA_BASE}/cas/api/v1/discovery/app_catalog/?query=${encodeURIComponent(query)}&limit=15`,
-    { headers: hdrs }
-  );
-  if (!searchResp.ok) throw new Error(`catalog_${searchResp.status}`);
-
-  const catBody = await searchResp.json();
-  const apps = catBody.data ?? catBody.apps ?? (Array.isArray(catBody) ? catBody : []);
-
-  // Log first 8 results so we can see real catalog names
-  console.log(`[mdca/tag] catalog "${query}" top results:`, apps.slice(0, 8).map(a => `${a.appId ?? a.id}:${a.name ?? a.appName}`).join(' | '));
-
-  const nameLower   = (appName  || '').toLowerCase();
-  const domainLower = appDomain.toLowerCase().replace(/^www\./, '');
-
-  const bestApp = apps.find(a => {
-    const aName = (a.name ?? a.appName ?? '').toLowerCase();
-    const aUrl  = (a.url  ?? a.domain  ?? a.appUrl ?? '').toLowerCase().replace(/^www\./, '');
-    // Guard against empty strings — "anything".includes("") is always true
-    const nameMatch   = nameLower   && aName && (aName.includes(nameLower)   || nameLower.includes(aName));
-    const domainMatch = domainLower && aUrl  && (aUrl.includes(domainLower)  || domainLower.includes(aUrl));
-    return nameMatch || domainMatch;
-  });
-
-  console.log(`[mdca/tag] match: ${bestApp ? `appId=${bestApp.appId ?? bestApp.id} name="${bestApp.name ?? bestApp.appName}"` : 'none — not_in_catalog'}`);
-
-  if (!bestApp) return { pushed: false, reason: 'not_in_catalog' };
-
-  const appId = bestApp.appId ?? bestApp.app_id ?? bestApp.id;
+  const appId = await findMdcaAppId(hdrs, appDomain, appName);
+  console.log(`[mdca/tag] resolved appId=${appId} for "${appName || appDomain}"`);
+  if (!appId) return { pushed: false, reason: 'not_in_catalog' };
 
   // Confirmed working: POST /cas/api/v1/discovery/app_tags/ with { app_id, tags: [num] }
   // set_app_tags returns 404 on this tenant; app_tags returns 200 with tag state.
