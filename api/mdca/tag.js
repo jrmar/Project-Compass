@@ -37,7 +37,7 @@ async function pushMdcaTag(appDomain, mdcaTag) {
 
   if (!apps.length) return { pushed: false, reason: 'not_in_catalog' };
 
-  const appId = apps[0].app_id ?? apps[0].id;
+  const appId = apps[0].appId ?? apps[0].app_id ?? apps[0].id;
 
   // MDCA uses numeric tag IDs: 1 = sanctioned, 2 = unsanctioned
   const tagNumMap = { sanctioned: 1, unsanctioned: 2, monitored: 3 };
