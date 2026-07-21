@@ -347,12 +347,12 @@
 
       <!-- Tabs -->
       <div class="login-tabs">
-        <button class="login-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
-        <button class="login-tab" id="tab-create" onclick="switchTab('create')">Create Account</button>
+        <button class="login-tab active" id="tab-create" onclick="switchTab('create')">Create Account</button>
+        <button class="login-tab" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
       </div>
 
       <!-- ── Sign In Panel ── -->
-      <div id="panel-signin">
+      <div id="panel-signin" style="display:none;">
         <h1 class="login-card-title">Welcome back</h1>
         <p class="login-card-sub">Sign in to continue your AI governance work.</p>
 
@@ -382,7 +382,7 @@
       </div>
 
       <!-- ── Create Account Panel ── -->
-      <div id="panel-create" style="display:none;">
+      <div id="panel-create">
         <h1 class="login-card-title">Assessment Setup</h1>
         <p class="login-card-sub">Tell us about your organization before we begin.</p>
 
@@ -469,11 +469,11 @@
 
     // ── Tab switching ──
     function switchTab(tab) {
-      const isSignIn = tab === 'signin';
-      document.getElementById('tab-signin').classList.toggle('active', isSignIn);
-      document.getElementById('tab-create').classList.toggle('active', !isSignIn);
-      document.getElementById('panel-signin').style.display = isSignIn ? '' : 'none';
-      document.getElementById('panel-create').style.display = isSignIn ? 'none' : '';
+      const isCreate = tab === 'create';
+      document.getElementById('tab-create').classList.toggle('active', isCreate);
+      document.getElementById('tab-signin').classList.toggle('active', !isCreate);
+      document.getElementById('panel-create').style.display = isCreate ? '' : 'none';
+      document.getElementById('panel-signin').style.display = isCreate ? 'none' : '';
       document.getElementById('error-msg-signin').classList.add('hidden');
       document.getElementById('error-msg-create').classList.add('hidden');
     }
@@ -504,13 +504,15 @@
     // Pre-fill if returning from an interrupted MSAL redirect
     const pending = JSON.parse(sessionStorage.getItem('compass_pending') || 'null');
     if (pending) {
-      if (pending.flow === 'create') {
-        switchTab('create');
+      if (pending.flow === 'signin') {
+        switchTab('signin');
+        if (pending.org_name && !remembered)
+          document.getElementById('signin-org-name').value = pending.org_name;
+      } else {
+        // create (default) — panel is already visible
         if (pending.org_name)  document.getElementById('org-name').value  = pending.org_name;
         if (pending.user_name) document.getElementById('user-name').value = pending.user_name;
         if (pending.user_role) document.getElementById('user-role').value = pending.user_role;
-      } else if (pending.org_name && !remembered) {
-        document.getElementById('signin-org-name').value = pending.org_name;
       }
     }
 
