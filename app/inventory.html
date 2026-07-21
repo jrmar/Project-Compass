@@ -713,11 +713,17 @@
     }
 
     function disconnectMdca() {
-      document.cookie = 'mdca_tid=; Max-Age=0; Path=/';
-      mdcaConnected = false;
-      mdcaTenantId  = null;
-      renderMdcaBanner(false, null);
-      showToast('Microsoft 365 disconnected', 'info');
+      // HttpOnly cookies cannot be deleted by JavaScript — call the server to expire it
+      fetch('/api/mdca/disconnect', { method: 'POST' })
+        .then(() => {
+          mdcaConnected = false;
+          mdcaTenantId  = null;
+          renderMdcaBanner(false, null);
+          showToast('Microsoft 365 disconnected', 'info');
+        })
+        .catch(() => {
+          showToast('Disconnect failed — try refreshing', 'error');
+        });
     }
 
     // Activity log (persisted in localStorage)

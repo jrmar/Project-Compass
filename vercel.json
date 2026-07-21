@@ -16,7 +16,8 @@
     { "source": "/upload",        "destination": "/app/upload.html" },
     { "source": "/scanning",      "destination": "/app/scanning.html" },
     { "source": "/sample-report", "destination": "/app/sample-report.html" },
-    { "source": "/auth/mdca/connect",  "destination": "/api/mdca/connect" },
-    { "source": "/auth/mdca/callback", "destination": "/api/mdca/callback" }
+    { "source": "/auth/mdca/connect",     "destination": "/api/mdca/connect" },
+    { "source": "/auth/mdca/callback",    "destination": "/api/mdca/callback" },
+    { "source": "/api/mdca/disconnect",   "destination": "/api/mdca/disconnect" }
   ]
 }

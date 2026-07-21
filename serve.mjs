@@ -204,6 +204,12 @@ const server = createServer(async (req, res) => {
     return res.end(JSON.stringify({ connected: !!tid, tenant_id: tid }));
   }
 
+  // ── POST /api/mdca/disconnect ───────────────────────────────────────────────
+  if (req.method === 'POST' && url === '/api/mdca/disconnect') {
+    const { default: disconnectHandler } = await import('./api/mdca/disconnect.js');
+    return disconnectHandler(req, res);
+  }
+
   // ── POST /api/mdca/upload ───────────────────────────────────────────────────
   if (req.method === 'POST' && url === '/api/mdca/upload') {
     const { default: uploadHandler } = await import('./api/mdca/upload.js');
