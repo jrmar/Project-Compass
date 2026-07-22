@@ -599,7 +599,7 @@
 
     // ── Detection data ──
     const allTools = det.detected_tools || [];
-    const totalEvents = det.total_events || det.events_parsed || 0;
+    const totalEvents = det.total_events || det.events_parsed || (det.summary && det.summary.total_events) || 0;
     const riskTools = allTools.filter(t => ['high','medium'].includes((t.risk_level || t.risk || '').toLowerCase()));
 
     // ── Questionnaire data ──
