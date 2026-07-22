@@ -143,7 +143,7 @@
       <div class="section-label">Assessment Summary</div>
       <div class="stats-row">
         <div class="stat-cell">
-          <div class="stat-label">DNS Events</div>
+          <div class="stat-label" id="sec-events-label">Network Events</div>
           <div class="stat-val" id="s-events" style="color:var(--text);">—</div>
           <div class="stat-sub">queries parsed</div>
         </div>
@@ -201,10 +201,10 @@
 
       <!-- Block Rules -->
       <div class="page-break"></div>
-      <div class="section-label">DNS Block Rules</div>
+      <div class="section-label" id="sec-block-title">Block Rules</div>
       <p style="font-size:10px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
         Block rules generated for high-risk and medium-risk domains. Apply only after change-management approval.
-        Test in a lab environment before deploying to production DNS infrastructure.
+        <span id="sec-block-note">Test in a lab environment before deploying to production DNS infrastructure.</span>
       </p>
       <div id="block-rules"></div>
 
