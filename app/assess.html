@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -357,10 +357,32 @@
   <!-- ── Main ── -->
   <main class="page-content-wide">
     <h1 class="page-title">Governance Assessment</h1>
-    <p class="page-subtitle">
+    <p class="page-subtitle" id="assess-subtitle">
       13 questions mapped to the NIST AI Risk Management Framework 1.0.
       Answers confirm governance gaps across your detected AI environment.
     </p>
+
+    <!-- Detection summary banner -->
+    <div id="detect-summary-bar" style="display:none;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Log Scan Context</div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span id="dsb-icon" style="font-size:16px;">🌐</span>
+        <span id="dsb-label" style="font-size:12px;color:var(--light);font-weight:600;"></span>
+      </div>
+      <div style="width:1px;height:24px;background:var(--glass-border);"></div>
+      <div style="font-size:12px;color:var(--muted);">
+        <span id="dsb-tools" style="color:var(--blue);font-weight:700;"></span> tools detected
+      </div>
+      <div style="width:1px;height:24px;background:var(--glass-border);"></div>
+      <div style="font-size:12px;color:var(--muted);">
+        <span id="dsb-high" style="color:var(--danger);font-weight:700;"></span> high-risk
+      </div>
+      <div style="width:1px;height:24px;background:var(--glass-border);"></div>
+      <div style="font-size:12px;color:var(--muted);">
+        <span id="dsb-med" style="color:var(--orange);font-weight:700;"></span> medium-risk
+      </div>
+      <div style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic;">Use these results to inform your answers below</div>
+    </div>
 
     <div class="assess-grid">
 
@@ -403,9 +425,24 @@
     if (!session || !session.org_name) { window.location.href = 'login.html'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 
+    // ── Detection context from parser results ──
+    const det = (session && session.detection) || {};
+    const detTools = det.detected_tools || [];
+    const logType  = det._log_type || (session && session.upload && session.upload.log_type) || 'dns';
+    const isLive   = det._live === true;
+    const highTools   = detTools.filter(t => (t.risk_level||'').toLowerCase() === 'high');
+    const medTools    = detTools.filter(t => (t.risk_level||'').toLowerCase() === 'medium');
+    const hasResults  = detTools.length > 0;
+
+    const LOG_TYPE_LABELS = {
+      dns:      { label: 'DNS log',      icon: '🌐' },
+      firewall: { label: 'firewall log', icon: '🔥' },
+      proxy:    { label: 'proxy log',    icon: '🔁' },
+    };
+    const logConfig = LOG_TYPE_LABELS[logType] || LOG_TYPE_LABELS.dns;
+
     // ── Detect whether GenAI tools were found ──
     function hasGenAI() {
-      const det = session && session.detection;
       if (!det || !det.detected_tools) return true;
       return det.detected_tools.some(t => {
         const c = (t.category || '').toLowerCase();
@@ -413,6 +450,30 @@
       });
     }
     const SHOW_GENAI = hasGenAI();
+
+    // ── Build contextual evidence note for specific questions ──
+    function getEvidenceNote(qId) {
+      if (!hasResults) return null;
+      const topTools = detTools.slice(0, 5).map(t => t.tool_name || t.domain).join(', ');
+      const highNames = highTools.slice(0, 3).map(t => t.tool_name || t.domain).join(', ');
+
+      if (qId === 'M-01') {
+        return `Compass ${logConfig.icon} ${logConfig.label} scan detected <strong>${detTools.length} AI tool${detTools.length !== 1 ? 's' : ''}</strong> including: ${topTools}${detTools.length > 5 ? ` and ${detTools.length - 5} more` : ''}. This confirms AI tools are in use — answer whether a <em>formal inventory process</em> exists beyond automated scanning.`;
+      }
+      if (qId === 'M-03' && highTools.length > 0) {
+        return `<strong>${highTools.length} high-risk tool${highTools.length !== 1 ? 's' : ''}</strong> detected in this scan (${highNames}). Answer whether a formal risk assessment has been conducted for these tools.`;
+      }
+      if (qId === 'MS-01') {
+        return `This Compass ${logConfig.label} scan provides point-in-time visibility. Answer whether <em>continuous</em> monitoring exists through a SIEM, log aggregator, or scheduled scanning process.`;
+      }
+      if (qId === 'MS-03' && highTools.length > 0) {
+        return `High-risk tools detected include direct API endpoints (${highNames}) where sensitive data submission is possible. Answer whether technical controls exist to prevent this.`;
+      }
+      if (qId === 'MG-02' && highTools.length > 0) {
+        return `${highTools.length} tool${highTools.length !== 1 ? 's' : ''} flagged as high-risk in this scan. Answer whether a process exists to formally block or restrict these tools.`;
+      }
+      return null;
+    }
 
     // ── NIST question data ──
     const SECTIONS = [
@@ -636,6 +697,10 @@
           </div>
           <div class="q-text">${q.text}</div>
           ${q.note ? `<div class="q-note">${q.note}</div>` : ''}
+          ${getEvidenceNote(q.q_id) ? `<div class="q-note" style="border-left-color:var(--teal);background:rgba(51,205,182,0.05);">
+            <span style="font-family:'Montserrat',sans-serif;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:3px;">📊 Compass Detection Evidence</span>
+            ${getEvidenceNote(q.q_id)}
+          </div>` : ''}
           <div class="q-controls-hint">Controls: ${q.controls.join(', ')}</div>
           <div class="answer-group">
             <button class="answer-btn ab-yes ${ans==='yes'?'ab-sel':''}"
@@ -711,6 +776,24 @@
 
     // ── Init ──
     renderSection();
+
+    // ── Populate detection summary bar ──
+    if (hasResults) {
+      document.getElementById('detect-summary-bar').style.display = 'flex';
+      document.getElementById('dsb-icon').textContent  = logConfig.icon;
+      document.getElementById('dsb-label').textContent = logConfig.label.charAt(0).toUpperCase() + logConfig.label.slice(1) + ' analysis';
+      document.getElementById('dsb-tools').textContent = detTools.length;
+      document.getElementById('dsb-high').textContent  = highTools.length;
+      document.getElementById('dsb-med').textContent   = medTools.length;
+    }
+
+    // ── Update subtitle with log type ──
+    if (hasResults) {
+      document.getElementById('assess-subtitle').innerHTML =
+        `13 questions mapped to the NIST AI Risk Management Framework 1.0. ` +
+        `Answers confirm governance gaps across <strong style="color:var(--light);">${detTools.length} AI tool${detTools.length !== 1 ? 's' : ''}</strong> ` +
+        `detected in your ${logConfig.icon} ${logConfig.label} scan.`;
+    }
   </script>
 </body>
 </html>
