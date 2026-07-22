@@ -184,6 +184,17 @@
         `Analyzing logs for ${session.org_name}...`;
     }
 
+    // ---- Log type detection (defined early so all functions can use it) ----
+    const logType = sessionStorage.getItem('compass_log_type')
+                 || (session && session.upload && session.upload.log_type)
+                 || 'dns';
+    const LOG_ENTRY_LABELS = {
+      dns:      'DNS log entries',
+      firewall: 'firewall entries',
+      proxy:    'proxy requests',
+    };
+    const entryLabel = LOG_ENTRY_LABELS[logType] || 'log entries';
+
     // ---- UI helpers ----
     const logEl   = document.getElementById('stage-log');
     const fillEl  = document.getElementById('progress-fill');
@@ -276,6 +287,14 @@
       const lowCount  = parsed.risk.low;
       const src = sourceType || logType || 'dns';
 
+      // Build events_by_source based on actual log type
+      const eventsBySource = { dns: 0, proxy: 0, firewall: 0 };
+      if (eventsBySource.hasOwnProperty(src)) {
+        eventsBySource[src] = parsed.flagged;
+      } else {
+        eventsBySource.dns = parsed.flagged;
+      }
+
       // Build detected_tools from top domains
       const detected_tools = parsed.top_domains.map(d => ({
         domain: d.domain,
@@ -291,10 +310,6 @@
         sources: [src],
         actions: d.risk_level === 'high' ? ['review_required', 'blocked'] : ['resolved']
       }));
-
-      // Build events_by_source based on log type
-      const eventsBySource = { dns: 0, proxy: 0, firewall: 0 };
-      eventsBySource[src] = parsed.flagged;
 
       return {
         assessment_id:   `assessment-${new Date().toISOString().slice(0,10)}-live`,
@@ -396,7 +411,7 @@
       setProgress(8);
 
       await delay(500);
-      addLog('INFO', `Reading DNS log entries — ${getRowCount()} rows across ${getFileCount()} file(s)`);
+      addLog('INFO', `Reading ${entryLabel} — ${getRowCount()} rows across ${getFileCount()} file(s)`);
       setProgress(18);
 
       await delay(700);
@@ -424,6 +439,7 @@
 
         const formData = new FormData();
         formData.append('logfile', file);
+        formData.append('log_type', logType);
 
         // Fire the real API call
         const responsePromise = fetch(AZURE_FN_URL, { method: 'POST', body: formData });
@@ -478,9 +494,10 @@
         session.detection = detection;
         sessionStorage.setItem('compass_session', JSON.stringify(session));
 
-        // Clear the file signal
+        // Clear the file signal and log type
         sessionStorage.removeItem('compass_has_files');
         sessionStorage.removeItem('compass_file_count');
+        sessionStorage.removeItem('compass_log_type');
 
         await delay(700);
         addLog('OK', 'Redirecting to detection results...');
