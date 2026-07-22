@@ -176,7 +176,7 @@
 
   <!-- ── Header ── -->
   <header class="app-header">
-    <a class="app-header-logo" href="login.html">
+    <a class="app-header-logo" href="/login">
       <img src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
       <span class="app-header-logo-text">Project Compass</span>
     </a>
@@ -185,7 +185,7 @@
         <span class="org-badge-dot"></span>
         <span id="header-org-name">Organization</span>
       </div>
-      <button class="btn-logout" onclick="localStorage.clear(); window.location.href='login.html';">Sign Out</button>
+      <button class="btn-logout" onclick="localStorage.clear(); window.location.href='/login';">Sign Out</button>
     </div>
   </header>
 
@@ -271,7 +271,7 @@
     <!-- Navigation -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--glass-border);">
       <button class="btn btn-ghost" onclick="history.back()">&#8592; Back to Dashboard</button>
-      <button class="btn btn-teal" onclick="window.location.href='upload.html'">Start New Assessment &#8635;</button>
+      <button class="btn btn-teal" onclick="window.location.href='/upload'">Start New Assessment &#8635;</button>
     </div>
 
     <div style="height:40px;"></div>
@@ -280,7 +280,7 @@
   <script>
     // ── Session guard ──
     const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
-    if (!session || !session.org_name) { window.location.href = 'login.html'; }
+    if (!session || !session.org_name) { window.location.href = '/login'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 
     const det     = (session && session.detection) || {};
@@ -327,7 +327,7 @@
 
     // ── Open report ──
     function openReport(type) {
-      window.open(`report-${type}.html`, '_blank');
+      window.open(`/app/report-${type}.html`, '_blank');
     }
 
     // ── Report cards ──
