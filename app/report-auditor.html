@@ -144,13 +144,13 @@
       <!-- Assessment Metadata -->
       <div class="section-label">Assessment Metadata</div>
       <table class="meta-table">
-        <tr><td>Assessment Type</td><td>DNS Log Analysis + Governance Questionnaire (Self-Assessment)</td></tr>
-        <tr><td>Methodology</td><td>Automated DNS log scan against AI domain registry + 13-question NIST AI RMF–mapped governance questionnaire</td></tr>
+        <tr><td>Assessment Type</td><td id="aud-assess-type">DNS Log Analysis + Governance Questionnaire (Self-Assessment)</td></tr>
+        <tr><td>Methodology</td><td id="aud-methodology">Automated DNS log scan against AI domain registry + 13-question NIST AI RMF–mapped governance questionnaire</td></tr>
         <tr><td>Scope</td><td>Organization-wide DNS traffic; AI tool governance posture across all NIST AI RMF functions (Govern, Map, Measure, Manage)</td></tr>
         <tr><td>Controls Assessed</td><td>19 NIST AI RMF controls across 4 functions</td></tr>
         <tr><td>Assessor</td><td>Project Compass (automated assessment tool)</td></tr>
-        <tr><td>Assessment Basis</td><td>Self-reported answers to governance questionnaire; DNS log evidence from submitted log file</td></tr>
-        <tr><td>Limitations</td><td>This assessment is based on DNS log data and self-reported responses. It does not constitute a formal third-party audit. Findings should be validated through independent controls testing prior to formal compliance submissions.</td></tr>
+        <tr><td>Assessment Basis</td><td id="aud-basis">Self-reported answers to governance questionnaire; DNS log evidence from submitted log file</td></tr>
+        <tr><td>Limitations</td><td id="aud-limitations">This assessment is based on DNS log data and self-reported responses. It does not constitute a formal third-party audit. Findings should be validated through independent controls testing prior to formal compliance submissions.</td></tr>
       </table>
 
       <!-- Summary Statistics -->
@@ -159,7 +159,7 @@
         <div class="stat-box">
           <div class="stat-box-label">AI Tools Detected</div>
           <div class="stat-box-val" id="ss-tools" style="color:var(--blue);">—</div>
-          <div class="stat-box-sub" id="ss-tools-sub">DNS log evidence</div>
+          <div class="stat-box-sub" id="ss-tools-sub">Network log evidence</div>
         </div>
         <div class="stat-box">
           <div class="stat-box-label">Governance Risk Score</div>
@@ -224,9 +224,9 @@
         </thead>
         <tbody>
           <tr>
-            <td>DNS Query Log Analysis</td>
-            <td>Organization-submitted DNS log file</td>
-            <td>DNS-layer AI tool access; domain, IP, query volume</td>
+            <td id="aud-ev-type">DNS Query Log Analysis</td>
+            <td id="aud-ev-source">Organization-submitted DNS log file</td>
+            <td id="aud-ev-coverage">DNS-layer AI tool access; domain, IP, query volume</td>
             <td>Point-in-time snapshot; does not capture content or user intent</td>
           </tr>
           <tr>
@@ -481,7 +481,7 @@
     // Certification
     document.getElementById('cert-text').textContent =
       `This AI Governance Risk Assessment for ${orgName} was generated on ${assessDate} by Project Compass, ` +
-      `an automated governance assessment tool. The assessment is based on DNS query log analysis and self-reported ` +
+      `an automated governance assessment tool. The assessment is based on ' + _logConfig.label.toLowerCase() + ' analysis and self-reported ` +
       `governance questionnaire responses mapped to the NIST AI Risk Management Framework 1.0 (January 2023) and ` +
       `the NIST-AI-600-1 GenAI Profile (July 2024). A total of ${ALL_CONTROLS.length} controls were assessed; ` +
       `${flagged.length} were found to be unmet or partially met. The Governance Risk Score of ${riskScore}/100 ` +
