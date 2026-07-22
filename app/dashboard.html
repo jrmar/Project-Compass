@@ -457,7 +457,7 @@
       <div class="kpi-tile">
         <div class="kpi-label">Total Events</div>
         <div class="kpi-value" id="kpi-events" style="color:var(--light);">—</div>
-        <div class="kpi-sub" id="kpi-events-sub">DNS queries parsed</div>
+        <div class="kpi-sub" id="kpi-events-sub">log entries parsed</div>
       </div>
       <div class="kpi-tile">
         <div class="kpi-label">Tools Detected</div>
@@ -515,7 +515,7 @@
 
       <!-- Top tools by query volume -->
       <div class="glass-card chart-panel">
-        <div class="chart-panel-title">Top AI Tools by Activity</div>
+        <div class="chart-panel-title" id="chart-top-title">Top AI Tools by Activity</div>
         <div id="chart-top-tools">
           <div class="chart-empty">No detection data</div>
         </div>
@@ -540,7 +540,7 @@
           <div class="panel-title">Tools Requiring Attention</div>
           <span class="panel-count" id="tools-count">— tools</span>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;" id="tool-panel-desc">
           Medium and high risk tools from log scan. Expand each to generate block rules.
         </div>
         <div id="tool-list">
@@ -626,11 +626,9 @@
     document.getElementById('log-type-label').textContent = logConfig.label.toLowerCase();
     document.getElementById('log-type-badge').textContent = logConfig.icon + ' ' + logConfig.label;
     document.getElementById('kpi-events-sub').textContent = logConfig.eventLabel + ' parsed';
-
-    // Also update the tool block rule description
-    const toolBlockDesc = document.querySelector('.glass-card .panel-header + div');
-    if (toolBlockDesc) {
-      toolBlockDesc.textContent = `Medium and high risk tools from ${logConfig.label.toLowerCase()} scan. Expand each to generate block rules.`;
+    const toolPanelDesc = document.getElementById('tool-panel-desc');
+    if (toolPanelDesc) {
+      toolPanelDesc.textContent = `Medium and high risk tools from ${logConfig.label.toLowerCase()} scan. Expand each to generate block rules.`;
     }
 
     // ── Render KPIs ──
@@ -666,13 +664,28 @@
       matBar.setAttribute('width', gapScore > 0 ? maturity : 0);
     }
 
-    // ── Block rule generator ──
-    const RULE_FORMATS = {
-      pihole:   { label:'Pi-hole', gen: d => `||${d}^` },
+    // ── Block rule generator — adapts to log type ──
+    const RULE_FORMATS_DNS = {
+      pihole:   { label:'Pi-hole',          gen: d => `||${d}^` },
       winsink:  { label:'Windows Sinkhole', gen: d => `0.0.0.0 ${d}` },
-      umbrella: { label:'Cisco Umbrella', gen: d => d },
-      sentinel: { label:'Sentinel KQL', gen: d => `// Sentinel KQL — Monitor ${d}\nDnsEvents\n| where QueryName has "${d}"\n| project TimeGenerated, Computer, ClientIP, QueryName, ResultCode\n| order by TimeGenerated desc` }
+      umbrella: { label:'Cisco Umbrella',   gen: d => d },
+      sentinel: { label:'Sentinel KQL',     gen: d => `// Sentinel KQL — Monitor ${d}\nDnsEvents\n| where QueryName has "${d}"\n| project TimeGenerated, Computer, ClientIP, QueryName, ResultCode\n| order by TimeGenerated desc` }
     };
+    const RULE_FORMATS_FIREWALL = {
+      paloalto: { label:'Palo Alto',   gen: d => `set rulebase security rules block-ai-${d.replace(/\./g,'-')} destination ${d} action deny` },
+      cisco:    { label:'Cisco ASA',   gen: d => `access-list BLOCK-AI extended deny ip any host ${d}\naccess-list BLOCK-AI extended deny ip any ${d} 255.255.255.0` },
+      fortinet: { label:'Fortinet',    gen: d => `config firewall address\n  edit "block-${d}"\n    set type fqdn\n    set fqdn "${d}"\n  next\nend` },
+      sentinel: { label:'Sentinel KQL', gen: d => `// Sentinel KQL — Monitor ${d}\nAzureFirewallNetworkRule\n| where Fqdn has "${d}"\n| project TimeGenerated, SourceIP, Fqdn, Action\n| order by TimeGenerated desc` }
+    };
+    const RULE_FORMATS_PROXY = {
+      squid:    { label:'Squid',       gen: d => `.${d}` },
+      zscaler:  { label:'Zscaler',     gen: d => `URL Category Block List:\n${d}` },
+      bluecoat: { label:'Blue Coat',   gen: d => `define condition block-${d.replace(/\./g,'-')}\n  url.host=${d}\nend condition` },
+      sentinel: { label:'Sentinel KQL', gen: d => `// Sentinel KQL — Monitor ${d}\nW3CIISLog\n| where csHost has "${d}"\n| project TimeGenerated, cIP, csUsername, csHost, csUriStem, scStatus\n| order by TimeGenerated desc` }
+    };
+    const RULE_FORMATS = logType === 'firewall' ? RULE_FORMATS_FIREWALL
+                       : logType === 'proxy'    ? RULE_FORMATS_PROXY
+                       : RULE_FORMATS_DNS;
 
     function getRuleContent(domain, formatKey) {
       const f = RULE_FORMATS[formatKey];
@@ -736,7 +749,7 @@
             ${badge}
             <span class="tool-name">${escHtml(name)}</span>
             <span class="tool-domain">${escHtml(domain)}</span>
-            ${queries > 0 ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);">${queries.toLocaleString()}q</span>` : ''}
+            ${queries > 0 ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);">${queries.toLocaleString()} ${logType === 'proxy' ? 'req' : logType === 'firewall' ? 'conn' : 'q'}</span>` : ''}
             <span class="tool-chevron" id="chev-${i}">&#9658;</span>
           </div>
           <div class="tool-accordion" id="acc-${i}">
@@ -753,7 +766,7 @@
             </div>
             <div class="rule-note">
               Block rules are generated for informational purposes. Apply only after change-management review.
-              Sentinel KQL requires your workspace log tables to include DnsEvents.
+              ${ logType === 'firewall' ? 'Sentinel KQL requires AzureFirewallNetworkRule or equivalent table.' : logType === 'proxy' ? 'Sentinel KQL requires W3CIISLog or ProxyLogs table in your workspace.' : 'Sentinel KQL requires your workspace log tables to include DnsEvents.' }
             </div>
           </div>
         </div>`;
@@ -899,7 +912,7 @@ Assessment Date: ${assessDate}
 Framework: NIST AI Risk Management Framework 1.0 + NIST-AI-600-1 GenAI Profile
 
 DETECTION SUMMARY
-Total DNS Events Parsed: ${totalEvents > 0 ? totalEvents.toLocaleString() : 'N/A'}
+Total ${logConfig.eventLabel} Parsed: ${totalEvents > 0 ? totalEvents.toLocaleString() : 'N/A'}
 Total AI Tools Detected: ${allTools.length}
   High Risk:   ${highTools.length} tools
   Medium Risk: ${medTools.length} tools
@@ -961,8 +974,8 @@ Assessment Date: ${assessDate}
 ASSESSMENT METADATA
 Framework:        NIST AI Risk Management Framework 1.0 (January 2023)
 GenAI Profile:    NIST-AI-600-1 (July 2024)
-Assessment Type:  DNS Log Analysis + Governance Questionnaire
-Methodology:      Automated log scan + 13-question NIST-mapped questionnaire
+Assessment Type:  ${logConfig.label} Analysis + Governance Questionnaire
+Methodology:      Automated ${logConfig.label.toLowerCase()} scan + 13-question NIST-mapped questionnaire
 Scope:            Organization-wide DNS traffic; AI tool governance posture
 Assessor:         Project Compass (automated)
 
@@ -1018,7 +1031,7 @@ ${assessDate}`;
           color: 'var(--teal)',
           title: 'Security Team Findings',
           desc: 'Full tool table, NIST gap bar chart, flagged controls, and Azure/AWS/GCP remediation steps.',
-          preview: `${flaggedCtrls.length} NIST controls flagged · ${allTools.filter(t=>(t.risk_level||t.risk||'').toLowerCase()==='high').length} high-risk tools · DNS block rules included`
+          preview: `${flaggedCtrls.length} NIST controls flagged · ${allTools.filter(t=>(t.risk_level||t.risk||'').toLowerCase()==='high').length} high-risk tools · ${logConfig.label} block rules included`
         },
         {
           type: 'auditor',
@@ -1156,6 +1169,13 @@ ${assessDate}`;
     }
 
     function renderCharts() {
+      // ── Update chart title based on log type ──
+      const chartTopTitle = document.getElementById('chart-top-title');
+      if (chartTopTitle) {
+        chartTopTitle.textContent = logType === 'proxy' ? 'Top AI Tools by Requests'
+                                  : logType === 'firewall' ? 'Top AI Tools by Connections'
+                                  : 'Top AI Tools by Query Volume';
+      }
       // ── Risk donut ──
       const counts = {
         critical: allTools.filter(t => (t.risk_level||t.riskLevel||t.risk||'').toLowerCase() === 'critical').length,
