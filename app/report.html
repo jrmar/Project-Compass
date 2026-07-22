@@ -217,7 +217,7 @@
       <div class="kpi-tile">
         <div class="kpi-label">Tools Detected</div>
         <div class="kpi-value" id="kpi-tools" style="color:var(--blue);">—</div>
-        <div class="kpi-sub" id="kpi-tools-sub">from DNS log analysis</div>
+        <div class="kpi-sub" id="kpi-tools-sub">${logConfig.icon} ${logConfig.label} analysis</div>
       </div>
       <div class="kpi-tile">
         <div class="kpi-label">High Risk Tools</div>
@@ -293,13 +293,22 @@
     const isLive    = det._live === true;
     const registrySize = det._registry_size || 0;
 
+    // ── Log type context ──
+    const logType = det._log_type || (session && session.upload && session.upload.log_type) || 'dns';
+    const LOG_LABELS = {
+      dns:      { label: 'DNS Log',      icon: '🌐', eventLabel: 'DNS queries',      secDesc: 'DNS block rules: Pi-hole, Windows sinkhole, Sentinel KQL', audDesc: 'DNS log evidence summary and tool inventory' },
+      firewall: { label: 'Firewall Log', icon: '🔥', eventLabel: 'firewall entries', secDesc: 'Firewall block rules and network-layer remediation steps',   audDesc: 'Firewall log evidence summary and tool inventory' },
+      proxy:    { label: 'Proxy Log',    icon: '🔁', eventLabel: 'proxy requests',   secDesc: 'Proxy block rules: URL filtering, SSL inspection, Zscaler', audDesc: 'Proxy log evidence summary and tool inventory'    },
+    };
+    const logConfig = LOG_LABELS[logType] || LOG_LABELS.dns;
+
     function escHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     // ── KPIs ──
     document.getElementById('kpi-tools').textContent = allTools.length || '—';
-    document.getElementById('kpi-tools-sub').textContent = `${highCount} high · ${medCount} medium · ${allTools.length - highCount - medCount} low`;
+    document.getElementById('kpi-tools-sub').textContent = `${logConfig.icon} ${logConfig.label} · ${highCount} high · ${medCount} medium`;
     document.getElementById('kpi-high').textContent = highCount || '0';
     document.getElementById('kpi-date').textContent = assessDate;
     document.getElementById('kpi-org').textContent = orgName;
@@ -338,7 +347,7 @@
         ],
         preview: allTools.length > 0
           ? `${allTools.length} tools · ${highCount} high-risk · Posture: ${postureLabel()}`
-          : 'Upload a DNS log to populate'
+          : `Upload a ${logConfig.label.toLowerCase()} to populate`
       },
       {
         type: 'security',
@@ -346,16 +355,16 @@
         color: 'var(--teal)',
         icon: '🔍',
         title: 'Security Team Findings',
-        desc: 'Full technical report with complete tool inventory, DNS block rules, and platform-specific remediation playbooks.',
+        desc: `Full technical report with complete tool inventory, ${logConfig.secDesc.toLowerCase()}, and platform-specific remediation playbooks.`,
         includes: [
           'Full AI tool inventory with domains, categories, risk levels',
           'Risk distribution bar chart',
-          'DNS block rules: Pi-hole, Windows sinkhole, Sentinel KQL',
+          logConfig.secDesc,
           'Technical remediation steps for Azure, AWS, and GCP',
         ],
         preview: allTools.length > 0
           ? `${allTools.length} tools · ${highCount + medCount} block rules generated`
-          : 'Upload a DNS log to populate'
+          : `Upload a ${logConfig.label.toLowerCase()} to populate`
       },
       {
         type: 'auditor',
@@ -366,14 +375,14 @@
         desc: 'Formal compliance documentation with evidence chain, NIST control reference, and certification statement.',
         includes: [
           'Assessment metadata and methodology',
-          'DNS log evidence summary and tool inventory',
+          logConfig.audDesc,
           'Evidence source documentation',
           'NIST AI RMF 1.0 control reference table',
           'Automated assessment certification statement',
         ],
         preview: allTools.length > 0
           ? `${allTools.length} tools detected · NIST AI RMF 1.0 · ${assessDate}`
-          : 'Upload a DNS log to populate'
+          : `Upload a ${logConfig.label.toLowerCase()} to populate`
       }
     ];
 
