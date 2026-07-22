@@ -185,7 +185,7 @@
         <span class="org-badge-dot"></span>
         <span id="header-org-name">Organization</span>
       </div>
-      <button class="btn-logout" onclick="localStorage.clear(); window.location.href='/login';">Sign Out</button>
+      <button class="btn-logout" onclick="sessionStorage.clear(); window.location.href='/login';">Sign Out</button>
     </div>
   </header>
 
@@ -279,7 +279,7 @@
 
   <script>
     // ── Session guard ──
-    const session = JSON.parse(localStorage.getItem('compass_session') || 'null');
+    const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
     if (!session || !session.org_name) { window.location.href = '/login'; }
     if (session) document.getElementById('header-org-name').textContent = session.org_name;
 
