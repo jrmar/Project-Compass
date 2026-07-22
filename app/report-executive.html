@@ -419,7 +419,7 @@
             <th>Domain</th>
             <th>Category</th>
             <th>Risk Level</th>
-            <th style="text-align:right;">DNS Queries</th>
+            <th style="text-align:right;" id="exec-col-events">Events</th>
           </tr>
         </thead>
         <tbody id="tools-tbody"></tbody>
@@ -451,6 +451,16 @@
   <script>
     // ── Load session data ──
     const session = JSON.parse(localStorage.getItem('compass_session') || '{}');
+
+    // ── Log type bridge ──
+    const _det_raw = session.detection || {};
+    const _logType = _det_raw._log_type || (session.upload && session.upload.log_type) || 'dns';
+    const _LOG_LABELS = {
+      dns:      { label: 'DNS Log',      icon: '🌐', eventLabel: 'DNS Queries',        sourceLabel: 'DNS log',      narrativeLabel: 'DNS log analysis' },
+      firewall: { label: 'Firewall Log', icon: '🔥', eventLabel: 'Firewall Entries',   sourceLabel: 'firewall log', narrativeLabel: 'firewall log analysis' },
+      proxy:    { label: 'Proxy Log',    icon: '🔁', eventLabel: 'Proxy Requests',     sourceLabel: 'proxy log',    narrativeLabel: 'proxy log analysis' },
+    };
+    const _logConfig = _LOG_LABELS[_logType] || _LOG_LABELS.dns;
 
     // ── Bridge: normalize live parser data into expected format ──
     if (session.detection && session.detection._live) {
@@ -522,7 +532,7 @@
 
     // ── Executive summary text ──
     const summaryText = `${orgName}'s AI governance assessment identified <strong>${allTools.length} AI tools</strong>
-    actively used within the organization based on DNS log analysis, including
+    actively used within the organization based on ' + _logConfig.narrativeLabel + ', including
     <strong>${highTools.length} high-risk</strong> and <strong>${medTools.length} medium-risk</strong> tools.
     The organization's <strong>Governance Risk Score is ${riskScore}/100</strong> (${riskScore >= 50 ? 'indicating significant governance gaps that require immediate attention' : riskScore >= 25 ? 'indicating moderate governance gaps that should be addressed in the near term' : 'indicating a relatively well-governed AI posture'}).
     A total of <strong>${flagged.length} NIST AI RMF controls</strong> were flagged as unmet or partially met across the
