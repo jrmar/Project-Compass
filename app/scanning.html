@@ -266,7 +266,7 @@
         if (line.startsWith('unknown')) result.risk.unknown = parseInt(line.split(/\s+/)[1]) || 0;
 
         // Top domains lines: "  domain.com   Category   high   42 queries"
-        const domainMatch = line.match(/^(\S+)\s+(.+?)\s+(high|medium|low|unknown)\s+(\d+)\s+quer/i);
+        const domainMatch = line.match(/^(\S+)\s+(.+?)\s+(high|medium|low|unknown)\s+(\d+)\s+(quer|requ|entr|conn)/i);
         if (domainMatch) {
           result.top_domains.push({
             domain: domainMatch[1],
@@ -317,8 +317,10 @@
         _live:           true,
         _registry_size:  parsed.registry_size,
         _log_type:       src,
+        total_events:    parsed.total_parsed,
+        events_parsed:   parsed.total_parsed,
         summary: {
-          total_events:             parsed.flagged,
+          total_events:             parsed.total_parsed,
           unique_tools_or_domains:  parsed.top_domains.length,
           events_by_source:         eventsBySource,
           events_by_risk_level:     { high: highCount, medium: medCount, low: lowCount, unknown: parsed.risk.unknown },
