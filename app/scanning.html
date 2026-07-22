@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="app.css">
-  <script src="../log_analysis/log_parsers.js"></script>
   <style>
     body {
       display: flex;
@@ -17,78 +16,138 @@
       justify-content: center;
       min-height: 100vh;
       padding: 32px;
-      background-image: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(64,130,232,0.07) 0%, transparent 65%);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(64,130,232,0.07) 0%, transparent 65%);
     }
-    .scan-container { text-align: center; max-width: 480px; width: 100%; }
-    .scan-logo { height: 44px; width: auto; border-radius: 8px; margin-bottom: 40px; opacity: 0.85; }
-    .radar-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto 36px; }
+
+    .scan-container {
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .scan-logo {
+      height: 44px;
+      width: auto;
+      border-radius: 8px;
+      margin-bottom: 40px;
+      opacity: 0.85;
+    }
+
+    .radar-wrap {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 36px;
+    }
+
     .radar-ring {
-      position: absolute; inset: 0; border-radius: 50%;
-      border: 2px solid var(--teal); opacity: 0;
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--teal);
+      opacity: 0;
       animation: radar-pulse 2s ease-out infinite;
     }
     .radar-ring:nth-child(2) { animation-delay: 0.6s; }
     .radar-ring:nth-child(3) { animation-delay: 1.2s; }
+
     @keyframes radar-pulse {
       0%   { transform: scale(0.3); opacity: 0.8; }
       100% { transform: scale(1.6); opacity: 0; }
     }
+
     .radar-core {
-      position: absolute; inset: 50%; transform: translate(-50%, -50%);
-      width: 52px; height: 52px; border-radius: 50%;
+      position: absolute;
+      inset: 50%;
+      transform: translate(-50%, -50%);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
       background: radial-gradient(circle, rgba(51,205,182,0.25) 0%, rgba(51,205,182,0.05) 60%, transparent 100%);
-      border: 2px solid rgba(51,205,182,0.5);
-      display: flex; align-items: center; justify-content: center; font-size: 22px;
+      border: 2px solid rgba(51, 205, 182, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
     }
-    .scan-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px; color: var(--light); }
-    .scan-org { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+
+    .scan-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+      color: var(--light);
+    }
+
+    .scan-org {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
     .scan-progress-wrap { margin-bottom: 16px; }
+
     .scan-progress-pct {
-      display: flex; justify-content: space-between;
-      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
     .scan-progress-pct .pct-val { color: var(--teal); font-weight: 700; }
+
     .stage-log {
-      background: rgba(9,26,54,0.6); border: 1px solid var(--glass-border);
-      border-radius: 10px; padding: 18px 20px; text-align: left; margin-top: 24px;
-      font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      min-height: 130px; display: flex; flex-direction: column; gap: 7px;
+      background: rgba(9, 26, 54, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      text-align: left;
+      margin-top: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
     }
+
     .log-line {
-      display: flex; gap: 10px; opacity: 0; transform: translateY(4px);
+      display: flex;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(4px);
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
     .log-line.visible { opacity: 1; transform: translateY(0); }
+
     .log-time { color: var(--muted); flex-shrink: 0; }
     .log-status { color: var(--teal); flex-shrink: 0; }
-    .log-status.warn  { color: var(--orange); }
+    .log-status.warn { color: var(--orange); }
     .log-status.error { color: var(--danger, #ff4d4d); }
     .log-msg { color: var(--light); }
-    .scan-disclaimer { margin-top: 28px; font-size: 11px; color: var(--muted); opacity: 0.6; }
 
-    /* Log type badge */
-    .log-type-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(51,205,182,0.08); border: 1px solid rgba(51,205,182,0.2);
-      border-radius: 100px; padding: 4px 12px; margin-bottom: 20px;
-      font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal);
+    .scan-disclaimer {
+      margin-top: 28px;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
   <div class="scan-container">
 
-    <img class="scan-logo" src="../brand_assets/New Main Logo Project Compass Image 1.png" alt="Project Compass">
-
-    <!-- Log type badge -->
-    <div class="log-type-badge" id="log-type-badge">🌐 DNS Log</div>
+    <img class="scan-logo"
+         src="../brand_assets/New Main Logo Project Compass Image 1.png"
+         alt="Project Compass">
 
     <div class="radar-wrap">
       <div class="radar-ring"></div>
       <div class="radar-ring"></div>
       <div class="radar-ring"></div>
-      <div class="radar-core" id="radar-icon">&#128270;</div>
+      <div class="radar-core">&#128270;</div>
     </div>
 
     <div class="scan-title" id="scan-title">Running COMPASS Analysis</div>
@@ -105,50 +164,36 @@
     </div>
 
     <div class="stage-log" id="stage-log"></div>
+
     <p class="scan-disclaimer">Do not close this window during analysis.</p>
 
   </div>
 
   <script>
-    // ── Azure Function endpoints ──
-    const AZURE_ENDPOINTS = {
-      dns:      'https://compass-dns-fn.azurewebsites.net/api/parse',
-      firewall: 'https://compass-dns-fn.azurewebsites.net/api/parse',
-      proxy:    'https://compass-dns-fn.azurewebsites.net/api/parse',
-    };
+    // ---- Azure Function endpoint ----
+    const AZURE_FN_URL = 'https://compass-dns-fn.azurewebsites.net/api/parse';
 
-    // ── Log type config ──
-    const LOG_TYPE_CONFIG = {
-      dns:      { label: '🌐 DNS Log',      icon: '🌐', source: 'dns',      entryLabel: 'DNS log entries' },
-      firewall: { label: '🔥 Firewall Log', icon: '🔥', source: 'firewall', entryLabel: 'firewall entries' },
-      proxy:    { label: '🔁 Proxy Log',    icon: '🔁', source: 'proxy',    entryLabel: 'proxy requests'   },
-    };
-
-    // ── Session guard ──
+    // ---- Session guard ----
     const session = JSON.parse(sessionStorage.getItem('compass_session') || 'null');
-    if (!session || !session.org_name) { window.location.href = 'login.html'; }
-    if (session) {
-      document.getElementById('scan-org').textContent = `Analyzing logs for ${session.org_name}...`;
+    if (!session || !session.org_name) {
+      window.location.href = 'login.html';
     }
 
-    // ── Detect log type ──
-    const logType   = sessionStorage.getItem('compass_log_type') || session?.upload?.log_type || 'dns';
-    const logConfig = LOG_TYPE_CONFIG[logType] || LOG_TYPE_CONFIG.dns;
-    const AZURE_FN_URL = AZURE_ENDPOINTS[logType] || AZURE_ENDPOINTS.dns;
+    if (session) {
+      document.getElementById('scan-org').textContent =
+        `Analyzing logs for ${session.org_name}...`;
+    }
 
-    // Update badge and radar icon
-    document.getElementById('log-type-badge').textContent = logConfig.label;
-    document.getElementById('radar-icon').textContent = logConfig.icon;
+    // ---- UI helpers ----
+    const logEl   = document.getElementById('stage-log');
+    const fillEl  = document.getElementById('progress-fill');
+    const pctEl   = document.getElementById('pct-label');
 
-    // ── UI helpers ──
-    const logEl  = document.getElementById('stage-log');
-    const fillEl = document.getElementById('progress-fill');
-    const pctEl  = document.getElementById('pct-label');
-    const now    = () => new Date().toTimeString().slice(0, 8);
+    const now = () => new Date().toTimeString().slice(0, 8);
 
     function setProgress(pct) {
       fillEl.style.width = pct + '%';
-      pctEl.textContent  = pct + '%';
+      pctEl.textContent = pct + '%';
     }
 
     function addLog(status, msg) {
@@ -169,8 +214,9 @@
 
     function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+    // ---- Helper: get row count from session ----
     function getRowCount() {
-      if (session?.upload?.files) {
+      if (session && session.upload && session.upload.files) {
         const total = session.upload.files.reduce((s, f) => s + (f.rows || 0), 0);
         return total > 0 ? total.toLocaleString() : '1,240';
       }
@@ -178,18 +224,25 @@
     }
 
     function getFileCount() {
-      return session?.upload?.files?.length || 1;
+      if (session && session.upload && session.upload.files) {
+        return session.upload.files.length;
+      }
+      return 1;
     }
 
-    // ── Parse plain-text response from Azure Function ──
+    // ---- Parse plain-text response from Azure Function ----
     function parseAzureResponse(text) {
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
       const result = {
-        registry_size: 0, total_parsed: 0, flagged: 0,
-        skipped: 0, errors: 0,
+        registry_size: 0,
+        total_parsed: 0,
+        flagged: 0,
+        skipped: 0,
+        errors: 0,
         risk: { high: 0, medium: 0, low: 0, unknown: 0 },
         top_domains: []
       };
+
       for (const line of lines) {
         if (line.startsWith('Domains in registry:'))  result.registry_size = parseInt(line.split(':')[1]) || 0;
         if (line.startsWith('Total entries parsed:')) result.total_parsed  = parseInt(line.split(':')[1]) || 0;
@@ -200,50 +253,55 @@
         if (line.startsWith('medium'))  result.risk.medium  = parseInt(line.split(/\s+/)[1]) || 0;
         if (line.startsWith('low'))     result.risk.low     = parseInt(line.split(/\s+/)[1]) || 0;
         if (line.startsWith('unknown')) result.risk.unknown = parseInt(line.split(/\s+/)[1]) || 0;
-        const domainMatch = line.match(/^(\S+)\s+(.+?)\s+(high|medium|low|unknown)\s+(\d+)\s+(quer|requ|entr)/i);
+
+        // Top domains lines: "  domain.com   Category   high   42 queries"
+        const domainMatch = line.match(/^(\S+)\s+(.+?)\s+(high|medium|low|unknown)\s+(\d+)\s+quer/i);
         if (domainMatch) {
           result.top_domains.push({
-            domain:      domainMatch[1],
-            category:    domainMatch[2].trim(),
-            risk_level:  domainMatch[3].toLowerCase(),
+            domain: domainMatch[1],
+            category: domainMatch[2].trim(),
+            risk_level: domainMatch[3].toLowerCase(),
             event_count: parseInt(domainMatch[4]) || 0
           });
         }
       }
+
       return result;
     }
 
-    // ── Build detection payload ──
+    // ---- Map Azure results → seeded detection format ----
     function buildDetectionPayload(parsed, fileNames, sourceType) {
       const highCount = parsed.risk.high;
       const medCount  = parsed.risk.medium;
       const lowCount  = parsed.risk.low;
+      const src = sourceType || logType || 'dns';
 
+      // Build detected_tools from top domains
       const detected_tools = parsed.top_domains.map(d => ({
-        domain:          d.domain,
-        tool_name:       toToolName(d.domain),
-        category:        d.category,
-        risk_level:      d.risk_level,
+        domain: d.domain,
+        tool_name: toToolName(d.domain),
+        category: d.category,
+        risk_level: d.risk_level,
         approved_status: d.risk_level === 'high' ? 'restricted'
                        : d.risk_level === 'medium' ? 'review_required'
                        : 'approved',
         event_count: d.event_count,
-        users:       [],
-        source_ips:  [],
-        sources:     [sourceType],
-        actions:     d.risk_level === 'high' ? ['review_required', 'blocked'] : ['resolved']
+        users:      [],
+        source_ips: [],
+        sources: [src],
+        actions: d.risk_level === 'high' ? ['review_required', 'blocked'] : ['resolved']
       }));
 
       // Build events_by_source based on log type
       const eventsBySource = { dns: 0, proxy: 0, firewall: 0 };
-      eventsBySource[sourceType] = parsed.flagged;
+      eventsBySource[src] = parsed.flagged;
 
       return {
         assessment_id:   `assessment-${new Date().toISOString().slice(0,10)}-live`,
-        assessment_name: `Compass ${sourceType.toUpperCase()} Analysis — ${fileNames.join(', ')}`,
+        assessment_name: `Compass ${src.toUpperCase()} Analysis — ${fileNames.join(', ')}`,
         _live:           true,
         _registry_size:  parsed.registry_size,
-        _log_type:       sourceType,
+        _log_type:       src,
         summary: {
           total_events:             parsed.flagged,
           unique_tools_or_domains:  parsed.top_domains.length,
@@ -258,30 +316,31 @@
       };
     }
 
+    // ---- Convert domain to a readable tool name ----
     function toToolName(domain) {
       const map = {
-        'openai.com':'OpenAI','chat.openai.com':'ChatGPT','api.openai.com':'OpenAI API',
-        'claude.ai':'Claude','anthropic.com':'Anthropic','gemini.google.com':'Google Gemini',
-        'copilot.github.com':'GitHub Copilot','github.com':'GitHub',
-        'midjourney.com':'Midjourney','huggingface.co':'Hugging Face',
-        'character.ai':'Character.AI','perplexity.ai':'Perplexity AI',
-        'notion.so':'Notion AI','stability.ai':'Stability AI',
-        'runwayml.com':'Runway ML','elevenlabs.io':'ElevenLabs',
-        'cursor.sh':'Cursor','codeium.com':'Codeium',
-        'jasper.ai':'Jasper AI','writesonic.com':'Writesonic',
-        'grammarly.com':'Grammarly','poe.com':'Poe',
+        'openai.com': 'OpenAI', 'chat.openai.com': 'ChatGPT',
+        'api.openai.com': 'OpenAI API', 'claude.ai': 'Claude',
+        'anthropic.com': 'Anthropic', 'gemini.google.com': 'Google Gemini',
+        'copilot.github.com': 'GitHub Copilot', 'github.com': 'GitHub',
+        'midjourney.com': 'Midjourney', 'huggingface.co': 'Hugging Face',
+        'character.ai': 'Character.AI', 'perplexity.ai': 'Perplexity AI',
+        'notion.so': 'Notion AI', 'www.google.com': 'Google',
+        'mail.google.com': 'Gmail', 'mini.google.com': 'Google Mini',
       };
       if (map[domain]) return map[domain];
+      // Capitalize first segment: "jasper.ai" → "Jasper AI"
       return domain.split('.').slice(-2, -1)[0]
         .replace(/-/g, ' ')
         .replace(/\b\w/g, c => c.toUpperCase()) + ' AI';
     }
 
-    // ── Fallback ──
+    // ---- Fallback: load seeded data ----
     function loadFallbackAndRedirect(reason) {
       addLog('WARN', `Live analysis unavailable: ${reason}`);
       addLog('INFO', 'Loading demonstration data...');
       setProgress(90);
+
       fetch('../project_compass_seeded_detection_results_frontend.json')
         .then(r => r.ok ? r.json() : Promise.reject('fetch failed'))
         .then(data => {
@@ -301,45 +360,52 @@
         });
     }
 
-    // ── Main analysis flow ──
+    // ---- Main analysis flow ----
     async function runAnalysis() {
+      // Try to get file from window global set by upload.html
+      // (File objects survive same-tab navigation as window globals in most browsers)
       const hasFiles = sessionStorage.getItem('compass_has_files') === 'true';
       const fileData = sessionStorage.getItem('compass_file_data');
-      const fileName = sessionStorage.getItem('compass_file_name') || `${logType}_log.csv`;
+      const fileName = sessionStorage.getItem('compass_file_name') || 'dns_log.csv';
       const fileType = sessionStorage.getItem('compass_file_type') || 'text/csv';
-
+      
+      // Reconstruct File object from base64 stored in sessionStorage
       let files = null;
       if (hasFiles && fileData) {
         try {
-          const arr   = fileData.split(',');
-          const bstr  = atob(arr[1]);
-          let n       = bstr.length;
+          const arr = fileData.split(',');
+          const bstr = atob(arr[1]);
+          let n = bstr.length;
           const u8arr = new Uint8Array(n);
           while (n--) u8arr[n] = bstr.charCodeAt(n);
-          files = [new File([u8arr], fileName, { type: fileType })];
+          const reconstructedFile = new File([u8arr], fileName, { type: fileType });
+          files = [reconstructedFile];
+          // Clear sessionStorage after reading
           sessionStorage.removeItem('compass_file_data');
           sessionStorage.removeItem('compass_file_name');
           sessionStorage.removeItem('compass_file_type');
         } catch (err) {
+          console.error('Failed to reconstruct file:', err);
           files = null;
         }
       }
 
-      // Phase 1: Init
+      // Phase 1: Init (always show, real or demo)
       await delay(200);
       addLog('INFO', 'COMPASS engine initialized');
       setProgress(8);
 
       await delay(500);
-      addLog('INFO', `Reading ${logConfig.entryLabel} — ${getRowCount()} rows across ${getFileCount()} file(s)`);
+      addLog('INFO', `Reading DNS log entries — ${getRowCount()} rows across ${getFileCount()} file(s)`);
       setProgress(18);
 
       await delay(700);
       addLog('INFO', 'Connecting to AI domain registry (Azure SQL)...');
       setProgress(28);
 
-      // Phase 2: Real file or demo
+      // Phase 2: Attempt real API call if files are available
       if (!hasFiles || !files || files.length === 0) {
+        // No real files — use demo data
         await delay(500);
         addLog('WARN', 'No live file detected — running in demonstration mode');
         setProgress(40);
@@ -348,102 +414,73 @@
         return;
       }
 
-      const file      = files[0];
+      // Real file upload
+      const file = files[0]; // Use first file
       const fileNames = files.map(f => f.name);
 
       try {
-        addLog('INFO', `Loading "${file.name}" into local analysis engine...`);
+        addLog('INFO', `Uploading "${file.name}" to analysis engine...`);
         setProgress(35);
 
-        // Read file as text for client-side parsing
-        const fileText = await file.text();
-        const totalLines = fileText.split('\n').filter(l => l.trim() && !l.startsWith('#')).length;
+        const formData = new FormData();
+        formData.append('logfile', file);
 
-        await delay(500);
-        addLog('INFO', `Matching ${totalLines.toLocaleString()} ${logConfig.entryLabel} against AI domain registry (${(CompassParsers.RULESET || []).length} entries)...`);
+        // Fire the real API call
+        const responsePromise = fetch(AZURE_FN_URL, { method: 'POST', body: formData });
+
+        // Show progress animation while waiting (Azure Function cold start can be slow)
+        await delay(800);
+        addLog('INFO', 'Matching domains against live registry (1,199 entries)...');
         setProgress(48);
 
-        await delay(600);
+        await delay(1000);
         addLog('INFO', 'Scoring risk levels using NIST AI RMF framework...');
         setProgress(60);
 
-        // Run the appropriate parser
-        const parseResult = CompassParsers.parse(logType, fileText);
-
-        await delay(600);
-        addLog('INFO', `Correlating ${logType === 'proxy' ? 'users and HTTP methods' : logType === 'firewall' ? 'source IPs and actions' : 'source IPs'} to detected tools...`);
+        await delay(800);
+        addLog('INFO', 'Correlating source IPs to detected tools...');
         setProgress(72);
 
-        const { flagged, skipped, errors: parseErrors, summary } = parseResult;
+        // Wait for actual response
+        const response = await responsePromise;
 
-        if (flagged.length === 0 && skipped === 0) {
-          throw new Error('No parseable entries found in file — check file format matches selected log type');
+        if (!response.ok) {
+          throw new Error(`API returned ${response.status}`);
         }
 
-        await delay(500);
+        const text = await response.text();
+
+        if (!text || text.startsWith('Error:')) {
+          throw new Error(text || 'Empty response from analysis engine');
+        }
+
         setProgress(85);
         addLog('INFO', 'Building detection findings...');
 
-        const detection = CompassParsers.buildDetectionPayload(logType, parseResult, fileNames);
+        const parsed = parseAzureResponse(text);
+        const detection = buildDetectionPayload(parsed, fileNames, logType);
 
-        await delay(400);
+        await delay(600);
         setProgress(95);
 
-        const riskCounts = summary.byRisk;
-        if (riskCounts.high > 0) {
-          addLog('WARN', `${riskCounts.high} high-risk destination(s) flagged for immediate review`);
+        const highCount = parsed.risk.high;
+        const totalTools = parsed.top_domains.length;
+
+        if (highCount > 0) {
+          addLog('WARN', `${highCount} high-risk domain(s) flagged for immediate review`);
         }
 
-        // Proxy-specific warning for POST requests
-        if (logType === 'proxy') {
-          const postCount = flagged.filter(e => (e.method || '').toUpperCase() === 'POST').length;
-          if (postCount > 0) {
-            addLog('WARN', `${postCount} POST request(s) detected — potential data submission to AI services`);
-          }
-        }
-
-        // MDCA upload status — fire-and-forget; poll sessionStorage for result
-        const mdcaTriggered = sessionStorage.getItem('mdca_upload_triggered') === 'true';
-        if (mdcaTriggered) {
-          const mdcaFile = sessionStorage.getItem('mdca_upload_file') || file.name;
-          addLog('INFO', `Forwarding "${mdcaFile}" to Microsoft Defender for Cloud Apps...`);
-
-          // Wait up to 6 s for the async upload to complete before scanning finishes
-          const mdcaResult = await (async () => {
-            for (let i = 0; i < 12; i++) {
-              const raw = sessionStorage.getItem('mdca_upload_result');
-              if (raw) { try { return JSON.parse(raw); } catch { break; } }
-              await delay(500);
-            }
-            return null;
-          })();
-
-          if (mdcaResult) {
-            if (mdcaResult.blob_staged) {
-              addLog('OK', `Traffic log staged in MDCA Cloud Discovery (${mdcaResult.bytes ? (mdcaResult.bytes / 1024).toFixed(1) + ' KB' : mdcaFile}) — queued for processing`);
-            } else if (mdcaResult.success) {
-              addLog('OK', `Log synced to Microsoft Defender Cloud Discovery snapshot report`);
-            } else {
-              addLog('WARN', `MDCA sync: ${mdcaResult.reason || mdcaResult.stage || 'partial — log staged in blob storage'}`);
-            }
-          } else {
-            addLog('INFO', 'MDCA upload in progress — check Cloud Discovery for results');
-          }
-        }
-
-        if (parseErrors > 0) {
-          addLog('WARN', `${parseErrors} unparseable line(s) skipped`);
-        }
-
-        await delay(300);
-        addLog('INFO', `Analysis complete — ${Object.keys(summary.byDomain).length} AI tool(s) detected across ${flagged.length} ${logConfig.entryLabel}`);
+        await delay(400);
+        addLog('INFO', `Analysis complete — ${totalTools} AI tools detected across ${parsed.flagged} events`);
         setProgress(100);
 
+        // Save real results to session
         session.detection = detection;
         sessionStorage.setItem('compass_session', JSON.stringify(session));
+
+        // Clear the file signal
         sessionStorage.removeItem('compass_has_files');
         sessionStorage.removeItem('compass_file_count');
-        sessionStorage.removeItem('compass_log_type');
 
         await delay(700);
         addLog('OK', 'Redirecting to detection results...');
@@ -451,12 +488,14 @@
         window.location.href = 'detect.html';
 
       } catch (err) {
+        console.error('Azure Function error:', err);
         addLog('ERROR', `Analysis engine error: ${err.message}`);
         await delay(500);
         loadFallbackAndRedirect(err.message);
       }
     }
 
+    // ---- Kick off ----
     runAnalysis();
   </script>
 </body>
